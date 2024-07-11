@@ -130,7 +130,8 @@ ndat_out <- bind_rows(ndat, ndat3v) %>%
 
 
 all_dat <- ndat_out %>%
-  mutate(id = seq(1, length(ndat_out$visible), 1))
+  mutate(id = seq(1, length(ndat_out$visible), 1))%>%
+  dplyr::mutate(deploy.on.date = ymd_hms(deploy.on.date))
 
 all_dat <- all_dat %>%
   dplyr::select(-year, -month, -day, - minute, -hour)

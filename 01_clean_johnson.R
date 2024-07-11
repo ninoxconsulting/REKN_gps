@@ -167,8 +167,15 @@ working_tags <- summ %>% filter(n>1)%>%
 ## 8 tags have only 1 record and flaged as 
 
 all_dat <- all_dat |> 
-  filter(tag.id %in% working_tags )
+  filter(tag.id %in% working_tags )  %>%
+  dplyr::mutate(animal.marker.id = animal.id) |> 
+  dplyr::mutate(animal.id = str_c("SANDIS_", tag.id, "_", year(deploy.on.date)))%>%
+  dplyr::mutate(deploy.on.date = ymd_hms(deploy.on.date)) 
 
+
+
+
+#year(all_dat$deploy.on.date)
 
 # #save out file
 saveRDS(all_dat, file = file.path(output_folder, "rekn_john_20240708.rds"))

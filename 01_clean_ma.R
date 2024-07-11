@@ -6,8 +6,6 @@ library(stringr)
 library(readxl)
 library(dplyr)
 
-
-
 data_folder <- file.path("../../02_data/REKN_gps/data")
 output_folder <- file.path("../../02_data/REKN_gps/output_temp")
 
@@ -47,7 +45,7 @@ all_dat <- left_join(bout, brep )%>%
   mutate(tag.id = as.character(tag.id))%>%
   mutate(animal.id = deployment.id)
 
-head(all_dat)
+#head(all_dat)
 
 all_dat <- all_dat %>%
   mutate(tag.id = as.character(tag.id)) %>%
@@ -67,10 +65,11 @@ all_dat <- all_dat %>%
 
 all_dat <- all_dat %>% 
   dplyr::select(-individual.local.identifier, -tag.local.identifier, -animal.taxon, 
-                -deploy.off.date, - deployment.id, -animal.comments)
+                -deploy.off.date, - deployment.id, -animal.comments, -visible)
 
 all_dat <- all_dat %>%
-  mutate(id = seq(1, length(all_dat$visible), 1))
+  mutate(id = seq(1, length(all_dat$tag.id), 1))%>%
+  dplyr::mutate(deploy.on.date = ymd_hms(deploy.on.date))
 
 
 # #save out file

@@ -61,7 +61,8 @@ all_dat <- left_join(bout, brep )%>%
 head(all_dat)
 
 all_dat <- all_dat %>%
-  mutate(id = seq(1, length(all_dat$visible), 1))
+  mutate(id = seq(1, length(all_dat$visible), 1))%>%
+  dplyr::mutate(deploy.on.date = ymd_hms(deploy.on.date)) 
 
 
 # #save out file

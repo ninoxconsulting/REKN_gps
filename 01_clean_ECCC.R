@@ -5,6 +5,7 @@ library(sf)
 library(ggplot2)
 library(stringr)
 library(readxl)
+library(readr)
 library(dplyr)
 
 
@@ -16,11 +17,17 @@ raw_dat <- file.path(data_folder, "movebank_locations_20231219")
 
 # read in tracking sheet to fix categories of deployed and not deployed 
 
-
-keyyy <- read_xlsx(file.path(data_folder, "movebank_reference", "movebank_ref_all_deployments.xlsx"), sheet = "ALL_COMBINED" )%>%
+keyyy <- read_csv(file.path(data_folder, "movebank_reference", "ECCC_movebank_ref_all_deployments.csv")) %>%
   dplyr:: filter(Project == "ECCC") %>%
-  dplyr::select(track_data, ArgosID)%>%
-  rename("tag.id" = ArgosID)
+  dplyr::select(track_data, ArgosID, Banding_or_recapture_Date)%>%
+  rename("tag.id" = ArgosID)%>% 
+  dplyr::mutate(deploy.on.date = ymd(Banding_or_recapture_Date)) |> 
+  dplyr::mutate(deploy.on.date.final = make_datetime(
+         year = year(deploy.on.date), month = month(deploy.on.date), 
+         day = day(deploy.on.date), hour = 09, min = 00, sec = 00 )) #|> 
+  #dplyr::select(tag.id, track, deploy.on.date.final)
+keyyy <- dplyr::select(keyyy, c(track_data, tag.id, deploy.on.date.final))
+
 
 
 list.files(file.path(data_folder, "movebank_reference"))
@@ -43,7 +50,7 @@ brep <- brep %>%
   mutate(tag.local.identifier = tag.id)%>% 
   filter(!is.na(tag.id))
 
-uref <- unique(brep$tag.id)
+#uref <- unique(brep$tag.id)
 # 121 tags on refernce dataset
 
 # read in the location data 
@@ -58,13 +65,13 @@ bout <- btemp %>%
   mutate(date_time = ymd_hms(timestamp))
 
 
-uids <- sort(unique(bout$tag.local.identifier))
+#uids <- sort(unique(bout$tag.local.identifier))
 
-setdiff (uref, uids)
+#setdiff (uref, uids)
 #[1] 230313 238581 238590 238596 238608
 # these tags have no loccation data associated with them 
 
-setdiff (uids, uref)
+#setdiff (uids, uref)
 
 all_dat <- left_join(bout, brep )%>%
   filter(!is.na(location.long), 
@@ -129,21 +136,35 @@ summ <- all_dat %>%
   group_by(tag.id) |> 
   count()
 
+#unique(all_dat$tag.id)
 
-unique(all_dat$tag.id)
 
 # filter by the key of track type. 
-
-#failed <- keyyy %>% filter(track_data == "failed") %>% pull(tag.id)
 track <- keyyy %>% filter(track_data == "track") %>% pull(tag.id)
-#notdep <- keyyy %>% filter(track_data == "not_deployed") %>% pull(tag.id)
-
 
 all_dat <- all_dat  |> 
-  filter(tag.id %in% track)
+  filter(tag.id %in% track)%>%
+  dplyr::select(-visible)
+
+all_dat <- left_join(all_dat, keyyy)%>% 
+  dplyr::select(-deploy.on.date)%>% 
+  rename("deploy.on.date" = deploy.on.date.final)%>%
+  dplyr::mutate(deploy.on.date = ymd_hms(deploy.on.date)) 
+
+# 
+# checks <- all_dat %>% dplyr::filter(is.na(deploy.on.date)) |> 
+#   pull(tag.id)
+# 
+#   unique(checks)
+# #
 
 #length(unique(out$tag.id))
+#checks <- all_dat %>% dplyr::filter(animal.id == "") |> 
+#  pull(tag.id)
+#
+#unique(checks)
 
+# 11 tags had no refernce information 
 
 # #save out file
 clean_save = all_dat %>% mutate(proj = "ECCC")

@@ -30,7 +30,7 @@ brep <- brep %>%
                   deployment.comments,tag.manufacturer.name )) %>% 
   rename("animal.ring.id" = animal.id,
          "animal.marker.id" = deployment.comments) %>%
-  mutate(study.site = "Kiawah")
+  mutate(study.site = "KIAWAH")
 
 
 brep  <- brep [complete.cases(brep ), ]
@@ -63,10 +63,14 @@ all_dat <- left_join(bout, brep) %>%
   mutate(deploy.on.latitude = 32.53945, 
          deploy.on.longitude = -80.17069)%>%
   dplyr::filter(argos.lc != "Z")%>%
-  dplyr::filter(argos.lc != "") 
+  dplyr::filter(argos.lc != "") %>%
+  dplyr::select(-visible) |> 
+  dplyr::mutate(animal.id = str_c("KIAWAH_", tag.id, "_2023"))
+
 
 all_dat <- all_dat %>%
-  mutate(id = seq(1, length(all_dat$visible), 1))
+  mutate(id = seq(1, length(all_dat$tag.id), 1))%>%
+  dplyr::mutate(deploy.on.date = ymd_hms(deploy.on.date))
 
 
 # #save out file

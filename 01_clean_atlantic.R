@@ -108,9 +108,9 @@ brep <- brep %>%
   
 
 # 107 tags original - not_deployed or fail. 
-length(unique(brep$tag.id)) # 95 
+#length(unique(brep$tag.id)) # 95 
 
-sort(unique(brep$tag.id)) 
+#sort(unique(brep$tag.id)) 
 
 # read in track data
 
@@ -125,11 +125,11 @@ bout <- btemp %>%
                 tag.local.identifier)%>%
   mutate(date_time = ymd_hms(timestamp))
 
-length(unique(bout$tag.local.identifier))
+#length(unique(bout$tag.local.identifier))
 
 # 87 tags in the dataset 
 
-sort(setdiff(unique(brep$tag.id), unique(bout$tag.local.identifier)))
+#sort(setdiff(unique(brep$tag.id), unique(bout$tag.local.identifier)))
  #[1] 204353 204354 204355 204356 204358 204360 204363 204365 204366 204367 204368 204372
 #[13] 204373 204374 204376 204377 204378 204379 224074 224090
 
@@ -144,13 +144,10 @@ all_length = length(all_dat$visible)
 all_dat <- all_dat %>% 
     filter(!is.na(animal.id))
 
-
 edit_length = length(all_dat$visible)
 all_length - edit_length # should = 64
 
-
 #head(all_dat)#2089
-
 
 all_dat <- all_dat %>% 
   dplyr::select(-individual.local.identifier, -tag.local.identifier, -animal.taxon, 
@@ -216,11 +213,16 @@ summ <- at_tag %>%
   count()
 
 # drop the failed tags  
-failed_tags <- at_tag %>% 
-  filter(tag.id == 229329)
+#failed_tags <- at_tag %>% 
+#  filter(tag.id == 229329)
 
 at_tag <- at_tag %>% 
- dplyr::filter(tag.id != "229329")
+  dplyr::filter(tag.id != "229329")%>%
+  dplyr::select(-visible, -data.sort.temp, -edited.manually)
+
+
+at_tag <- at_tag %>%
+  dplyr::mutate(deploy.on.date = ymd_hm(deploy.on.date))
 
 
 # #save out file
@@ -236,12 +238,11 @@ saveRDS(clean_save, file = file.path(output_folder, "rekn_atlantic_20240708.rds"
 # spring data downloaded direct from movebank
 # spring data downloaded from atlantic dataset 
 
-head(spring_tag_data) # from At
-head(spring_all_dat)  # from spring tags dataset
+#head(spring_tag_data) # from At
+#head(spring_all_dat)  # from spring tags dataset
 
 ospring <- bind_rows(spring_all_dat, spring_tag_data)
-ospring <- ospring |> 
-  select(-edited.manually, -data.sort.temp)
+ospring <- ospring 
 
 ospring <- ospring |> 
   group_by(tag.id) |> 
@@ -295,12 +296,15 @@ ospring <- ospring |>
 # length(ospring$visible)
 
 ospring <- ospring %>%
- dplyr::mutate(deploy.on.date = as.character(deploy.on.date)) |> 
-  dplyr::mutate(id = seq(1, length(ospring$visible), 1))
+  dplyr::mutate(deploy.on.date = ymd_hms(deploy.on.date)) |> 
+  dplyr::mutate(id = seq(1, length(ospring$visible), 1))%>%
+  dplyr::select(-visible, -data.sort.temp, -edited.manually)
+
 
 
 # #save out file
 clean_save = ospring %>% mutate(proj = "spring_USFWS")
+
 saveRDS(clean_save, file = file.path(output_folder, "rekn_spring_usfws_20240708.rds"))
 
 

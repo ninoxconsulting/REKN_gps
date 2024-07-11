@@ -28,38 +28,14 @@ new <- readRDS(file.path(raw_dat, "rekn_newstead_20240708.rds"))
 eccc <- readRDS(file.path(raw_dat, "rekn_eccc_20240708.rds")) 
 qu <- readRDS(file.path(raw_dat, "rekn_mignon_raw_20240708.rds"))   
 
-all <- bind_rows(spring, dom, at, john, ma, oc, mils, sth, new, eccc,qu)%>%
-  select(-visible, -data.sort.temp, -edited.manually) %>%
-  dplyr::mutate( animal.taxon == "Calidris canutus")
+all <- bind_rows(eccc, spring, dom, at, john, ma, oc, mils, sth, qu, new) %>%
+  dplyr::select(-visible) %>%
+  dplyr::mutate(animal.taxon = "Calidris canutus")%>% 
+  dplyr::mutate(date_time = ymd_hms(timestamp)) %>%
+  dplyr::mutate(deploy_date_time = ymd_hms(deploy.on.date)) 
 
 
-
-
-
-
-#TO do 
-
-# at individual daataset level 
-
-# fix these peioe to import (animal_id)
-Johnson, ECCC, mingan , ma)migration, newstead 
-
-
-
-
-# for compiled dataset 
-# deploy.on.date = check format 
-
-
-
-
-# remove locations made prior to deployment date. 
-
-
-
-write.csv(all, file.path(output_folder, "compiled_20240710.csv"))
-
-
+#write.csv(all, file.path(output_folder, "compiled_202407114.csv"))
 
 # check the values 
 summ <- all %>%
@@ -73,20 +49,30 @@ summ <- unique_id %>%
   group_by(proj) |>
   count()
 
-
 unique(all$proj)
-
 unique(all$algorithm.marked.outlier)
-unique(all$visible)
 unique(all$import.marked.outlier)
-
 unique(all$study.site)
 
 
 
-
 #######################################
-# add the year, month, day values 
+# filter records than occur before deplopyment 
+# length 94262
+
+out <- all %>%
+    mutate(pre_dep = ifelse(date_time >= deploy_date_time, 1, 0 )) |> 
+    mutate(pre_dep = ifelse(is.na(pre_dep), 1, pre_dep)) |> 
+    filter(pre_dep == 1) |> 
+    dplyr::select(-pre_dep)
+  
+#write.csv(out, file.path(output_folder, "compiled_202407114.csv"))
+
+summ <- out |> 
+  group_by(tag.id, pre_dep) %>% 
+  count()
+
+# filter dates and generate the durtation 
 
 out <- all %>%
   mutate(date_time = ymd_hms(timestamp))%>%

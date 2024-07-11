@@ -59,7 +59,7 @@ qbirds <- read.csv(file.path(raw_dat, "aurey_yves", "redknotcan_6687_QuebecRawLo
 # since the initial dat compilation there has been more data added to movebank. we will check this also up to December 2023
 
  qmovebank <- read.csv(file.path(data_folder,"movebank_locations_20240706", "Red Knot rufa Migration Quebec (1).csv"))%>%
-    dplyr::mutate(argos.lc = as.character(argos.lc))%>%
+   dplyr::mutate(argos.lc = as.character(argos.lc))%>%
    dplyr::mutate(date_time = ymd_hms(timestamp))  %>%
    dplyr::mutate(year = year(date_time )) %>% 
    dplyr::mutate(tag.id = as.character(tag.local.identifier))
@@ -87,7 +87,7 @@ qb <- qb %>%
          "location.lat" = Latitude,
          "location.long" = Longitude ,
          "argos.lc" = Location.Quality) %>%
-  mutate(animal.id = str_c("MING_", tag.id ),
+  mutate(#animal.id = str_c("MING_", tag.id, "_", year),
          tag.id = as.numeric(tag.id)) %>%
   dplyr::select(- UTC_Date, -UTC_Time, -day, -hour, -minute) %>% 
   filter(!is.na(location.long), 
@@ -100,8 +100,7 @@ qb <- qb %>%
 
 allq <- bind_rows(qmovebank, qb)%>%
   dplyr::select(-visible, -event.id,-algorithm.marked.outlier)%>% 
-  #dplyr::mutate(study.name = "Red Knot rufa Migration Quebec")%>% 
-  dplyr::select(-year, -month)
+  dplyr::select(-month)
 
 
 locnos <- unique(allq$tag.id)
@@ -118,10 +117,11 @@ qout <- left_join(allq, qref, by = "tag.id")
 
 qout <- qout  %>% 
   dplyr::mutate(pt_time = ymd_hms(timestamp)) |> 
-  plyr::mutate( deploy_date_time = ymd_hms(deploy.on.timestamp)) |> 
+  dplyr::mutate( deploy_date_time = ymd_hms(deploy.on.timestamp)) |> 
   mutate(pre_dep = ifelse(pt_time >= deploy_date_time, 1, 0 )) %>% 
+  mutate(deploy.on.date = deploy_date_time)%>%
   filter(pre_dep == 1) |> 
-  dplyr::select(-Tag.ID, -deploy.on.date, -Location, -Argos_3, 
+  dplyr::select(-Tag.ID, -deploy.on.timestamp, -Location, -Argos_3, 
                 -Argos_1, -old.tag.id, -  pt_time , - deploy_date_time,
                 -pre_dep) |> 
 dplyr::mutate(tag.mass = as.numeric(tag.mass))%>%
@@ -132,7 +132,6 @@ all_dat <- qout %>%
   mutate(id = seq(1, length(qout$tag.id), 1)) %>%
   dplyr::mutate(tag.mass = as.numeric(tag.mass))%>% 
   mutate(tag.model = case_when(
-    tag.model == "lotek PinPoint 75" ~ "Lotek PinPoint GPS-Argos 75",
     tag.model == "Sunbird Lotek" ~ "Sunbird Solar Argos",
     tag.model == "lotek PinPoint 76" ~ "Lotek PinPoint GPS-Argos 75",
     #tag.model == "Loteck 5/PPT-10"  ~ "Lotek PinPoint GPS-Argos 75",
@@ -141,14 +140,14 @@ all_dat <- qout %>%
   mutate(attachment.type = deployment.comment) |> 
   dplyr::select(-lotek.crc.status.text, -mortality.status, -tag.voltage,
                 -tag.local.identifier, -individual.taxon.canonical.name,
-                -individual.local.identifier)
+                -individual.local.identifier, -external.temperature, -capture.timestamp,
+                -deployment.comment)%>%
+  mutate(animal.id = str_c("MING_", tag.id, "_", year)) %>% 
+  dplyr::select(-year, -study.name)
                 
 
   # create and animal.id
-
 #locations_idno_year_banded
-
-
 
 
 # #save out file

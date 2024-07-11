@@ -28,15 +28,41 @@ filesoi <- list.files(raw_dat)
 #####################################################
 # 1) Yves_Aubres 
 
-# download raw location data # note many have no lat longs
-qbirds <- read.csv(file.path(raw_dat, "aurey_yves", "redknotcan_6687_QuebecRawLotek.csv"))
 
 # read in reference data 
 qref <- read_xlsx(file.path(raw_dat, "aurey_yves", "ReferenceQuebec_2020_2023_ArgosDeployment26Jan2024.xlsx"), 
-                   .name_repair = "universal") %>%
-  mutate(tag.id = as.numeric(Tag.ID)) %>%
-  filter(!is.na(tag.id)) %>%
-  dplyr::select(-animal.id, -...23, -deploy.on.timestamp) 
+                  .name_repair = "universal") %>%
+  dplyr::mutate(tag.id = as.character(Tag.ID)) %>%
+  dplyr::filter(!is.na(tag.id)) %>%
+  dplyr::select(-animal.id, -...25, -deploy.on.timestamp) 
+
+
+
+# read in reference data edddited to check the tracks
+qref2 <-  read.csv(file.path(raw_dat, "aurey_yves", "movebank_ref_all_deployments.csv")) %>%
+  dplyr:: filter(Project == "Red Knot rufa Migration Quebec") %>%
+  dplyr::select(notes, track_data, Location, `deploy.on.timestamp`, ArgosID)%>%
+  rename("tag.id" = ArgosID)%>% 
+  filter(notes != "no_location_data")%>%
+  filter(track_data  !=  "not_rekn" )%>%
+  filter(track_data !=  "not_deployed")
+  #dplyr::mutate(correct_date = as.Date(`Banding_or_recapture_Date`, origin = "1900-01-01") )
+  
+length(qref2$notes)
+  
+qref <- left_join(qref2, qref)
+
+
+# download raw location data # note many have no lat longs
+qbirds <- read.csv(file.path(raw_dat, "aurey_yves", "redknotcan_6687_QuebecRawLotek.csv"))
+
+# since the initial dat compilation there has been more data added to movebank. we will check this also up to December 2023
+
+ qmovebank <- read.csv(file.path(data_folder,"movebank_locations_20240706", "Red Knot rufa Migration Quebec (1).csv"))%>%
+    dplyr::mutate(argos.lc = as.character(argos.lc))%>%
+   dplyr::mutate(date_time = ymd_hms(timestamp))  %>%
+   dplyr::mutate(year = year(date_time )) %>% 
+   dplyr::mutate(tag.id = as.character(tag.local.identifier))
 
 
 # select important cols
@@ -63,75 +89,7 @@ qb <- qb %>%
          "argos.lc" = Location.Quality) %>%
   mutate(animal.id = str_c("MING_", tag.id ),
          tag.id = as.numeric(tag.id)) %>%
-  dplyr::select(- UTC_Date, -UTC_Time, -day, -hour, -minute)
-
-
-qout <- left_join(qb, qref, by = "tag.id")
-
-
-# filter out Quebec ids that need to be updated 
-qb <- qout |> 
-  mutate(toremove = case_when(
-    tag.id == 232347 ~ 1, # this is a upland sandpiper
-    tag.id == 213948 ~ 1, 
-    tag.id == 224455 ~ 1,
-    tag.id == 232341 ~ 1, 
-    tag.id == 232342 ~ 1, 
-    tag.id == 232341 ~ 1, 
-    tag.id == 232342 ~ 1, 
-    tag.id == 232344 ~ 1, 
-    tag.id == 239414 ~ 1,
-    tag.id == 242699 ~ 1,
-    tag.id == 239423 & month == 7 ~ 1,
-    tag.id == 239420 & month == 7 ~ 1,
-    tag.id == 232346  ~1, # this is a upland sandpiper
-    tag.id == 239425 & month == 8 ~1,
-    tag.id == 229370 & year == 2022 & month ==6 ~ 1,
-    tag.id == 239414 & year == 2023 & month ==2 ~ 1,
-    tag.id == 239413 & year == 2023 & month ==2 ~ 1,
-    tag.id == 239409 & year == 2023 & month ==2 ~ 1,
-    tag.id == 239408 & year == 2023 & month ==2 ~ 1,
-    tag.id == 239412 & year == 2023 & month ==2 ~ 1,
-    tag.id == 239411 & year == 2023 & month ==7 ~ 1,
-    tag.id == 232345 & year == 2022 & month ==5~ 1,
-    tag.id == 232351 & year == 2022 & month ==5~ 1,
-    tag.id == 232352 & year == 2022 & month ==5~ 1,
-    tag.id == 232353 & year == 2022 & month ==5~ 1,
-    tag.id == 232350 & year == 2022 & month ==5~ 1,
-    tag.id == 232348 & year == 2022 & month ==5~ 1,
-    tag.id == 239408 & year == 2023 & month ==7~ 1,
-    tag.id == 239409 & year == 2023 & month ==7~ 1,
-    tag.id == 239410 & year == 2023 & month ==7~ 1,
-    tag.id == 239421 & year == 2023 & month ==7~ 1,
-    tag.id == 239412 & year == 2023 & month ==7~ 1,
-    tag.id == 239413 & year == 2023 & month ==7~ 1,
-    tag.id == 239415 & year == 2023 & month ==7~ 1,
-    tag.id == 239416 & year == 2023 & month ==7~ 1,
-    tag.id == 239417 & year == 2023 & month ==7~ 1,
-    tag.id == 239418 & year == 2023 & month ==7~ 1,
-    tag.id == 239422 & year == 2023 & month ==7~ 1,
-    tag.id == 239419 & year == 2023 & month ==7~ 1,
-    tag.id == 239424 & year == 2023 & month ==7~ 1,
-    tag.id == 239424 & year == 2023 & month ==8~ 1,
-    tag.id == 239425 & year == 2023 & month ==7~ 1,
-    tag.id == 229364 & year == 2022 & month ==6~ 1,
-    tag.id == 229363 & year == 2022 & month ==6~ 1,
-    tag.id == 229366 & year == 2022 & month ==6~ 1,
-    tag.id == 229368 & year == 2022 & month ==6~ 1,
-    tag.id == 229369 & year == 2022 & month ==6~ 1,
-    year == 2022 & month ==6~ 1,
-    location.long > 160 ~ 1, 
-    TRUE ~ NA))
-
-
-#head(qb)
-
-qb <- qb %>% 
-  filter(is.na(toremove)) %>% 
-  dplyr::select(-toremove) 
-
-# remove the ids with no lat/long or invalid locations 
-qb <- qb %>% 
+  dplyr::select(- UTC_Date, -UTC_Time, -day, -hour, -minute) %>% 
   filter(!is.na(location.long), 
          !is.na(location.lat))%>%
   mutate(tag.id = as.character(tag.id)) %>%
@@ -140,20 +98,57 @@ qb <- qb %>%
     TRUE ~ as.character(argos.lc)))%>%
   dplyr::filter(argos.lc != "Z") 
 
+allq <- bind_rows(qmovebank, qb)%>%
+  dplyr::select(-visible, -event.id,-algorithm.marked.outlier)%>% 
+  #dplyr::mutate(study.name = "Red Knot rufa Migration Quebec")%>% 
+  dplyr::select(-year, -month)
 
-all_dat <- qb  %>%
-  mutate(id = seq(1, length(qb$tag.id), 1)) %>%
-  dplyr::select(-year, -month) %>%
-  filter(!is.na(location.lat))%>%
+
+locnos <- unique(allq$tag.id)
+qrefnos <- unique(qref$tag.id)
+
+
+
+missing_refs <- setdiff(locnos,qrefnos)
+missing_locals <- setdiff(qrefnos,locnos)
+
+# join the reference to location data
+qout <- left_join(allq, qref, by = "tag.id")
+
+
+qout <- qout  %>% 
+  dplyr::mutate(pt_time = ymd_hms(timestamp)) |> 
+  plyr::mutate( deploy_date_time = ymd_hms(deploy.on.timestamp)) |> 
+  mutate(pre_dep = ifelse(pt_time >= deploy_date_time, 1, 0 )) %>% 
+  filter(pre_dep == 1) |> 
+  dplyr::select(-Tag.ID, -deploy.on.date, -Location, -Argos_3, 
+                -Argos_1, -old.tag.id, -  pt_time , - deploy_date_time,
+                -pre_dep) |> 
+dplyr::mutate(tag.mass = as.numeric(tag.mass))%>%
+  dplyr::filter(track_data == "track")%>%
+  dplyr::select(-track_data, -notes)
+
+all_dat <- qout %>%
+  mutate(id = seq(1, length(qout$tag.id), 1)) %>%
   dplyr::mutate(tag.mass = as.numeric(tag.mass))%>% 
   mutate(tag.model = case_when(
     tag.model == "lotek PinPoint 75" ~ "Lotek PinPoint GPS-Argos 75",
     tag.model == "Sunbird Lotek" ~ "Sunbird Solar Argos",
-    #tag.model == "PTT solarLotek" ~ "Solar 2-g PTT",
+    tag.model == "lotek PinPoint 76" ~ "Lotek PinPoint GPS-Argos 75",
+    #tag.model == "Loteck 5/PPT-10"  ~ "Lotek PinPoint GPS-Argos 75",
     TRUE ~ as.character(tag.model))) %>%
-  dplyr::select(-old.tag.id, -Tag.ID)%>%
-  filter(animal.taxon == "Calidris canutus") |> 
-  rename("animal.comments" = comment.for.not.working)
+  rename("animal.comments" = comment.for.not.working) |> 
+  mutate(attachment.type = deployment.comment) |> 
+  dplyr::select(-lotek.crc.status.text, -mortality.status, -tag.voltage,
+                -tag.local.identifier, -individual.taxon.canonical.name,
+                -individual.local.identifier)
+                
+
+  # create and animal.id
+
+#locations_idno_year_banded
+
+
 
 
 # #save out file

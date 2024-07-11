@@ -135,6 +135,19 @@ all_dat <- ndat_out %>%
 all_dat <- all_dat %>%
   dplyr::select(-year, -month, -day, - minute, -hour)
 
+summ <- all_dat  %>% 
+  group_by(tag.id) |> 
+  count()
+
+
+
 # #save out file
 saveRDS(all_dat, file = file.path(output_folder, "rekn_newstead_20240708.rds"))
+
+
+# write out 
+#clean_sf <- st_as_sf(all_dat, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+#st_write(clean_sf, file.path(output_folder, "pt_news_test.gpkg"), append = F)
+
+
 # 

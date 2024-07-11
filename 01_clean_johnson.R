@@ -22,12 +22,14 @@ raw_dat <- file.path(data_folder, "other_dataset")
 filesoi <- list.files(raw_dat)
 
 
-
 j17 <- read.csv(file.path(raw_dat, "johnson", "REKN_GPSprocessed_2017.csv")) %>% 
   dplyr::mutate(Lat = as.numeric(Lat), 
                 Long = as.numeric(as.character(Long)),
                 Long_new = as.numeric(Long_new), 
   )
+
+#23
+#43
 
 j18 <- read.csv(file.path(raw_dat, "johnson", "REKN_GPSprocessed_2018.csv"))
 
@@ -149,6 +151,24 @@ deploy_dates <- all_dat %>%
 
 
 all_dat <- left_join(all_dat, deploy_dates)
+
+
+
+summ <- all_dat %>% 
+  group_by(tag.id) |> 
+  count()
+
+single <- summ %>% filter(n==1)%>% 
+  pull(tag.id)
+
+working_tags <- summ %>% filter(n>1)%>% 
+  pull(tag.id)
+
+## 8 tags have only 1 record and flaged as 
+
+all_dat <- all_dat |> 
+  filter(tag.id %in% working_tags )
+
 
 # #save out file
 saveRDS(all_dat, file = file.path(output_folder, "rekn_john_20240708.rds"))

@@ -29,9 +29,12 @@ brep <- read.csv(file.path(raw_dat, filesoi_ref))
 brep <- brep %>%
   mutate(tag.local.identifier = tag.id)
 
+#length(brep$tag.id) # 61 tags 
+
 # read in track data 
 
 btemp <- read.csv(file.path(raw_dat, filesoi))
+
 bout <- btemp %>%
   dplyr::select(visible, timestamp, location.long, location.lat,
                 argos.altitude, import.marked.outlier, 
@@ -42,29 +45,6 @@ bout <- btemp %>%
                 height.above.ellipsoid)%>%
   mutate(date_time = ymd_hms(timestamp))
 
-# 
-# %>%
-#   mutate(year = year(date_time )) %>%
-#   mutate(month = month(date_time),
-#          day = day(date_time),
-#          hour = hour(date_time),
-#          minute = minute(date_time))
-
-# no.tags <- unique(bout$tag.local.identifier)
-# no.ids <- unique(bout$individual.local.identifier)
-# 
-# ids <- bout %>%
-#   dplyr::select(tag.local.identifier, individual.local.identifier) %>%
-#   group_by(tag.local.identifier, individual.local.identifier)%>%
-#   summarise(n = n())
-#   
-# ymin = min(range(bout$year))
-# ymax = max(range(bout$year))
-
-###########################
-# 
-# brep 
-# bout
 
 all_dat <- left_join(bout, brep )
 
@@ -108,7 +88,7 @@ all_dat <- all_dat %>%
 
 #save out file
 clean_save = all_dat %>% mutate(proj = "OceanWinds")
-saveRDS(clean_save, file = file.path(output_folder, "rekn_ocean_20240129.rds"))
+saveRDS(clean_save, file = file.path(output_folder, "rekn_ocean_20240708.rds"))
 
 #clean_sf <- st_as_sf(clean_save, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 #st_write(clean_sf, file.path(manual_edits, "rekn_oceanwinds_20240123.gpkg"), append = F)

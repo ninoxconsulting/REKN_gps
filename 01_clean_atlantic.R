@@ -218,7 +218,9 @@ summ <- at_tag %>%
 
 at_tag <- at_tag %>% 
   dplyr::filter(tag.id != "229329")%>%
-  dplyr::select(-visible, -data.sort.temp, -edited.manually)
+  dplyr::select(-visible, -data.sort.temp, -edited.manually) |> 
+  dplyr::filter(!is.na(location.long), 
+                !is.na(location.lat)) 
 
 
 at_tag <- at_tag %>%

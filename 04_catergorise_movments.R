@@ -136,6 +136,41 @@ st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_mispillio
 
 
 
+## ECCC
+
+
+loc2 <- loc1 %>% 
+  dplyr::mutate(movement_temp = case_when(
+    month %in% c(12,1,2) ~ "wintering",
+    month %in% c(10,9,8) ~ "south_migration",
+    month %in% c(4,5) ~ "north_migration",
+    .default = movement_temp
+  ))
+
+
+
+
+loc_eccc <- loc2 %>% dplyr::filter(proj =="ECCC") 
+clean_sf <- st_as_sf(loc_eccc, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_eccc_raw.gpkg"), append = F)
+st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_eccc_final.gpkg"), append = F)
+
+
+## MA migration 
+
+loc_ma <- loc2 %>% dplyr::filter(proj =="ma_migration") 
+
+clean_sf <- st_as_sf(loc_ma, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_ma_raw.gpkg"), append = F)
+st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_ma_final.gpkg"), append = F)
+
+
+
+
+
+
+##
+
 
 
 

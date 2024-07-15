@@ -167,9 +167,61 @@ st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_ma_final.
 
 
 
+## New stead 
 
 
-##
+loc_new <- loc2 %>% dplyr::filter(proj =="Newstead") 
+
+clean_sf <- st_as_sf(loc_new, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+
+st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_new_raw.gpkg"), append = F)
+st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_new_final.gpkg"), append = F)
+
+
+
+## atlantic
+
+
+loc_atl <- loc2 |> dplyr::filter(proj == "atlantic")
+
+clean_sf <- st_as_sf(loc_atl, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_atlantic_raw.gpkg"), append = F)
+st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_atlantic_final.gpkg"), append = F)
+
+
+
+
+## ocean winds
+
+loc3 <- loc2 |> 
+  dplyr::mutate(movement_temp = case_when(
+    tag.id.order == 1  ~ "deployment",
+    .default = movement_temp))
+
+loc_oc <- loc3 |> dplyr::filter(proj == "OceanWinds")
+
+clean_sf <- st_as_sf(loc_oc, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_ocean_raw.gpkg"), append = F)
+st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_ocean_final.gpkg"), append = F)
+
+
+
+
+## spring
+
+loc_spring <- loc3 |> dplyr::filter(proj == "spring_USFWS")
+
+clean_sf <- st_as_sf(loc_spring, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_spring_raw.gpkg"), append = F)
+st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_spring_final.gpkg"), append = F)
+
+
+
+
+
+
+
+
 
 
 

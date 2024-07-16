@@ -218,22 +218,116 @@ st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_spring_fi
 
 
 
+## Dominion
+
+loc_dom <- loc3 |> dplyr::filter(proj == "dominion")
+
+clean_sf <- st_as_sf(loc_dom, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_dom_raw.gpkg"), append = F)
+st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_dom_final.gpkg"), append = F)
 
 
+## mingan 
+
+loc_ming <- loc3 |> dplyr::filter(proj == "Mingnan")
+
+clean_sf <- st_as_sf(loc_ming, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_ming_raw.gpkg"), append = F)
+st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_ming_final.gpkg"), append = F)
 
 
+# south carolina
 
-
-
-
-
-
-loc_sthcarolina <- loc1 %>% dplyr::filter(proj =="sthcarolina_arctic") 
+loc_sthcarolina <- loc3 %>% dplyr::filter(proj =="sthcarolina_arctic") 
 
 # # write out the entire dataset 
 clean_sf <- st_as_sf(loc_sthcarolina, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_sthcarolina_raw.gpkg"), append = F)
 st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_sthcarolina_final.gpkg"), append = F)
+
+
+
+
+
+
+
+
+
+
+
+## After manual edits and vertifiaction, combine all files back together: 
+
+  
+final_input <- file.path(raw_dat, "locations_final") 
+final_dat <- file.path("../../02_data/REKN_gps/output_final")
+
+# join the manual edits together and merge to the main dataset 
+list.files(final_input, pattern = "*.gpkg$" )
+
+
+man1 <- st_read(file.path(final_input, "loc_20240712_atlantic_final.gpkg"))
+man2 <- st_read(file.path(final_input, "loc_20240712_dom_final.gpkg" ))
+man3 <- st_read(file.path(final_input, "loc_20240712_eccc_final.gpkg" ))
+man4 <- st_read(file.path(final_input,  "loc_20240712_johnson_final.gpkg"))
+man5 <- st_read(file.path(final_input,  "loc_20240712_ma_final.gpkg"  ))
+man6 <- st_read(file.path(final_input, "loc_20240712_ming_final.gpkg"  ))
+man7 <- st_read(file.path(final_input,  "loc_20240712_mispillion_final.gpkg"))
+man8 <- st_read(file.path(final_input,  "loc_20240712_new_final.gpkg"  ))
+man9 <- st_read(file.path(final_input, "loc_20240712_ocean_final.gpkg"   ))
+man10 <- st_read(file.path(final_input,  "loc_20240712_spring_final.gpkg" ))
+man11 <- st_read(file.path(final_input,  "loc_20240712_sthcarolina_final.gpkg" ))
+
+
+man_out <- bind_rows(man1, man3, man4, man5, man6, man7, man8, man9, man10, man11) 
+
+man_out <- man_out %>%
+  #man_out <- man11 %>%
+  cbind(st_coordinates(.))%>%
+  rename(location.lat = Y, 
+         location.long = X) %>%
+  st_drop_geometry()
+
+
+
+## checks 
+#length(sub_dir$tag.id)
+#length(man_out$tag.id)
+#length(st$tag.id)
+
+# stsf <- st_as_sf(man_out, coords = c("location.long", "location.lat"), crs = 4326)
+# 
+# write_sf(stsf, file.path(raw_dat, "test_edited_compiled2.gpkg"))
+# 
+# unique(stsf$proj)
+# 
+# 
+# 
+
+#### 
+## Estimate the stopover locations per state and month 
+
+install.packages("USA.state.boundaries")
+library(USA.state.boundaries)
+library(ggplot2)
+
+# load tggplot2# load the map
+
+data(state_boundaries_wgs84)
+
+us <- state_boundaries_wgs84 %>% 
+  select(NAME,  STATE_ABBR, TYPE)
+
+
+
+
+
+# plotting with ggplot2
+ggplot(state_boundaries_wgs84) + geom_sf()
+  
+  
+basic_stopovers <- man1 %>% 
+  select(movement_final)
+
 
 
 

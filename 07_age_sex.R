@@ -320,7 +320,6 @@ global
 ############# ROSELARRI SUBSPECESI ###############################
 
 
-
 # calcualte the duration of tags 
 mf_sp <- df_all %>% 
   filter(tag.id %in% mfids) %>%
@@ -348,8 +347,6 @@ mf_move_yr <- mf_move_rose |>
   mutate(yr = year(min)) |> 
   group_by(animal.sex, yr) |> 
   count()
-
-
 
 
 
@@ -400,7 +397,6 @@ global
 
 global
 ggsave(file.path(out.plots,"figure2_sex_rose.jpg"), width = 40, height = 20,units = "cm", dpi = 600)
-
 
 
 
@@ -470,9 +466,6 @@ breed_dur_sum <- breed_dur %>%
 
 
 
-
-
-
 ## Summary of tags in mingan 
 # M 
 # "194904" - 2020 - M - HY - recods in Venezuela
@@ -482,12 +475,12 @@ breed_dur_sum <- breed_dur %>%
 # "229365" - 2022 - M - HY - 
 # "229368" - 2022 - M - HY - 
 
-# femal 
-"229364" - HY (F) - 
-  "232348" - HY (F) - 
-  "232349" - HY (F) - 
-  "232351" - HY (F) - 
-  "232353" - HY (F) - 
+# # femal 
+# "229364" - HY (F) - 
+#   "232348" - HY (F) - 
+#   "232349" - HY (F) - 
+#   "232351" - HY (F) - 
+#   "232353" - HY (F) - 
   
   
   
@@ -512,11 +505,7 @@ HY_movement <- left_join(HY_movement, hy_sp)
 
 
 
-
-
-
-
-
+## FIGUE XX3 : map of unique tag which returned to the mainland. 
 
 
 allsf <- df_all %>%

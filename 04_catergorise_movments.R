@@ -12,13 +12,22 @@ raw_dat <- file.path("../../02_data/REKN_gps/output_temp")
 final_dat <- file.path("../../02_data/REKN_gps/output_final")
 
 
-# write out the entire dataset 
+
 
 # read in the ref data
 ref <- read_csv(file.path(final_dat, "reference_data_edited.csv"))
 
 loc_all <- read_csv(file.path(final_dat, "location_data_raw.csv"))
 
+length(loc_all$proj)
+
+summ_tag <- loc_all |> 
+  group_by(proj, tag.id)%>%
+  count()
+
+summ_proj <- loc_all |> 
+  group_by(proj)%>%
+  count()
 
 # split out the basic information 
 
@@ -30,6 +39,17 @@ loc <- loc_all |>
                  -  "argos.semi.minor", -"argos.sensor.1" ,  -"argos.sensor.2" ,               
                   -"argos.sensor.3", - "argos.sensor.4"  , -"argos.valid.location.algorithm", -"height.above.ellipsoid") 
     
+
+
+# keep this to add back to the full dataset later... 
+
+
+
+
+
+
+
+
 
 # general criteria 
 
@@ -111,7 +131,7 @@ loc_johnson <- loc %>% filter(proj =="Johnson_GPS")
 # # write out the entire dataset 
 clean_sf <- st_as_sf(loc_johnson, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_johnson_raw.gpkg"), append = F)
-st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_johnson_final.gpkg"), append = F)
+#st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_johnson_final.gpkg"), append = F)
 
 #head(loc)
 #unique(loc$proj)
@@ -132,7 +152,7 @@ loc_mispillion <- loc1 %>% dplyr::filter(proj =="Mispillion")
 # # write out the entire dataset 
 clean_sf <- st_as_sf(loc_mispillion, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_mispillion_raw.gpkg"), append = F)
-st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_mispillion_final.gpkg"), append = F)
+#st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_mispillion_final.gpkg"), append = F)
 
 
 
@@ -153,7 +173,7 @@ loc2 <- loc1 %>%
 loc_eccc <- loc2 %>% dplyr::filter(proj =="ECCC") 
 clean_sf <- st_as_sf(loc_eccc, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_eccc_raw.gpkg"), append = F)
-st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_eccc_final.gpkg"), append = F)
+#st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_eccc_final.gpkg"), append = F)
 
 
 ## MA migration 
@@ -162,7 +182,7 @@ loc_ma <- loc2 %>% dplyr::filter(proj =="ma_migration")
 
 clean_sf <- st_as_sf(loc_ma, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_ma_raw.gpkg"), append = F)
-st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_ma_final.gpkg"), append = F)
+#st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_ma_final.gpkg"), append = F)
 
 
 
@@ -175,7 +195,7 @@ loc_new <- loc2 %>% dplyr::filter(proj =="Newstead")
 clean_sf <- st_as_sf(loc_new, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 
 st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_new_raw.gpkg"), append = F)
-st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_new_final.gpkg"), append = F)
+#st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_new_final.gpkg"), append = F)
 
 
 
@@ -186,7 +206,7 @@ loc_atl <- loc2 |> dplyr::filter(proj == "atlantic")
 
 clean_sf <- st_as_sf(loc_atl, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_atlantic_raw.gpkg"), append = F)
-st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_atlantic_final.gpkg"), append = F)
+#st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_atlantic_final.gpkg"), append = F)
 
 
 
@@ -202,7 +222,7 @@ loc_oc <- loc3 |> dplyr::filter(proj == "OceanWinds")
 
 clean_sf <- st_as_sf(loc_oc, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_ocean_raw.gpkg"), append = F)
-st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_ocean_final.gpkg"), append = F)
+#st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_ocean_final.gpkg"), append = F)
 
 
 
@@ -213,7 +233,7 @@ loc_spring <- loc3 |> dplyr::filter(proj == "spring_USFWS")
 
 clean_sf <- st_as_sf(loc_spring, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_spring_raw.gpkg"), append = F)
-st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_spring_final.gpkg"), append = F)
+#st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_spring_final.gpkg"), append = F)
 
 
 
@@ -224,7 +244,7 @@ loc_dom <- loc3 |> dplyr::filter(proj == "dominion")
 
 clean_sf <- st_as_sf(loc_dom, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_dom_raw.gpkg"), append = F)
-st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_dom_final.gpkg"), append = F)
+#st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_dom_final.gpkg"), append = F)
 
 
 ## mingan 
@@ -233,7 +253,7 @@ loc_ming <- loc3 |> dplyr::filter(proj == "Mingnan")
 
 clean_sf <- st_as_sf(loc_ming, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_ming_raw.gpkg"), append = F)
-st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_ming_final.gpkg"), append = F)
+#st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_ming_final.gpkg"), append = F)
 
 
 # south carolina
@@ -243,7 +263,7 @@ loc_sthcarolina <- loc3 %>% dplyr::filter(proj =="sthcarolina_arctic")
 # # write out the entire dataset 
 clean_sf <- st_as_sf(loc_sthcarolina, coords = c("location.long", "location.lat"), crs = st_crs(4326))
 st_write(clean_sf, file.path(raw_dat, "locations_raw", "loc_20240712_sthcarolina_raw.gpkg"), append = F)
-st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_sthcarolina_final.gpkg"), append = F)
+#st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_sthcarolina_final.gpkg"), append = F)
 
 
 
@@ -255,7 +275,27 @@ st_write(clean_sf, file.path(raw_dat, "locations_final", "loc_20240712_sthcaroli
 
 
 
-## After manual edits and vertifiaction, combine all files back together: 
+
+##################################################################################
+####################################################################################
+
+library(lubridate)
+library(sf)
+library(stringr)
+library(readr)
+library(dplyr)
+
+
+#data_folder <- file.path("../../02_data/REKN_gps/data")
+raw_dat <- file.path("../../02_data/REKN_gps/output_temp")
+final_dat <- file.path("../../02_data/REKN_gps/output_final")
+
+
+# read in the ref data
+ref <- read_csv(file.path(final_dat, "final_tags_list_edited.csv"))
+
+
+## After manual edits and verification, combine all files back together: 
 
   
 final_input <- file.path(raw_dat, "locations_final") 
@@ -278,57 +318,17 @@ man10 <- st_read(file.path(final_input,  "loc_20240712_spring_final.gpkg" ))
 man11 <- st_read(file.path(final_input,  "loc_20240712_sthcarolina_final.gpkg" ))
 
 
-man_out <- bind_rows(man1, man3, man4, man5, man6, man7, man8, man9, man10, man11) 
+man_out <- bind_rows(man1, man2, man3, man4, man5, man6, man7, man8, man9, man10, man11) 
+length(man_out$proj)
 
-man_out <- man_out %>%
-  #man_out <- man11 %>%
-  cbind(st_coordinates(.))%>%
-  rename(location.lat = Y, 
-         location.long = X) %>%
-  st_drop_geometry()
+unique(man_out$movement_final)
 
 
+#summ_proj_sf <- man_out |> 
+#  group_by(proj)%>%
+#  count()
 
-## checks 
-#length(sub_dir$tag.id)
-#length(man_out$tag.id)
-#length(st$tag.id)
-
-# stsf <- st_as_sf(man_out, coords = c("location.long", "location.lat"), crs = 4326)
-# 
-# write_sf(stsf, file.path(raw_dat, "test_edited_compiled2.gpkg"))
-# 
-# unique(stsf$proj)
-# 
-# 
-# 
-
-#### 
-## Estimate the stopover locations per state and month 
-
-install.packages("USA.state.boundaries")
-library(USA.state.boundaries)
-library(ggplot2)
-
-# load tggplot2# load the map
-
-data(state_boundaries_wgs84)
-
-us <- state_boundaries_wgs84 %>% 
-  select(NAME,  STATE_ABBR, TYPE)
-
-
-
-
-
-# plotting with ggplot2
-ggplot(state_boundaries_wgs84) + geom_sf()
-  
-  
-basic_stopovers <- man1 %>% 
-  select(movement_final)
-
-
+st_write(man_out, file.path(final_dat, "rekn_moveclass_20240716.gpkg"), append = F)
 
 
 

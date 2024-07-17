@@ -70,6 +70,11 @@ jgps <- jd %>%
   mutate(date_time = ymd_hms(timestamp)) 
 
 
+
+
+
+
+
 jgps <- jgps %>%
   mutate(sensor.type = case_when(
     sensor.type %in% c("Doppler", "Doppler ") ~ "argos-doppler-shift", 

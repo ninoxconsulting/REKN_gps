@@ -16,25 +16,51 @@ final_dat <- file.path("../../02_data/REKN_gps/output_final")
 # read in the ref data
 ref <- read_csv(file.path(final_dat, "reference_data_edited.csv"))
 loc <- read_csv(file.path(final_dat, "location_data_raw.csv"))
+df_all <- st_read(file.path(final_dat,"rekn_moveclass_20240716.gpkg" ))
+
+
+# read in the key data
+ref_key <- read_csv(file.path(final_dat, "final_tags_list_edited.csv"))
+ref_id <- ref_key  %>% select("tag.id" , "proj", "subspecies", "subpop", 
+                              "north", "breeding" , "south","wintering" ,  
+                              "type", "usable"  )
+
+tag.ids_y <- ref_id |> filter(usable == 'y')%>% select(tag.id)%>% pull()
+
+
+df <- df_all %>% 
+  filter(tag.id %in% tag.ids_y)
+
+st_write(df, file.path(final_dat,"rekn_moveclass_20240716_usable.gpkg" ))
+
+
+
+
+# subset to the usable tags 
+
+# read in the ref data
+ref_key <- read_csv(file.path(final_dat, "final_tags_list_edited.csv"))
+ref_id <- ref_key  %>% select("tag.id" , "proj", "subspecies", "subpop", 
+                         "north", "breeding" , "south","wintering" ,  
+                         "type", "usable"  )
+
+tag.ids_y <- ref_id |> filter(usable == 'y')%>% select(tag.id)%>% pull()
+
+#
+
+ref_u <- ref |> 
+  filter(tag.id %in% tag.ids_y)
+
+
 
 
 # clean up the spatial resolution # can remove these cols. 
-unique(loc$argos.lc)
-unique(loc$lotek.crc.status)
-unique(loc$gps.fix.type.raw)
+#unique(loc$argos.lc)
+#unique(loc$lotek.crc.status)
+#unique(loc$gps.fix.type.raw)
 
 ## How many tags and types of tage 
 unique(ref$tag.model)
-
-
-
-# quick fix for reference data
-
-ref <- ref |> 
-  mutate(tag.model = case_when(
-  tag.model == "lotek PinPoint 75" ~ "Lotek PinPoint GPS-Argos 75",
-  tag.model == "Loteck 5/PPT-10" ~ "Lotek PinPoint GPS-Argos 75",
-  .default = as.character(tag.model)))
 
 
 
@@ -49,7 +75,7 @@ length(loc$proj)
 
 
 
-### SUMMARY OF ANIMALS 
+### SUMMARY OF ANIMALS ## NOTE THIS IS THE FULL DATA SET (n = 353)
 
 # tags per project 
 tag.proj <-  ref %>% 
@@ -65,29 +91,27 @@ tag.types <- ref %>%
   summarise(no.of.tags = length(unique(tag.id)))
 
 # type of fix per tag model (accuracy per tag type - only relevant for pinpoint)
-tag.types.model <- loc %>% 
-  dplyr::select(tag.id, tag.model, proj, gps.fix.type.raw) %>%
-  group_by(gps.fix.type.raw, tag.model) |> 
-  summarise(no.of.tags = length(unique(tag.id)))
-
-
-
+#tag.types.model <- loc %>% 
+#  dplyr::select(tag.id, tag.model, proj, gps.fix.type.raw) %>%
+#  group_by(gps.fix.type.raw, tag.model) |> 
+#  summarise(no.of.tags = length(unique(tag.id)))
 
 
 
 ### Capture location 
 
-study.site <- ref |> 
+study.site <- ref_u |> 
   dplyr::select(tag.id, study.site, deploy.on.date, deploy.on.latitude,  deploy.on.longitude ) |> 
   group_by(study.site) |> 
   summarise(no.of.tags = length(unique(tag.id)))
 
 
-study.site.proj <- ref |> 
+study.site.proj <- ref_u |> 
   dplyr::select(tag.id, study.site, proj ) |> 
   group_by(study.site, proj) |> 
   summarise(no.of.tags = length(unique(tag.id)))
 
+length(unique(ref_u$tag.id))
 
 # capture_loc <- ref |> 
 #   dplyr::select(tag.id, study.site,  animal.life.stage, animal.sex, deploy.on.date, deploy.on.latitude,  deploy.on.longitude ) %>%

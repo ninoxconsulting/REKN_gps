@@ -2,13 +2,14 @@
 #library(leaflet)
 #library(RColorBrewer)
 
+# combine all th individual edited dataset to produce a single dataset (not this requires a phase 2 for the migration portion)
+
 library(lubridate)
 library(sf)
 library(ggplot2)
 library(stringr)
 library(readxl)
 library(dplyr)
-
 
 #data_folder <- file.path("../../02_data/REKN_gps/data")
 raw_dat <- file.path("../../02_data/REKN_gps/output_temp")

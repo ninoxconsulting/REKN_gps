@@ -35,18 +35,7 @@ st_write(df, file.path(final_dat,"rekn_moveclass_20240716_usable.gpkg" ))
 
 
 
-
-# subset to the usable tags 
-
-# read in the ref data
-ref_key <- read_csv(file.path(final_dat, "final_tags_list_edited.csv"))
-ref_id <- ref_key  %>% select("tag.id" , "proj", "subspecies", "subpop", 
-                         "north", "breeding" , "south","wintering" ,  
-                         "type", "usable"  )
-
-tag.ids_y <- ref_id |> filter(usable == 'y')%>% select(tag.id)%>% pull()
-
-#
+# filter the refernce data 
 
 ref_u <- ref |> 
   filter(tag.id %in% tag.ids_y)
@@ -60,18 +49,18 @@ ref_u <- ref |>
 #unique(loc$gps.fix.type.raw)
 
 ## How many tags and types of tage 
-unique(ref$tag.model)
+#unique(ref$tag.model)
 
 
-
-# quick fix for location data
-length(loc$proj)
-
-loc <- loc |> 
-  dplyr::filter(year > 2000)
-
-length(loc$proj)
-
+# 
+# # quick fix for location data
+# length(loc$proj)
+# 
+# loc <- loc |> 
+#   dplyr::filter(year > 2000)
+# 
+# length(loc$proj)
+# 
 
 
 
@@ -122,25 +111,6 @@ length(unique(ref_u$tag.id))
 #write_sf(capture_loc, file.path(raw_dat , "maps", "capture_locations.gpkg"))
 
 
-
-
-
-### Summary statistics
-
-## Age / sex of individuals 
-
-## capture age and sex 
-sex_sum <- ref |> 
-  dplyr::select(tag.id, study.site, proj, animal.life.stage, animal.sex) |> 
-  group_by(animal.sex, proj) |> 
-  summarise(no.of.tags = length(unique(tag.id)))
-
-age_sum <- ref |> 
-  dplyr::select(tag.id, study.site, proj, animal.life.stage) |> 
-  #group_by(animal.life.stage , study.site) |> 
-  group_by(animal.life.stage, proj ) |> 
-  #group_by(animal.life.stage ) |> 
-  summarise(no.of.tags = length(unique(tag.id)))
 
 
 # ring-id for subpop information

@@ -32,7 +32,7 @@ tag.ids_y <- ref_id |> filter(usable == 'y')%>% select(tag.id)%>% pull()
 df <- df_all %>% 
   filter(tag.id %in% tag.ids_y)
 
-st_write(df, file.path(final_dat,"rekn_moveclass_20240716_usable.gpkg" ))
+#st_write(df, file.path(final_dat,"rekn_moveclass_20240716_usable.gpkg" ))
 
 
 
@@ -255,7 +255,7 @@ ggplot(aes(y = dur_days,
   
 
 
-ggsave(file.path(out.plots,"figure3_tag_duration.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
+#ggsave(file.path(out.plots,"figure3_tag_duration.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
 
 
 

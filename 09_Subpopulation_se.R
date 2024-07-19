@@ -166,7 +166,7 @@ global <- ggplot(data = Americas) +
   geom_sf(data = se_stopover_fall, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
   scale_color_viridis_d(name = "Movement Type") + 
   xlab("Longitude") + ylab("Latitude") +
-  coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
+  coord_sf(xlim = c(-130, -40), ylim = c(5, 80), expand = FALSE)+
   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
@@ -182,27 +182,27 @@ global
 
 ###############################################################################
 
-
-### Figure 17
-
-# Geographic distributon of all tag (all stopover data) tags 
-
-global <- ggplot(data = Americas) +
-  geom_sf(color = "grey") +
-  geom_sf(data = se, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") + 
-  facet_wrap(~tag.id)+
-  xlab("Longitude") + ylab("Latitude") +
-  coord_sf(xlim = c(-130, -20), ylim = c(-60, 80), expand = FALSE)+
- #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
-  theme_bw()+
-  theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank())
-
-global
-
-#ggsave(file.path(out.plots,"fig12_south_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
-
+# 
+# ### Figure 17
+# 
+# # Geographic distributon of all tag (all stopover data) tags 
+# 
+# global <- ggplot(data = Americas) +
+#   geom_sf(color = "grey") +
+#   geom_sf(data = se, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
+#   scale_color_viridis_d(name = "Movement Type") + 
+#   facet_wrap(~tag.id)+
+#   xlab("Longitude") + ylab("Latitude") +
+#   coord_sf(xlim = c(-130, -40), ylim = c(5, 80), expand = FALSE)+
+#  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
+#   theme_bw()+
+#   theme(axis.text.x=element_blank(),
+#         axis.text.y=element_blank())
+# 
+# global
+# 
+# #ggsave(file.path(out.plots,"fig12_south_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+# 
 
 ###############################################################################
 
@@ -210,7 +210,7 @@ global
 
 ## Breeding locations 
 
-se_breed <- se_stopover %>% filter(movement_final != "wintering")
+se_breed <- se_stopover %>% filter(movement_final == "breeding")
 
 # entire north America 
 global <- ggplot(data = Americas) +
@@ -235,19 +235,19 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+#ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
 
 ## Breeding locations - alternate 
 
-south_breed <- south %>% filter(movement_final == "breeding")
+#south_breed <- south %>% filter(movement_final == "breeding")
 
 # entire north America 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = south_breed, size = 1.5, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
+  geom_sf(data = se_breed, size = 1.5, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
   scale_color_viridis_d(name = "Tag ID") + 
   #facet_wrap(~movement_final)+
   # geom_point(ru, aes(x = lng, y = lat), size = 4) +
@@ -267,53 +267,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
-
-
-
-
-
-### 
-
-# 
-# # arrival stopover HB
-# 232982 - arrive HBay (July 21st - August 10 th) - direct to Sth Am 
-# 240161 - from Prince charles arrive (july 26th - August 15th)- via sth hamp, hb (multiple stops) - different stops on retunr than towards                                   
-# 240164 -  from Vic Is = (August 18 - Sept 23)  -multple stops in HB - ends here 
-# 240167 - from Vic is = single stop in hudson By (July 27th - August 8th)
-# 
-# # stopover delaware bay                   
-# 234375 -  depart delaware bay August 31 - banded here - direct to sth am ()                     
-# 240167 - from hudson bay (August 12 - 31th) the depart to Guyana 
-# 
-# 
-# 
-# 232982 - VicIs - Hudson Bay -                  - Marahoa - sth Brazil (multiple stops)
-# 234375 -                      DEL BAY (multiple) - GUYANA - sth Brazil
-# 240167 - VicIS - hudson Bay - DELBAY (multiple) -  GUYANA(multiple stops) - sth Brazil(multiple stops)
-# 241167 - VicIS -hudson Bay (multiple) -       - GUYANA
-# 
-# 
-# # arrive nth sth americs                      
-# 232982 - arrive  stheast maranhao (August 17th - Sept 28th) - diredct from HB         
-# 240167 - arrive October 8th - stayed to at least Dec 19th (tag ran out) - Reserva natural bahia San Blas (
-#   234375 - arrive Guyana Sept 4th - Sept 26th direct from nth america                   
-#   
-#   
-#   # arrive wintering grouds 
-#   232982 - arrive  15th Oct (mutliple stop sth brazil/ argentina) - tag died
-#   232982  - arrive Mar del plata October 1th - from Nth Sth Am.    
-#  
-
-
-
-
-
-
-
-
-
-
+#ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -322,7 +276,7 @@ ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, heig
 
 ############## Migration map ###################
 
-south_stopover <- cbind(south_stopover, st_coordinates(south_stopover))
+south_stopover <- cbind(se_stopover, st_coordinates(se_stopover))
 
 library(leaflet)
 
@@ -330,7 +284,7 @@ pal <- colorFactor(
   palette = "viridis",
   domain = unique(south_stopover$tag.id))
 
-birdmapall <- leaflet(wgwp_stopover) %>%
+birdmapall <- leaflet(south_stopover) %>%
   #addProviderTiles("CartoDB.DarkMatter") %>%
   addProviderTiles("CartoDB") %>%
   addCircleMarkers(lng = south_stopover$X, lat = south_stopover$Y, 
@@ -345,140 +299,197 @@ birdmapall <- leaflet(wgwp_stopover) %>%
 birdmapall
 
 
-#deployemtn summary 
 
-#"234375" - southward NJ
-# "240158" "240159" 240164", 240165",  "240167",  "241166",  "241167""229312", 229314,-Piexe 
-# "232982", 240168 , 213835, 213841  - NJ nth 
+####################################################
 
-
-
-# # fall migration - depart date 
-
-# 240158 - depart Lago de Piexe/ sth sth Am - may 15th
-# 240159 - depart Lago de Piexe/ sth sth Am - May 24 h 2023
-# 240164 - depart Lago de Piexe - April 11 th and depart sth sth Am may 27th 2023
-# 240165 - depart Lago de Piexe - April 26th depart sth sth depart may 27th 
-# "241166 -  depart Lago de Piexe -   April 13th  depart sth sth depart may 27th 
-# 240167 - depart Lago de Piexe - April 10 th and depart sth sth Am may 29th 2023
-# 241167 - depart Lago de Piexe - April 26 th and depart sth sth Am may 25th 2023
-
-############################## 240166 - depart Lago de Piexe/ sth sth Am - May 8th 2023
-############################### 241166 - depart Lago de Piexe/ sth sth Am - May 1st 2023
-
-
-# #Depart Nth Brazil 
-# 240158 - depart Marahao - may 15th 
-# 240159 - depart Marahao - may 24th
-# 241166 - depart Marahao - may 27th
-# 240164 - depart Marahao = may 27th 
-# 241167 - depart New Amsterdam - May 25th
-# 240165 - depart New Amsterdam = may 27th 
-# 241167 - depart Amapa - May 30th 
-# 
-# #Depart US mainland 
-# 213830 - depart del bay May 24th (2021)
-# 213835 - Depart del Bay - june 1 (2021) - tagged in delbay (unknown arrival)
-# 213841 - Depart del Bay - june 1 (2021) - tagged in delbay (unknown arrival)
-# 232982 - Depart del Bay - May 30th (2023) - tagged in delbay (unknown arrival)
-# 240156  - depart del Bay May 29 2023 - tagged in delbay (unknown arrival)
-# 240159  - depart del Bay May 31 2023) (arrive 29th May) 
-# 240158  - depart sthport (nth carolina)  june 7th 2023 (arrive 20th May) 
-# 240161  - depart del bay - May 29 2023 - tagged in delbay (unknown arrival)
-# 240164  - depart del bay - June 20th 2023 - multiple stops on mainland(arrive 2nd june)
-# 240165  - depart del bay - June 15th 2023 - multiple stops on mainland (arrive 6th june)
-# 240167  - depart del bay - June 11th 2023 - arrive june 4th
-# 240166  - depart del bay - June 11th 2023 - arrive june 1st
-# 240167  - depart del bay - June 8th 2023 - arrive May 27th 
-# 
-# 
-# #Arrive/depart Hudson bay - noth bound 
-# 229312 arrive sth carolina may 18th / virginia beach / 25th - 28th May skip DEL BAY 
-# 240164 arrive Nth Caroline june 2 to june 17 / del bay (june 18 - 21)    *multiple stops) - 2023 - 4 days 
-# 210165 arrive Nth Crolin june 3rd to june 8th / del bay june 11 - 16th  
-# 240158 arrive nth Carolina may 20 - may 30 th / skip DEL BAY 
-# 240167 arrive Virginia june 3rd to june 11  
-# 241166 arrive Virginia - june 1 to 11th h 
-# 241167 arrive virginia/maryland may 27th to June 8th  
-# 240159 arrive del bay june 2 and depart June 8 (multiple stops)- 2023 - 5 days
-# 
-# those bankded at delaware bay 
-
-#232982, - deploy Del bay depart May 31
-#213835, - deploy Del Bay - depart june 1
-#213841 - deploy Del Bay - depart june 1
-# 240168 arrive del bay may 16th = 30th
+## SE migration spring north 
 
 
 
 
+## Nth Bound 
+###  Depart US 
 
-# # arrive/depart breeding grounds 
-# 240168 arrive prinec of wales isladn Juen 6 and tag dies Sept 8th 
-# 232982 arrive Victoria is June 9th and July 16 th depart is  - DEPARTURE 
-# 240158 arrive Victoria is June 12th - til ? tag died 
-# 213841 arrive Victoria is june 14th - Sept 19 (tag died ?())
-# 240159 arrive Victoria is June 17th and july 11 (last transmit)
-# 240167 arrive Victoria is june 22 and depart July 26th (full record)- DEPARTURE 
-# 240166 arrive Victoria is june 22 and depart July 4th (tag died)
-#  arrive Coasts Is june 14th - july 2nd (tag died?) 
-# 240167 -june 21 and depart Jule 16th (full record)
-# 240164 arrive Prince of wales island june 29th - depart july 21 (full record)- DEPARTURE 
- 
- 
+# 213829  - Del Bay depart may 28th - head north (toronto - tag died)
 
-# south bound migration 
+# 213833  - Del Bay depart (May 28th) 
+#          -  East James Bay (may 29/30 - dropped tag here) 
 
-# # arrival stopover HB
-# 232982 - From Vic Is  -  hudson bay and james bay (July 20 - August 10 ) James Bay  - DIRECT TO STH AM (arrive August 15th) 
-# 240164 - (TAG DIES - from Prince of Wales  - suuthern hudson Bay (near Nelson river) (August 18 -  Sept 23)  - ends here 
-# 240167 - from Vic is = single stop in sth hudson By (July 27th - August 10th) - continue to Del Bay _ Sth Am
-# 240168- from Prince of wales - south Hudson bay (August 6 - 17th) then james bay (August 18 - 24) - direct Nth America                           
-# 241167 - from Vic is = ultiple short stop, then james bay single stop in hudson By (July 27th - August 10th) - direct to Sth AM 
+
+## EASTERN ARCTI
+
+# 242658  _ Kiawah Beach (stayed in area - depart - May 13)
+#         - Monom (May 13 - 29)
+#         - Eastern James Bay - (May 31 - june 6)       7 days 
+#         - Baffin Is (June 7 -15) 
+#         - Breeding : prince Charles Is (June 16 - August 10) 
+#         ....more
+
+# 213831   -  Del Bay depart (May 28th)  
+#          - East James Bay (may 30 - Juen 10th ) - 10 days 
+#          - Coats Isalnd (June 11 - June 16 ) - last transmission (possible breeding?)
+
+
+## WEST
+
+# 230306 - - Del Bay depart (June 1 ) 
+#           - Nelson River, (June 4 - 10)
+#           - multiple short stops Queen Maud Gulf Bird Sanctuary ()
+#           - Vic Island - breeding ground arrive (June 20 - july 12)
+
+
+# 213830  - Del Bay depart (May 24th)  - 
+#            - EAST JAMES BAY (May 29 th to June 6th ) _ 7 days 
+#            - multiple stops on Nelson River, Arviat - (June 7th)
+#            - stopover King william (June 12th)  
+#            - Vic Isalnd (breeding ground - arr June 20 - Sept 8th - dropped tag here)
+
+# 242656  _ Kiawah Beach (stayed in area - depart - May 23)
+#         - EAST JAMES BAY (May 24 - June 3 ) _ 9 days 
+#          - HB Nelson River (June 4 - June 7 )
+#          - multiple short stops Queen Maud Gulf Bird Sanctuary ?Victoria Is ()
+#          - Vic Island - breeding ground arrive (June 10 - August 3)
+##          ....more
+
+
+# 242657  - _ Kiawah Beach (stayed in area - depart - May 22)
+#          - Delaware Bay (May 25 - May 28)
+#          - Eastern James Bay - (june 1 -6)  -  5 days 
+#          - Hiurarryuaa / King William Isalnad (june 7 - 9)
+#          - Breeding : Prince of Wales june 9 - August 4)
+#           ....more
+          
+
+
+
+##########################################################
+#South from breeding grounds 
+
+# west Arctic
+
+#'
+# 242656  _ Kiawah Beach (stayed in area - depart - May 23)
+#         - EAST JAMES BAY (May 24 - June 3 ) _ 9 days 
+#          - HB Nelson River (June 4 - June 7 )
+#          - multiple short stops Queen Maud Gulf Bird Sanctuary ?Victoria Is ()
+#          - Vic Island - breeding ground arrive (June 10 - August 3)
+##          ....more
+#          - brd of Nunavut and manitoba (August 8 - 16)
+#          - North Carolina (August 18 - 20 ) 
+#          - Sth carolina (same as deploymet local)August 20 - Dec 12 - possible dropped tag? 
+          
+
+# 242657  - _ Kiawah Beach (stayed in area - depart - May 22)
+#          - Delaware Bay (May 25 - May 28)
+#          - Eastern James Bay - (june 1 -6)  -  5 days 
+#          - Hiurarryuaa / King William Isalnad (june 7 - 9)
+#          - Breeding : Prince of Wales june 9 - August 4)
+#           ....more
+#           - brd of Nunavut and manitoba (August 6 -7 )
+#           - WEST JAMES BAY (August 8 - 19) 
+#           - Sth Caroline August 20 - Oct 8
+#           - Georgia - (OCt 8 - 31)
+
+
+#EAST Arctic 
+
+# 242658  _ Kiawah Beach (stayed in area - depart - May 13)
+#         - Monom (May 13 - 29)
+#         - Eastern James Bay - (May 31 - june 6)       7 days 
+#         - Baffin Is (June 7 -15) 
+#         - Breeding : prince Charles Is (June 16 - August 10) 
+#         ....more
+#         - Westn James Bay (Akimiski island bird Sanctuary - (August 12 -24) 
+#         - Flew direct to Cuba (August 28 - Oct 7)
+
+
 #
 
 
-# # stopover delaware bay                   
-# 234375 -  depart delaware bay August 31 - banded here - direct to sth am ()                     
-# 240167 - from hudson bay (August 12 - 31th) the depart to Guyana 
-# 
-# 
-# 
-# 232982 - VicIs - Hudson Bay -                  - Marahoa - sth Brazil (multiple stops)
-# 234375 -                      DEL BAY (multiple) - GUYANA - sth Brazil
-# 240167 - VicIS - hudson Bay - DELBAY (multiple) -  GUYANA(multiple stops) - sth Brazil(multiple stops)
-# 241167 - VicIS -hudson Bay (multiple) -       - GUYANA
-# 
-# 
-# # arrive nth sth americs                      
-# 232982 - arrive  stheast maranhao (August 17th - Sept 28th) - diredct from HB         
-# 240167 - arrive October 8th - stayed to at least Dec 19th (tag ran out) - Reserva natural bahia San Blas (
-#   234375 - arrive Guyana Sept 4th - Sept 26th direct from nth america                   
-#   
-#   
-#   # arrive wintering grouds 
-#   232982 - arrive  15th Oct (mutliple stop sth brazil/ argentina) - tag died
-#   232982  - arrive Mar del plata October 1th - from Nth Sth Am.    
-#   
-#   
-#   
-#   # 
-#   # hist(bddvisit$revisits, breaks = 20, main = "", xlab = "Revisits (radius = 2)")
-#   # summary(bddvisit$revisits)
-#   # 
-#   # head(bddvisit$revisitStats)
-#   # 
-#   # 
-#   # par(mfrow = c(1, 2), mar = c(4, 4, 1, 1))
-#   # plot(martinvisit, martin, legendPos = c(13, -10))
-#   # 
-#   # 
-#   # 
-#   # 
-#   # 
-#   # 
-#   # 
-#   # 
+## Tags deployed ## 
+
+# north Carolina (5) 
+
+# 221844 - atlantic shores - Deployed (nov 12 - 19) \
+#          - Southport, NOrth Carolina (nov   Dec 6) # tag dies 
+
+# 221845- atlantic shores - Deployed (nov 12 - 18) 
+#          - Pamlico sound, NOrth Carolina (nov 19  Dec 5) # tag dies 
+
+# 221847 - atlantic shores - Deployed (nov 12 - 22) 
+#          - Pamlico sound, NOrth Carolina (nov 11  - 25 ) # tag dies 
+
+# 221850- atlantic shores - Deployed (nov 12 - 13) 
+#          - Pamlico sound, NOrth Carolina (nov 14  -  Dec 5 ) # tag dies
+
+# 221856- atlantic shores - Deployed (nov 12 - 13) 
+#          - Pamlico sound, NOrth Carolina (nov 14  -  Dec 5 ) # tag dies 
+
+
+
+## florida (2)
+
+# 221858- atlantic shores - Deployed (nov 12 - 13) 
+#         - Daytona Beach , Florida  (nov 15 - 26 ) # tag dies 
+
+# 221863 -  atlantic shores - Deployed (nov 12 - 22) 
+#         - cAPE cARNAVERAL, Florida  (nov 24 - 26 ) # tag dies 
+
+
+
+#VIrginia(1)
+
+# 221860- atlantic shores - Deployed (nov 12 - 13) 
+#          - Exmore, Virginia (nov 13- 14 ) # tag dies 
+#          - atlantic shores, Virginia (nov 15 -  noV 26 ) # tag dies 
+#         - Exmore, Virginia (nov 27 -  Dec 5 ) # tag dies 
+
+
+
+## Sth Carolina(1)
+
+# 221866 - atlantic shores - Deployed (nov 12 - 13) 
+#         - north Charlston, Sth Carolina (nov 16 - Dec 10 )
+
+
+
+
+
+
+
+## NORTH - nEW YORK (1)
+# 233931 - Atlantic Coast deployed (Sept 30 - Oct 11)
+#           - Long Island New York (Oct 11 - 26 )
+
+# NEW JERSEY (1)
+#234376 - Atlantic Coast deployed (August 15- Oct 19) - two distinct stopovers Stone harbour and Brigantine
+
+
+## CARIBEAN (5)
+#224080- atlantic shores - Deployed (August 21 - 22) 
+#        - north Charlston, Sth Carolina (Aug 25 - Sept 10 )
+#        -  Bahamas (Sep 14 - 20) - tags dies 
+
+#234370 - Atlantic Coast deployed (August 26 -Dec 4)
+#        -  Bahamas (Dec 6 - 14) - tags dies 
+
+#224082 -  atlantic shores - Deployed (August 21 - 28)
+#       - Sapelo Island WMA, Georgia  - Deployed (August 30 - sept 12)
+#       - Cuba   (Sept 12 - sept 24 )
+
+# 224088 - atlantic shores - Deployed (August 27 - 29) 
+#        -Cuba  (Sep 1- 26) - tags dies 
+
+
+
+#236444 - deploy Monomoy NJ, August 27 - 30 
+# - Barbuda is Sept 3 - 25- depart directly souuth (unusual for SE) more similar to NSA migration pattern?
+
+
+
+
+
+
 
 
 

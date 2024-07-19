@@ -66,15 +66,15 @@ df_stopover_subset <- st_read(file.path(out.plots , "rufa_stopovers.gpkg"))
 
 #############################################################################
 
-# south
+# south  east
 
 ##############################################################################
 
-south_id <- pop_id %>% filter(subpop == "South" ) |> arrange(type)
+se_id <- pop_id %>% filter(subpop == "SE" ) |> arrange(type)
 
 # all locations 
-south <- df_all %>% 
-  filter(tag.id %in% south_id $tag.id) %>%
+se<- df_all %>% 
+  filter(tag.id %in% se_id $tag.id) %>%
   mutate(movement_final = case_when(
     movement_final == "deployment" ~ "north_migration",
     .default = movement_final
@@ -84,18 +84,18 @@ south <- df_all %>%
 
 
 # stopoverlocations
-south_stopover <-df_stopover_subset |> 
-  filter(tag.id %in% south_id $tag.id) %>%
-  mutate(movement_final = case_when(
-    movement_final == "deployment" ~ "north_stopover",
-    .default = movement_final
-  )) %>% 
+se_stopover <-df_stopover_subset |> 
+  filter(tag.id %in% se_id $tag.id) %>%
+# mutate(movement_final = case_when(
+#    movement_final == "deployment" ~ "north_stopover",
+#    .default = movement_final
+#  )) %>% 
   filter(keep >1) %>% 
   dplyr::select(-movement_final_next, -toremove, -toremove2, -keep)
 
 
-south_dur <- dur_type_move %>% 
-  filter(tag.id %in% south_id$tag.id)
+se_dur <- dur_type_move %>% 
+  filter(tag.id %in% se_id$tag.id)
 
 
 
@@ -125,9 +125,9 @@ south_dur <- dur_type_move %>%
 
 
 ########################################################
-# Geographic distributon of tags ## figure 11 - spring
+# Geographic distributon of tags ## figure 16- spring
 
-south_stopover_spring <- south |> 
+se_stopover_spring <- se |> 
   filter(movement_final != "south_stopover")
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -136,25 +136,24 @@ Americas <- world %>% dplyr::filter(region_un == "Americas")
 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = south_stopover_spring, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
+  geom_sf(data = se_stopover_spring, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
   scale_color_viridis_d(name = "Movement Type") + 
   xlab("Longitude") + ylab("Latitude") +
-  coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
-  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
+  coord_sf(xlim = c(-130, -40), ylim = c(5, 80), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
         axis.text.y=element_blank())
 
 global
 
-ggsave(file.path(out.plots,"fig11_south_stopovers__fall_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+#ggsave(file.path(out.plots,"fig16_se_stopovers__fall_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
 ###########################################################
-# Geographic distributon of tags ## figure 11 - fall
+# Geographic distributon of tags ## figure 16 - fall
 
-south_stopover_fall <- south |> 
+se_stopover_fall <- se |> 
   filter(movement_final != "north_stopover")
 
 
@@ -164,7 +163,7 @@ Americas <- world %>% dplyr::filter(region_un == "Americas")
 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = south_stopover_fall, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
+  geom_sf(data = se_stopover_fall, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
   scale_color_viridis_d(name = "Movement Type") + 
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
@@ -175,7 +174,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig11_south_stopovers_spring_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+#ggsave(file.path(out.plots,"fig16_south_stopovers_spring_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -184,13 +183,13 @@ ggsave(file.path(out.plots,"fig11_south_stopovers_spring_combined.jpg"), width =
 ###############################################################################
 
 
-### Figure 12
+### Figure 17
 
 # Geographic distributon of all tag (all stopover data) tags 
 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = south, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
+  geom_sf(data = se, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
   scale_color_viridis_d(name = "Movement Type") + 
   facet_wrap(~tag.id)+
   xlab("Longitude") + ylab("Latitude") +
@@ -202,7 +201,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig12_south_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+#ggsave(file.path(out.plots,"fig12_south_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 ###############################################################################
@@ -211,12 +210,12 @@ ggsave(file.path(out.plots,"fig12_south_stopovers_pertag.jpg"), width = 30, heig
 
 ## Breeding locations 
 
-south_breed <- south_stopover %>% filter(movement_final == "breeding")
+se_breed <- se_stopover %>% filter(movement_final != "wintering")
 
 # entire north America 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = south_breed, size = 2.1, aes(colour= movement_final)) +#colour = "dark blue") +
+  geom_sf(data = se_breed, size = 2.1, aes(colour= movement_final)) +#colour = "dark blue") +
   scale_color_viridis_d(name = "Movement Type") + 
   #facet_wrap(~movement_final)+
   # geom_point(ru, aes(x = lng, y = lat), size = 4) +

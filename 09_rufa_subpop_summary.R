@@ -161,21 +161,4 @@ st_write(df_stopover_subset , file.path(out.plots , "rufa_stopovers.gpkg"), appe
 
 
 
-#############################################################
-
-# get the first departure and also the 
-
-#############################################################
-
-dur_type_move
-
-## arrive brewedfing grounds 
-
-arrive_breed <- dur_type_move %>% 
-  filter(movement_final == "breeding")
-
-
-## depart breeding grounds 
-
-
 

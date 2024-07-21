@@ -115,8 +115,8 @@ HY_movement <- left_join(HY_movement, hy_sp)
 
 
 # NOte of interest 
-2022 cohort depart 
-2023 got caught in storm 
+#2022 cohort depart 
+#2023 got caught in storm 
 
 
 # calculate the departure dates and success
@@ -238,6 +238,8 @@ mf_movement_all <- left_join(mf_movement , mf_sp_sth)
 
 
 
+
+
 ############# RUFA SUBSPECESI ###############################
 
 
@@ -255,11 +257,11 @@ mf_movement <- mf_movement_all |>
 # "229368" - 2022 - M - HY - 
 
 # femal 
-"229364" - HY (F) - 
-"232348" - HY (F) - 
-"232349" - HY (F) - 
-"232351" - HY (F) - 
-"232353" - HY (F) - 
+#"229364" - HY (F) - 
+#"232348" - HY (F) - 
+#"232349" - HY (F) - 
+#"232351" - HY (F) - 
+#"232353" - HY (F) - 
 
 
 
@@ -381,8 +383,8 @@ world <- ne_countries(scale = "medium", returnclass = "sf")
 global <- ggplot(data = world) +
   geom_sf(color = "grey") +
   #geom_sf(data = mf_rose_sf, size = 1.2, alpha = 0.2,colour ="darkblue" ) + #aes(fill = movement_dir, colour = movement_dir))+#colour = "dark blue") +
-  geom_sf(data = mf_rose_sf, size = 2.5,aes(fill = movement_final, colour = movement_final) ) + #aes(fill = movement_dir, colour = movement_dir))+#colour = "dark blue") +
-  scale_color_viridis_d(option = "viridis",begin = 0.1)+
+  geom_sf(data = mf_rose_sf, size = 2.5,aes( colour = movement_final) ) + #aes(fill = movement_dir, colour = movement_dir))+#colour = "dark blue") +
+  scale_color_viridis_d(option = "viridis",begin = 0.1, name = "Movement category")+
   facet_wrap(~animal.sex)+
   # geom_point(ru, aes(x = lng, y = lat), size = 4) +
   xlab("Longitude") + ylab("Latitude") +

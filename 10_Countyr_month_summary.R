@@ -29,7 +29,8 @@ pop_id <- pop %>%
          "north", "breeding" , "south","wintering" ,  
          "type", "usable"  ) |> 
   filter(usable == 'y') %>% 
-  filter(subspecies == "rufa") #%>%
+  filter(subspecies == "rufa") %>%
+  select(-usable, -north, -breeding, -south, -wintering)
   #left_join(ref_due)
 
 rufa_ids <- pop_id$tag.id
@@ -53,18 +54,33 @@ rufa_ids <- pop_id$tag.id
 #world <- ne_countries(scale = "medium", returnclass = "sf") %>% select (admin)
 #st_write(world, file.path(out.plots, "world.gpkg"))
 
-
+### read in intersected table 
 
 int <- st_read(file.path(final_dat, "rekn_moveclass_20240716_usable_world_ca_us_int.gpkg"))
- 
+
 ## add the subpop to the table 
   
-intt <- int |> 
-  select(-"admin", - "NAME", -"STATE_ABBR", -"PRNAME", - "PREABBR" ) |> 
-  left_join(pop_id)%>% 
-  select(-tag.model, -usable, -north, -breeding, -south, -wintering, -tag.id.order, -proj) |> 
-  mutate(weekno = week(date_time)) 
-  
+inn <- int |> 
+  select(tag.id, date_time, year, month, movement_final, admin, NAME, STATE_ABBR, PRNAME, PREABBR)%>% 
+  st_drop_geometry() |> 
+  dplyr::mutate(country = case_when(
+    is.na(admin) & !is.na(NAME) ~ "United States of America",
+    is.na(admin) & !is.na(PRNAME) ~ "Canada",
+    .default = admin
+  ))|> 
+  dplyr::mutate(state = case_when(
+     !is.na(NAME) ~ NAME,
+     !is.na(PRNAME) ~ PRNAME,
+    .default = NA
+  ))%>% 
+  filter(movement_final %in% c("deployment", "south_stopover", "north_stopover" , "breeding", "wintering" ))
+
+
+
+intt <- inn |> 
+  select(-"admin",  -"NAME", -"STATE_ABBR", -"PRNAME", -"PREABBR" ) |> 
+  left_join(pop_id)
+
 # 
 # ## Summary by Week of year 
 # cs <- intt |> 
@@ -81,8 +97,7 @@ intt <- int |>
 ## Summary by Month 
 
 ms <- intt |> 
-  st_drop_geometry() |> 
-  select(-date_time, -year, -weekno, -subspecies, -type, -movement_final) |> 
+  select(-date_time, -year,  -subspecies, -type, -movement_final) |> 
   filter(!is.na(country)) |> 
   distinct()
 
@@ -90,30 +105,9 @@ ms_summ <- ms|>
   group_by(country, state, subpop, month) |>
   count()
 
+write.csv(ms_summ , file.path(final_dat, "figures", "country_by_month_occupancy.csv"))
 
 
 
 
-
-
-
-
-co_sum <- int |> 
-  st_drop_geometry()
-  group_by(year, month, country, state, tag.id) |> 
-  count()
-
-
-
-
-%>% 
-  filter(tag.id %in% rufa_ids ) %>% 
-  filter(movement_final != "uncertain_location")
-
-# plotting with ggplot2
-ggplot(state_boundaries_wgs84) + geom_sf()
-
-
-basic_stopovers <- man1 %>% 
-  select(movement_final)
 

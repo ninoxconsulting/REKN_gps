@@ -147,7 +147,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig11_south_stopovers__fall_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+#ggsave(file.path(out.plots,"fig11_south_stopovers__fall_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -175,7 +175,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig11_south_stopovers_spring_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+#ggsave(file.path(out.plots,"fig11_south_stopovers_spring_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -202,7 +202,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig12_south_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+#ggsave(file.path(out.plots,"fig12_south_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 ###############################################################################
@@ -249,12 +249,13 @@ south_breed <- south %>% filter(movement_final == "breeding")
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
   geom_sf(data = south_breed, size = 1.5, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Tag ID") + 
+ # scale_color_viridis_d(name = "Tag ID") + 
+  scale_color_brewer(palette = "Spectral", name = 'Tag ID')+
   #facet_wrap(~movement_final)+
   # geom_point(ru, aes(x = lng, y = lat), size = 4) +
   # xlab("Longitude") + ylab("Latitude") +
   #coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
-  coord_sf(xlim = c(-125, -60), ylim = c(50, 79), expand = FALSE)+
+  coord_sf(xlim = c(-120, -70), ylim = c(59, 78), expand = FALSE)+
   theme_bw()+
   #labs(colour = "Type") + 
   theme(
@@ -268,7 +269,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+#ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -463,24 +464,6 @@ birdmapall
 #   
 #   
 #   
-#   # 
-#   # hist(bddvisit$revisits, breaks = 20, main = "", xlab = "Revisits (radius = 2)")
-#   # summary(bddvisit$revisits)
-#   # 
-#   # head(bddvisit$revisitStats)
-#   # 
-#   # 
-#   # par(mfrow = c(1, 2), mar = c(4, 4, 1, 1))
-#   # plot(martinvisit, martin, legendPos = c(13, -10))
-#   # 
-#   # 
-#   # 
-#   # 
-#   # 
-#   # 
-#   # 
-#   # 
-
 
 
 

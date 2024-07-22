@@ -148,8 +148,6 @@ global
 
 #ggsave(file.path(out.plots,"fig16_se_stopovers__fall_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
-
-
 ###########################################################
 # Geographic distributon of tags ## figure 16 - fall
 
@@ -187,19 +185,19 @@ global
 # 
 # # Geographic distributon of all tag (all stopover data) tags 
 # 
-# global <- ggplot(data = Americas) +
-#   geom_sf(color = "grey") +
-#   geom_sf(data = se, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
-#   scale_color_viridis_d(name = "Movement Type") + 
-#   facet_wrap(~tag.id)+
-#   xlab("Longitude") + ylab("Latitude") +
-#   coord_sf(xlim = c(-130, -40), ylim = c(5, 80), expand = FALSE)+
-#  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
-#   theme_bw()+
-#   theme(axis.text.x=element_blank(),
-#         axis.text.y=element_blank())
-# 
-# global
+global <- ggplot(data = Americas) +
+  geom_sf(color = "grey") +
+  geom_sf(data = se, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
+  scale_color_viridis_d(name = "Movement Type") +
+  facet_wrap(~tag.id)+
+  xlab("Longitude") + ylab("Latitude") +
+  coord_sf(xlim = c(-130, -40), ylim = c(5, 80), expand = FALSE)+
+ #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
+  theme_bw()+
+  theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+global
 # 
 # #ggsave(file.path(out.plots,"fig12_south_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 # 
@@ -222,6 +220,37 @@ global <- ggplot(data = Americas) +
   # xlab("Longitude") + ylab("Latitude") +
   #coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
   coord_sf(xlim = c(-125, -60), ylim = c(50, 79), expand = FALSE)+
+  theme_bw()+
+  #labs(colour = "Type") + 
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank()
+    #legend.title = "", 
+    #legend.position = "bottom",
+    #legend.key.width = unit(3, "lines")
+  )
+
+global
+
+## alteernate breding plot 
+
+se_breed <- se_stopover %>% filter(movement_final == "breeding")
+
+# entire north America 
+global <- ggplot(data = Americas) +
+  geom_sf(color = "grey") +
+  geom_sf(data = se_breed, size = 3, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
+  #scale_color_viridis_d(name = "Movement Type") + 
+  #geom_sf(data = south_breed, size = 1.5, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
+  # scale_color_viridis_d(name = "Tag ID") + 
+  scale_color_brewer(palette = "Spectral", name = 'Tag ID')+
+  #facet_wrap(~movement_final)+
+  # geom_point(ru, aes(x = lng, y = lat), size = 4) +
+  # xlab("Longitude") + ylab("Latitude") +
+  #coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
+  coord_sf(xlim = c(-120, -70), ylim = c(59, 78), expand = FALSE)+
+ # coord_sf(xlim = c(-125, -60), ylim = c(50, 79), expand = FALSE)+
   theme_bw()+
   #labs(colour = "Type") + 
   theme(
@@ -269,6 +298,37 @@ global
 
 #ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
+
+# 
+# 
+# ## WINTERING 
+# 
+# se_winter <- se %>% filter(movement_final == "wintering")
+# 
+# # entire north America 
+# global <- ggplot(data = Americas) +
+#   geom_sf(color = "grey") +
+#   geom_sf(data = se_winter, size = 1.5, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
+#   scale_color_viridis_d(name = "Tag ID") + 
+#   #facet_wrap(~movement_final)+
+#   # geom_point(ru, aes(x = lng, y = lat), size = 4) +
+#   # xlab("Longitude") + ylab("Latitude") +
+#   coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
+#   #coord_sf(xlim = c(-125, -60), ylim = c(50, 79), expand = FALSE)+
+#   theme_bw()+
+#   #labs(colour = "Type") + 
+#   theme(
+#     axis.text = element_blank(),
+#     axis.ticks = element_blank(),
+#     axis.title = element_blank()
+#     #legend.title = "", 
+#     #legend.position = "bottom",
+#     #legend.key.width = unit(3, "lines")
+#   )
+# 
+# global
+
+#ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -489,7 +549,39 @@ birdmapall
 
 
 
+## wintering 
 
+# 221844 - atlantic shores - Deployed (nov 12 - 19) \
+#          - Southport, NOrth Carolina (nov   Dec 6) # tag dies 
+
+# 221845- atlantic shores - Deployed (nov 12 - 18) 
+#          - Pamlico sound, NOrth Carolina (nov 19  Dec 5) # tag dies 
+
+# 221847 - atlantic shores - Deployed (nov 12 - 22) 
+#          - Pamlico sound, NOrth Carolina (nov 11  - 25 ) # tag dies 
+
+# 221850- atlantic shores - Deployed (nov 12 - 13) 
+#          - Pamlico sound, NOrth Carolina (nov 14  -  Dec 5 ) # tag dies
+
+# 221856- atlantic shores - Deployed (nov 12 - 13) 
+#          - Pamlico sound, NOrth Carolina (nov 14  -  Dec 5 ) # tag dies 
+
+# 221860- atlantic shores - Deployed (nov 12 - 13) 
+#          - Exmore, Virginia (nov 13- 14 ) # tag dies 
+#          - atlantic shores, Virginia (nov 15 -  noV 26 ) # tag dies 
+#         - Exmore, Virginia (nov 27 -  Dec 5 ) # tag dies 
+
+# 221863 -  atlantic shores - Deployed (nov 12 - 22) 
+#         - cAPE cARNAVERAL, Florida  (nov 24 - 26 ) # tag dies 
+
+# 221866 - atlantic shores - Deployed (nov 12 - 13) 
+#         - north Charlston, Sth Carolina (nov 16 - Dec 10 )
+ 
+# 234370 - Atlantic Coast deployed (August 26 -Dec 4)
+#        -  Bahamas (Dec 6 - 14) - tags dies 
+
+# 221858- atlantic shores - Deployed (nov 12 - 13) 
+#         - Daytona Beach , Florida  (nov 15 - 26 ) # tag dies 
 
 
 

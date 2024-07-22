@@ -221,13 +221,19 @@ se_breed <- se_stopover %>% filter(movement_final == "breeding")
 # entire north America 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = se_breed, size = 2.1, aes(colour= movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") + 
+  geom_sf(data = se_breed, size = 2.1, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
+  scale_color_brewer(palette = "Spectral", name = 'Tag ID')+
   #facet_wrap(~movement_final)+
   # geom_point(ru, aes(x = lng, y = lat), size = 4) +
   # xlab("Longitude") + ylab("Latitude") +
   #coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
-  coord_sf(xlim = c(-125, -60), ylim = c(50, 79), expand = FALSE)+
+  coord_sf(xlim = c(-120, -70), ylim = c(59, 78), expand = FALSE)+
+  #scale_color_viridis_d(name = "Movement Type") + 
+  #facet_wrap(~movement_final)+
+  # geom_point(ru, aes(x = lng, y = lat), size = 4) +
+  # xlab("Longitude") + ylab("Latitude") +
+  #coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
+  #coord_sf(xlim = c(-125, -60), ylim = c(50, 79), expand = FALSE)+
   theme_bw()+
   #labs(colour = "Type") + 
   theme(

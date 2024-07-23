@@ -166,7 +166,7 @@ _Figure 2: Distribution of Red Knot rufa Western subpopulation (n = 15). Points 
 ## all points 
 
 bdat_sp <- df_all %>% 
-  filter(subpop == "west")%>% 
+  filter(subpop == "NSA")%>% 
   arrange(tag.id)
 
 pal <- colorFactor(

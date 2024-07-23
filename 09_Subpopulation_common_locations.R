@@ -92,6 +92,9 @@ br_summ <- br_stoppovers |> group_by(subpop) |>
 
 
 
+world <- ne_countries(scale = "medium", returnclass = "sf")
+Americas <- world %>% dplyr::filter(continent == "North America")
+
 # entire north America 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
@@ -101,7 +104,8 @@ global <- ggplot(data = Americas) +
   # geom_point(ru, aes(x = lng, y = lat), size = 4) +
   # xlab("Longitude") + ylab("Latitude") +
   #coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
-  coord_sf(xlim = c(-125, -60), ylim = c(50, 79), expand = FALSE)+
+  coord_sf(xlim = c(-120, -70), ylim = c(59, 78), expand = FALSE)+
+  #coord_sf(xlim = c(-125, -60), ylim = c(50, 79), expand = FALSE)+
   theme_bw()+
   #labs(colour = "Type") + 
   theme(

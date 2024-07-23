@@ -1,0 +1,230 @@
+---
+title: "Understanding migration and breeding patterns of <i>rufa</i> Red Knot subpopulations"
+author: "Ninox Consulting Ltd"
+date: "2024-07-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+### Background
+
+The following graphics provide interactive maps to explore satellite locations recorded for Red Knot rufa subpopulation. These graphics are part of a more detailed report (**Migratory Bird Satellite Tracking Synthesis: Using cutting edge data to advance understanding of Red Knot migration and breeding patterns**). 
+
+
+Satelitte tags were used to track the distribution of 201 <i>rufa</i> Red Knots and 46 <i>roselaari</i> Red Knots. Individuals were reviewed and categorized into subpopulations following discussion with experts and draft recovery plan mapping.
+
+<i>Rufa</i> subspecies (n = 210) were assigned under the following categories: 
+
+- Southeast US/Caribbean (SE) : 25 birds
+
+- Northern South America (NSA) : 31 birds
+
+- Western Gulf of Mexico, Central America, Pacific Coast of South America (Western): 15 birds
+
+- Tierra del Fuego and Patagonia (Southern): 14 birds
+
+- Uncertain: 116 birds
+
+
+Note: These maps contained all location points not filtered to a specific level of spatial accuracy. 
+
+```{r set up data, echo = FALSE, message = FALSE, warnings = FALSE }
+
+####################################################################################
+library("rnaturalearth")
+library("rnaturalearthdata")
+library(lubridate)
+library(sf)
+library(stringr)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library (gganimate)
+library(ggspatial)
+library(leaflet)
+
+
+final_dat <- file.path("../../02_data/REKN_gps/output_final")
+
+# read in the sub_population list 
+
+pop <- read_csv(file.path(final_dat, "final_tags_list_edited.csv"))
+pop_id <- pop %>% 
+  dplyr::select("tag.id" , "subspecies", "subpop", 
+         "usable"  ) |> 
+  filter(usable == 'y') 
+
+rufa_ids <- pop_id$tag.id
+
+## read in compiled data with movements and limit to rufa 
+
+df_all <- st_read(file.path(final_dat,"rekn_moveclass_20240716_usable.gpkg" ), quiet = T) %>% 
+  filter(tag.id %in% rufa_ids ) %>% 
+  filter(movement_final != "uncertain_location") %>% 
+  select(tag.id, month, date_time,day, tag.id.order, movement_final )%>% 
+  left_join(pop_id)
+
+#sp <- unique(df_all$subpop)
+df_all <- cbind(df_all , st_coordinates(df_all ))
+
+```
+
+
+### Map description
+
+For each of the maps below, each point is a recorded location with colours corresponding to a unique bird. 
+Click on the point to see the bird id and date and time the location was recorded. Note grey lines link successive locations by date and represent straight line distance for orientation only.
+
+Maps can be zoomed in and out using the + and - on the top right of each map. 
+
+## 1. Southeast US/Caribbean (SE_US)
+
+```{r semap, echo = FALSE, message = FALSE, warnings = FALSE}
+
+## all points 
+
+bdat_sp <- df_all %>% 
+  filter(subpop == "SE")%>% 
+  arrange(tag.id)
+
+pal <- colorFactor(
+ #palette = "viridis",
+  palette = "magma",
+  domain = unique(bdat_sp$tag.id))
+
+
+birdmapall <- leaflet(bdat_sp) %>%
+  #addProviderTiles("CartoDB.DarkMatter") %>%
+  addProviderTiles("CartoDB") %>%
+  addCircleMarkers(lng = bdat_sp$X, lat = bdat_sp$Y, 
+                   weight = 4, 
+                   color = ~pal(bdat_sp$tag.id), 
+                   fill = TRUE,
+                   label = ~bdat_sp$tag.id,
+                   radius = ~2 ,
+                   popup = paste("Bird id:", bdat_sp$tag.id, "<br>",
+                           "Date:", bdat_sp$date_time)) %>%
+  addPolylines(data = bdat_sp, lng = bdat_sp$X, lat = bdat_sp$Y,
+               color = "grey",   opacity = 0.1, stroke = TRUE)# %>%
+
+birdmapall
+
+```
+
+_Figure 1: Distribution of Red Knot rufa Southeast US and Caribbean subpopulation (n = 25). Points represent recorded locations via satellite tags, with colors corresponding to a unique tag id. Note grey lines link successive locations by date and represent straight line distance for orientation only._
+
+
+
+## Western Gulf of Mexico, Central America, Pacific Coast of South America (Western) 
+
+
+```{r westmap, echo = FALSE, message = FALSE, warnings = FALSE}
+
+## all points 
+
+bdat_sp <- df_all %>% 
+  filter(subpop == "west")%>% 
+  arrange(tag.id)
+
+pal <- colorFactor(
+ #palette = "viridis",
+  palette = "magma",
+  domain = unique(bdat_sp$tag.id))
+
+
+birdmapall <- leaflet(bdat_sp) %>%
+  #addProviderTiles("CartoDB.DarkMatter") %>%
+  addProviderTiles("CartoDB") %>%
+  addCircleMarkers(lng = bdat_sp$X, lat = bdat_sp$Y, 
+                   weight = 4, 
+                   color = ~pal(bdat_sp$tag.id), 
+                   fill = TRUE,
+                   label = ~bdat_sp$tag.id,
+                   radius = ~2 ,
+                   popup = paste("Bird id:", bdat_sp$tag.id, "<br>",
+                           "Date:", bdat_sp$date_time)) %>%
+  addPolylines(data = bdat_sp, lng = bdat_sp$X, lat = bdat_sp$Y,
+               color = "grey",   opacity = 0.1, stroke = TRUE)# %>%
+
+birdmapall
+
+```
+
+_Figure 2: Distribution of Red Knot rufa Western subpopulation (n = 15). Points represent locations recorded via satellite tags, with colors corresponding to a unique tag id. Note grey lines link successive locations by date and represent straight line distance for orientation only._
+
+
+## Northern South America (NSA) 
+
+
+```{r nsamap, echo = FALSE, message = FALSE, warnings = FALSE}
+
+## all points 
+
+bdat_sp <- df_all %>% 
+  filter(subpop == "west")%>% 
+  arrange(tag.id)
+
+pal <- colorFactor(
+  palette = "magma",
+  domain = unique(bdat_sp$tag.id))
+
+
+birdmapall <- leaflet(bdat_sp) %>%
+  addProviderTiles("CartoDB") %>%
+  addCircleMarkers(lng = bdat_sp$X, lat = bdat_sp$Y, 
+                   weight = 4, 
+                   color = ~pal(bdat_sp$tag.id), 
+                   fill = TRUE,
+                   label = ~bdat_sp$tag.id,
+                   radius = ~2 ,
+                   popup = paste("Bird id:", bdat_sp$tag.id, "<br>",
+                           "Date:", bdat_sp$date_time)) %>%
+  addPolylines(data = bdat_sp, lng = bdat_sp$X, lat = bdat_sp$Y,
+               color = "grey",   opacity = 0.1, stroke = TRUE)# %>%
+
+birdmapall
+
+```
+
+_Figure 3: Distribution of Red Knot rufa northern South America (NSA) subpopulation (n = 31). Points represent locations recorded via satellite tags, with colors corresponding to a unique tag id. Note grey lines link successive locations by date and represent straight line distance for orientation only._
+
+
+#	Tierra del Fuego and Patagonia (Southern)
+
+```{r echo = FALSE, message = FALSE, warnings = FALSE}
+
+## all points 
+
+bdat_sp <- df_all %>% 
+  filter(subpop == "South")%>% 
+  arrange(tag.id)
+
+pal <- colorFactor(
+ #palette = "viridis",
+  palette = "magma",
+  domain = unique(bdat_sp$tag.id))
+
+
+birdmapall <- leaflet(bdat_sp) %>%
+  addProviderTiles("CartoDB") %>%
+  addCircleMarkers(lng = bdat_sp$X, lat = bdat_sp$Y, 
+                   weight = 4, 
+                   color = ~pal(bdat_sp$tag.id), 
+                   fill = TRUE,
+                   label = ~bdat_sp$tag.id,
+                   radius = ~2 ,
+                   popup = paste("Bird id:", bdat_sp$tag.id, "<br>",
+                           "Date:", bdat_sp$date_time)) %>%
+  addPolylines(data = bdat_sp, lng = bdat_sp$X, lat = bdat_sp$Y,
+               color = "grey",   opacity = 0.1, stroke = TRUE)# %>%
+
+birdmapall
+
+```
+
+_Figure 4: Distribution of Red Knot rufa Tierra del Fuego and Patagonia (Southern) subpopulation (n = 14). Points represent locations recorded via satellite tags, with colors corresponding to a unique tag id. Note grey lines link successive locations by date and represent straight line distance for orientation only._

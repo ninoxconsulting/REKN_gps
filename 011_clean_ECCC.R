@@ -9,10 +9,10 @@ library(readr)
 library(dplyr)
 
 
-data_folder <- file.path("../../02_data/REKN_gps/data")
-output_folder <- file.path("../../02_data/REKN_gps/output_temp")
+data_folder <- file.path("./02_data/REKN_gps/data") # "./" refers to the current working directory, with the subsequent folders below
+output_folder <- file.path("./02_data/REKN_gps/output_temp")
 
-raw_dat <- file.path(data_folder, "movebank_locations_20231219")
+raw_dat <- file.path(data_folder, "movebank_locations_20251210")
 
 
 # read in tracking sheet to fix categories of deployed and not deployed 
@@ -20,7 +20,7 @@ raw_dat <- file.path(data_folder, "movebank_locations_20231219")
 keyyy <- read_csv(file.path(data_folder, "movebank_reference", "ECCC_movebank_ref_all_deployments.csv")) %>%
   dplyr:: filter(Project == "ECCC") %>%
   dplyr::select(track_data, ArgosID, Banding_or_recapture_Date)%>%
-  rename("tag.id" = ArgosID)%>% 
+  rename("tag.id" = ArgosID)%>%
   dplyr::mutate(deploy.on.date = ymd(Banding_or_recapture_Date)) |> 
   dplyr::mutate(deploy.on.date.final = make_datetime(
          year = year(deploy.on.date), month = month(deploy.on.date), 

@@ -1,5 +1,5 @@
 
-# South Carolina
+### South Carolina or "Southeast USA to Arctic" ###
 
 library(lubridate)
 library(sf)
@@ -10,14 +10,14 @@ library(readxl)
 library(dplyr)
 
 
-data_folder <- file.path("../../02_data/REKN_gps/data")
-output_folder <- file.path("../../02_data/REKN_gps/output_temp")
+data_folder <- file.path("./02_data/REKN_gps/data")
+output_folder <- file.path("./02_data/REKN_gps/output_temp")
 
-raw_dat <- file.path(data_folder, "movebank_locations_20231219")
+raw_dat <- file.path(data_folder, "movebank_locations_20251210")
 
 
 # data_set3 : spring migration 
-key = "South Carolina"
+key = "Southeast USA" # changed from South Carolina based on the name of the downloaded files for this area
 
 filesoi <- list.files(raw_dat, pattern = key)
 filesoi_ref <- filesoi[1]
@@ -27,9 +27,11 @@ filesoi <- filesoi[2]
 brep <- read.csv(file.path(raw_dat, filesoi_ref))
 brep <- brep %>%
   dplyr::select(c(tag.id , "animal.id" , deploy.on.date, animal.life.stage, tag.model, animal.sex,
-                  deployment.comments,tag.manufacturer.name )) %>% 
+                  #deployment.comments # this column does not exist in the downloaded data
+                  ,tag.manufacturer.name )) %>% 
   rename("animal.ring.id" = animal.id,
-         "animal.marker.id" = deployment.comments) %>%
+         #"animal.marker.id" = deployment.comments # this column does not exist in the downloaded data
+         ) %>%
   mutate(study.site = "KIAWAH")
 
 
@@ -75,7 +77,7 @@ all_dat <- all_dat %>%
 
 # #save out file
 clean_save = all_dat  %>% mutate(proj = "sthcarolina_arctic")
-saveRDS(clean_save, file = file.path(output_folder, "rekn_sthcarolina_20240708.rds"))
+saveRDS(clean_save, file = file.path(output_folder, "rekn_sthcarolina_20251211.rds"))
 
 
 # write out 

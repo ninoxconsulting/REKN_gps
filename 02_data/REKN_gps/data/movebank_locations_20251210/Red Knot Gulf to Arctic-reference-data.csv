@@ -1,0 +1,73 @@
+tag-id,animal-id,animal-taxon,deploy-on-date,deploy-off-date,animal-marker-id,animal-ring-id,animal-sex,animal-taxon-detail,deploy-on-person,deployment-comments,deployment-id,tag-manufacturer-name,tag-model,tag-serial-no
+228165,9*E,Calidris canutus,,,,,,Rufa or rosleaari,,,,,,
+228182,9*C,Calidris canutus,,,,,,Rufa or roselaari,,,,,,
+232599,9*A,Calidris canutus,,,,,,Rufa or roselaari,,,,,,
+201139,J3+,Calidris canutus,2020-05-01 00:00:00.000,,,1332-94773,,rufa or roselaari,DN,"27.302672, -97.340618
+",Padre Island National Seashore - TX spring,Lotek Wireless,PinPoint 75,PP01489
+201133,J2+,Calidris canutus,2020-05-01 00:00:00.000,,,133294774,,rufa or roselaari,,,Padre Island National Seashore - spring Texas,Lotek Wireless,PinPoint 75,PP01483
+201134,J5+,Calidris canutus,2020-05-04 00:00:00.000,,,133294788,,rufa or roselaari,,,Padre Island National Seashore - spring Texas J5+,Lotek Wireless,PinPoint 75,PP01484
+201135,J6+,Calidris canutus,2020-05-04 00:00:00.000,,,133294789,,rufa or roselaari,,,Padre Island National Seashore - spring Texas J6+,Lotek Wireless,PinPoint 75,PP01485
+201138,U0+,Calidris canutus,2020-09-23 00:00:00.000,,,133294792,,rufa or roselaari,,,,Lotek Wireless,PinPoint 75,PP01488
+201149,U1+,Calidris canutus,2020-09-23 00:00:00.000,,,133294793,,rufa or roselaari,,,,Lotek Wireless,PinPoint 75,PP01499
+201171,U2+,Calidris canutus,2020-09-23 00:00:00.000,,,133294794,,rufa or roselaari,,,,Lotek Wireless,PinPoint 75,PP01521
+201147,U6+,Calidris canutus,2020-09-23 00:00:00.000,,,133294796,,rufa or roselaari,,,,Lotek Wireless,PinPoint 75,PP01497
+201154,U7+,Calidris canutus,2020-09-23 00:00:00.000,,,133294797,,rufa or roselaari,,,,Lotek Wireless,PinPoint 75,PP01504
+201155,U9+,Calidris canutus,2020-09-23 00:00:00.000,,,133294798,,rufa or roselaari,,,,Lotek Wireless,PinPoint 75,PP01505
+201132,8A+,Calidris canutus,2020-10-01 00:00:00.000,,,133294833,,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01482
+201141,Y0+,Calidris canutus,2020-10-01 00:00:00.000,,,133294817,,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01491
+201148,X2+,Calidris canutus,2020-10-01 00:00:00.000,,,133294810,,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01498
+201172,8K+,Calidris canutus,2020-10-01 00:00:00.000,,,133294838,,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01522
+201173,V8+,Calidris canutus,2020-10-01 00:00:00.000,,,133294806,,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01523
+201174,V5+,Calidris canutus,2020-10-01 00:00:00.000,,,133294803,,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01524
+201165,L6+,Calidris canutus,2021-04-26 00:00:00.000,,,133294900,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01515
+201145,L4+,Calidris canutus,2021-04-26 00:00:00.000,,,133294899,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01495
+201137,K9+,Calidris canutus,2021-04-26 00:00:00.000,,,133294893,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01487
+201160,L0+,Calidris canutus,2021-04-26 00:00:00.000,,,133294894,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 7,01510
+201163,318,Calidris canutus,2021-04-26 00:00:00.000,,,133294690,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01513
+201159,K6+,Calidris canutus,2021-04-26 00:00:00.000,,,133294890,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01509
+201150,K3+,Calidris canutus,2021-04-26 00:00:00.000,,,133294887,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01500
+201143,312,Calidris canutus,2021-04-26 00:00:00.000,,,133294684,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01493
+201140,326,Calidris canutus,2021-04-27 00:00:00.000,,,133294698,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01490
+201164,201,Calidris canutus,2021-04-27 00:00:00.000,,,133267359,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01514
+201169,M9+,Calidris canutus,2021-04-27 00:00:00.000,,,139242712,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01519
+201151,M0+,Calidris canutus,2021-04-27 00:00:00.000,,,133242704,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01501
+201156,354,Calidris canutus,2021-04-28 00:00:00.000,,,139242728,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01506
+201158,355,Calidris canutus,2021-04-28 00:00:00.000,,,139242729,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01508
+201162,350,Calidris canutus,2021-04-28 00:00:00.000,,,139242724,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01512
+201168,351,Calidris canutus,2021-04-28 00:00:00.000,,,139242725,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01518
+201152,N1+,Calidris canutus,2021-04-28 00:00:00.000,,,139242714,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01502
+201142,365,Calidris canutus,2021-04-30 00:00:00.000,,,139242739,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01492
+201146,366,Calidris canutus,2021-04-30 00:00:00.000,,,139242740,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01496
+201167,367,Calidris canutus,2021-04-30 00:00:00.000,,,139242741,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01517
+201153,378,Calidris canutus,2021-10-21 00:00:00.000,,,139242752,u,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01503
+201144,379,Calidris canutus,2021-10-21 00:00:00.000,,,139242753,u,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01494
+201161,380,Calidris canutus,2021-10-21 00:00:00.000,,,139242754,u,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01511
+201170,386,Calidris canutus,2021-10-21 00:00:00.000,,,139242760,u,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01520
+201136,388,Calidris canutus,2021-10-21 00:00:00.000,,,139242762,u,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01486
+201157,P9+,Calidris canutus,2021-10-21 00:00:00.000,,,133294864,u,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01507
+201166,389,Calidris canutus,2021-10-21 00:00:00.000,,,139242763,u,rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,01516
+228164,0*U,Calidris canutus,2022-10-07 00:00:00.000,,,139242851,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,02275
+228174,0*V,Calidris canutus,2022-10-07 00:00:00.000,,,139242852,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,02285
+228176,0*J,Calidris canutus,2022-10-07 00:00:00.000,,,139242843,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,02287
+228185,0*X,Calidris canutus,2022-10-07 00:00:00.000,,,139242850,u,Rufa or roselaari,,,,Lotek Wireless,Pinpoint 75,02296
+228166,3*V,Calidris canutus,2023-05-12 00:00:00.000,,,,,,,,,,,
+262986,7*A,Calidris canutus,2024-05-16 11:15:00.000,,1392-55602,,,Rufa or roselaari,,,,Lotek Wireless,PinPoint 75,59000
+233128,7*H,Calidris canutus,2024-05-16 11:15:00.000,,1392-55605,,,Rufa or roselaari,,,,Lotek Wireless,PinPoint 75,02404
+228181,7*E,Calidris canutus,2024-05-16 16:10:00.000,,1392-55604,,,Rufa or roselaari,,,,Lotek Wireless,PinPoint 75,02292
+228184,7*J,Calidris canutus,2024-05-16 16:10:00.000,,1392-55606,,,Rufa or roselaari,,,,Lotek Wireless,PinPoint 75,02295
+262989,7*K,Calidris canutus,2024-05-16 16:10:00.000,,1392-55607,,,Rufa or roselaari,,,,Lotek Wireless,PinPoint 75,59003
+232601,7*C,Calidris canutus,2024-05-16 16:10:00.000,,1392-55603,,,Rufa or roselaari,,,,Lotek Wireless,PinPoint 75,02424
+228170,7*L,Calidris canutus,2024-05-16 19:25:00.000,,1392-55608,,,Rufa or roselaari,,,,Lotek Wireless,PinPoint 75,02281
+228177,7*N,Calidris canutus,2024-05-17 10:25:00.000,,1392-55610,,,Rufa or roselaari,,,,Lotek Wireless,PinPoint 75,02288
+228171,7*P,Calidris canutus,2024-05-17 10:25:00.000,,1392-55611,,,Rufa or roselaari,,,,Lotek Wireless,PinPoint 75,02282
+163171,,,,,,,,,,,,,,
+175770,,,,,,,,,,,,,,
+212359,,,,,,,,,,,,,,
+212360,,,,,,,,,,,,,,
+212361,,,,,,,,,,,,,,
+212362,,,,,,,,,,,,,,
+212363,,,,,,,,,,,,,,
+228172,,,,,,,,,,,,,,
+239725,,,,,,,,,,,,,,
+239727,,,,,,,,,,,,,,
+262987,,,,,,,,,,,,,,

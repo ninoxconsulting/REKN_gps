@@ -1,7 +1,8 @@
 
 #########################################################################
-# 3)  (Newstead)
+### 3)  (Newstead) or "Gulf to Arctic" ###
 
+# Read in R packages #
 library(lubridate)
 library(sf)
 library(adehabitatHR)
@@ -10,27 +11,41 @@ library(stringr)
 library(readxl)
 library(dplyr)
 
-
-data_folder <- file.path("../../02_data/REKN_gps/data")
-output_folder <- file.path("../../02_data/REKN_gps/output_temp")
-
-
-raw_dat <- file.path(data_folder, "other_dataset")
-
-filesoi <- list.files(raw_dat)
+# Set Input and Output folder paths #
+data_folder <- file.path("./02_data/REKN_gps/data")
+output_folder <- file.path("./02_data/REKN_gps/output_temp")
 
 
+#raw_dat <- file.path(data_folder, "other_dataset") # changed this to point to the same raw data location as others
+raw_dat <- file.path(data_folder, "movebank_locations_20251210")
 
-ndatr <- read_xlsx(file.path(raw_dat, "Newstead","CBBEP_Newstead_Red Knot Gulf to Arctic.xlsx"), 
-                   .name_repair = "universal")
+#filesoi <- list.files(raw_dat) # no longer reading all files in the folder, see addition of keyword below
 
-nref<- read_xlsx(file.path(raw_dat, "Newstead","CBBEP_Newstead_Red Knot Gulf to Arctic.xlsx"), 
-                 sheet = 'Capture Data', .name_repair = "universal") %>% 
-  mutate(animal.id = individual.local.identifier) %>%
-  rename("animal.sex" = Sex, 
-         "animal.life.stage" = Age, 
-         "animal.ring.id" = Band.number) 
+# Set keyword to use to pull desired datasets
+key = "Gulf to Arctic" # added keyword variable similar to sth carolina script
 
+# Pull location and reference data file names based on keyword
+filesoi <- list.files(raw_dat, pattern = key)
+filesoi_ref <- filesoi[1]
+filesoi <- filesoi[2]
+
+# Read in location data
+ndatr <- read.csv(file.path(raw_dat, filesoi)) # replaced read in of location data for CSV, downloaded data no longer xlsx format
+  #read_xlsx(file.path(raw_dat, "Newstead","Red Knot Gulf to Arctic.xlsx"), # removed "CBBEP_Newstead_" file prefix for reading file
+            #.name_repair = "universal")
+
+
+# Read in reference data
+nref<- read.csv(file.path(raw_dat, filesoi_ref)) 
+
+  #read_xlsx(file.path(raw_dat, "Newstead","CBBEP_Newstead_Red Knot Gulf to Arctic.xlsx"), 
+            #sheet = 'Capture Data', .name_repair = "universal") %>% 
+  #mutate(animal.id = individual.local.identifier) %>% # this is no longer needed as 'animal.id' column name exists in raw data
+  #rename(#"animal.sex" = Sex, # no longer needed as 'animal.sex' column name exists in raw data
+         #"animal.life.stage" = Age, # do not see either column name present in data, may need to add as blank column
+         #"animal.ring.id" = Band.number) # no longer needed as 'animal.ring.id' column name exists in raw data
+
+# ***this needs to be modifed***
 nref <- nref %>%
   mutate(deploy.on.date = Capture.date,
          deploy.on.measurements = str_c("{culmenInMillimeters:",Culmen, ",theadInMilimeters:", TotalHead,",wingInMillimeters:",Wing,"}"),

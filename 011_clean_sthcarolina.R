@@ -36,7 +36,7 @@ brep <- brep %>%
   mutate(study.site = "KIAWAH")
 
 brep <- brep %>%
-  mutate(animal.marker.id = '') # adding a blank column for animal.marker.id in order to be compatible in later joins
+  mutate(animal.marker.id = NA) # adding a blank column for animal.marker.id in order to be compatible in later joins (mark as NA)
 
 
 brep  <- brep [complete.cases(brep ), ]

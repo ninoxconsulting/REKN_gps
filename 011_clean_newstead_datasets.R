@@ -45,16 +45,19 @@ nref<- read.csv(file.path(raw_dat, filesoi_ref))
          #"animal.life.stage" = Age, # do not see either column name present in data, may need to add as blank column
          #"animal.ring.id" = Band.number) # no longer needed as 'animal.ring.id' column name exists in raw data
 
-# ***this needs to be modifed***
+# **had to make several changes here due to differing column names / absence of previously existing columns in the new download. commented out most of the pre-existing stuff for reference and added new lines as needed for ref data
 nref <- nref %>%
-  mutate(deploy.on.date = Capture.date,
-         deploy.on.measurements = str_c("{culmenInMillimeters:",Culmen, ",theadInMilimeters:", TotalHead,",wingInMillimeters:",Wing,"}"),
-         animal.mass = Weight,
-         study.site = case_when(
-           Site == "Elmers Island" ~ "elmer",
-           Site == "Grand Isle" ~ "grandis",
-           Site == "Padre Island National Seashore - Southbeach" ~ "padre",
-           Site == "Fourchon Beach/Caminada" ~ "fourc",
+  mutate(#deploy.on.date = Capture.date, # not needed, deploy.on.date already exists with proper name
+         #deploy.on.measurements = str_c("{culmenInMillimeters:",Culmen, ",theadInMilimeters:", TotalHead,",wingInMillimeters:",Wing,"}"),
+         deploy.on.measurements = NA, # assign this column to be null since there is no existing data for this in the new download.
+         #animal.mass = Weight,
+         animal.mass = NA, # assign this column to be null since there is no existing data for this in the new download.
+         animal.life.stage = NA, # set this to null as it doesn't appear to exist in this data cut
+         study.site = case_when( # replacing "Site ==" with CONTAINS for deployment.id column as it appears to contain the study site for this download. However most rows for this are blank (will set to NA)
+           str_detect(deployment.id, "Elmers Island") ~ "elmer",
+           str_detect(deployment.id, "Grand Isle") ~ "grandis",
+           str_detect(deployment.id, "Padre Island National Seashore") ~ "padre",
+           str_detect(deployment.id, "Fourchon Beach/Caminada") ~ "fourc",
          ))%>% 
   dplyr::mutate(deploy.on.latitude = case_when(
     study.site == "elmer" ~ 29.1774,
@@ -69,7 +72,7 @@ nref <- nref %>%
   dplyr::select("study.site", "animal.id", "deploy.on.date", "deploy.on.measurements",  "deploy.on.latitude",      
                 "deploy.on.longitude" ,"animal.sex" , "animal.ring.id",  "animal.life.stage"      )
 
-
+# ***need to modify this section next!***
 ndat <- ndatr %>%
   #filter(`lotek.crc.status.text` != "OK(corrected)")  %>%
   rename("animal.id" = individual.local.identifier,

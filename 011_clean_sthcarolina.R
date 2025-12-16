@@ -39,7 +39,7 @@ brep <- brep %>%
   mutate(animal.marker.id = NA) # adding a blank column for animal.marker.id in order to be compatible in later joins (mark as NA)
 
 
-brep  <- brep [complete.cases(brep ), ]
+brep  <- brep [complete.cases(brep ), ] # this returns 0 records since there are blank records in the data. is this a problem?
 
 brep <- brep %>%
   mutate(tag.local.identifier = tag.id)

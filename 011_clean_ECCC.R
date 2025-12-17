@@ -17,7 +17,7 @@ raw_dat <- file.path(data_folder, "movebank_locations_20251210")
 
 # read in tracking sheet to fix categories of deployed and not deployed 
 
-keyyy <- read_csv(file.path(data_folder, "movebank_reference", "ECCC_movebank_ref_all_deployments.csv")) %>%
+keyyy <- read_csv(file.path(data_folder, "movebank_reference", "movebank_ref_all_deployments.csv")) %>% # removed "ECCC_" prefix from ref_all csv based on file name
   dplyr:: filter(Project == "ECCC") %>%
   dplyr::select(track_data, ArgosID, Banding_or_recapture_Date)%>%
   rename("tag.id" = ArgosID)%>%
@@ -168,5 +168,5 @@ all_dat <- left_join(all_dat, keyyy)%>%
 
 # #save out file
 clean_save = all_dat %>% mutate(proj = "ECCC")
-saveRDS(clean_save, file = file.path(output_folder, "rekn_eccc_20240708.rds"))
+saveRDS(clean_save, file = file.path(output_folder, "rekn_eccc_20251217.rds"))
 

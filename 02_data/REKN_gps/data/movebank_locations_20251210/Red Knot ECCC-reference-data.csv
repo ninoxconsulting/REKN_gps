@@ -1,0 +1,205 @@
+tag-id,animal-id,animal-taxon,deploy-on-date,deploy-off-date,animal-life-stage,animal-marker-id,animal-mass,animal-ring-id,capture-timestamp,deploy-on-latitude,deploy-on-longitude,deploy-on-measurements,deploy-on-person,deployment-comments,study-site,tag-beacon-frequency,tag-comments,tag-manufacturer-name,tag-model,tag-serial-no
+230318,KIMB_230318_2022,Calidris canutus,2022-05-16 10:00:00.000,,ASY,FELG(+4Y),121.0,1332-98518,2022-05-16 17:30:00.000,,,"'{culmenInMillimeters:34.5,theadInMilimeters:64.4, wingInMillimeters:170}'",,,KIMBLESO,60.0,,Lotek,gps-pinpoint,55697
+232984,KIMB_232984_2022,Calidris canutus,2022-05-16 17:52:00.000,,ASY,FELG(*NP),121.0,1392-35783,2022-05-16 17:30:00.000,,,"'{culmenInMillimeters:33.8,theadInMilimeters:67.3, wingInMillimeters:171}'",,,KIMBLESO,,,Lotek,sunbird,40481
+230305,KIMB_230305_2022,Calidris canutus,2022-05-16 18:25:00.000,,ASY,FELG(*NT),161.0,1392-35784,2022-05-16 05:30:00.000,,,"'{culmenInMillimeters:38,theadInMilimeters:67, wingInMillimeters:174}'",,,KIMBLESO,60.0,,Lotek,gps-pinpoint,55684
+232985,KIMB_232985_2022,Calidris canutus,2022-05-16 22:58:00.000,,ASY,FELG(C95),151.0,1332-79086,2022-05-16 17:30:00.000,,,"'{culmenInMillimeters:38.8,theadInMilimeters:68.4, wingInMillimeters:181}'",,,KIMBLESO,,,Lotek,sunbird,40482
+230313,KIMB_230313_2022,Calidris canutus,2022-05-16 23:10:00.000,,ASY,FELG(*NM),110.0,1282-02747,2022-05-16 17:30:00.000,,,"'{culmenInMillimeters:35.1,theadInMilimeters:64.4, wingInMillimeters:169}'",,,KIMBLESO,60.0,,Lotek,gps-pinpoint,55692
+230300,KIMB_230300_2022,Calidris canutus,2022-05-16 23:12:00.000,,ASY,FELG(M*U),136.0,1392-24739,2022-05-16 17:30:00.000,,,"'{culmenInMillimeters:33.1,theadInMilimeters:65.7, wingInMillimeters:170}'",,,KIMBLESO,60.0,,Lotek,gps-pinpoint,55679
+230316,KIMB_230316_2022,Calidris canutus,2022-05-16 23:16:00.000,,ASY,FEW(LTP),132.0,9822-53152,2022-05-16 17:30:00.000,,,"'{culmenInMillimeters:37.2,theadInMilimeters:63.2, wingInMillimeters:167}'",,,KIMBLESO,60.0,,Lotek,gps-pinpoint,55695
+232986,KIMB_232986_2022,Calidris canutus,2022-05-16 23:21:00.000,,ASY,FELG(TK*),123.0,1392-35832,2022-05-16 17:30:00.000,,,"'{culmenInMillimeters:36.1,theadInMilimeters:68.6, wingInMillimeters:172}'",,,KIMBLESO,,,Lotek,sunbird,40517
+230303,MOOR_230303_2022,Calidris canutus,2022-05-21 10:00:00.000,,ASY,FELG(=9U),,1332-74312,2022-05-21 15:35:00.000,,,NA,,,MOORES,60.0,,Lotek,gps-pinpoint,55682
+232981,MOOR_232981_2022,Calidris canutus,2022-05-21 21:00:00.000,,ASY,FEW(CMM),144.0,0802-64979,2022-05-21 15:35:00.000,,,NA,,,MOORES,,,Lotek,sunbird,40519
+230320,MOOR_230320_2022,Calidris canutus,2022-05-21 21:01:00.000,,ASY,FELG(>YA),185.0,1392-35847,2022-05-21 15:35:00.000,,,NA,,,MOORES,60.0,,Lotek,gps-pinpoint,55699
+230319,MOOR_230319_2022,Calidris canutus,2022-05-21 21:03:00.000,,ASY,FELG(A=V),170.0,1322-36410,2022-05-21 15:35:00.000,,,NA,,,MOORES,60.0,,Lotek,gps-pinpoint,55698
+232980,MOOR_232980_2022,Calidris canutus,2022-05-21 21:05:00.000,,ASY,FELG(4>E),166.0,1332-74332,2022-05-21 15:35:00.000,,,NA,,,MOORES,,,Lotek,sunbird,40518
+230302,MOOR_230302_2022,Calidris canutus,2022-05-21 21:09:00.000,,ASY,FELG(0+V),177.0,1332-98993,2022-05-21 15:35:00.000,,,NA,,,MOORES,60.0,,Lotek,gps-pinpoint,55681
+230309,MOOR_230309_2022,Calidris canutus,2022-05-21 21:22:00.000,,ASY,FELG(4>M),137.0,1392-35223,2022-05-21 15:35:00.000,,,"'{culmenInMillimeters:35.6,theadInMilimeters:66.4, wingInMillimeters:168}'",,,MOORES,60.0,,Lotek,gps-pinpoint,55688
+230301,MOOR_230301_2022,Calidris canutus,2022-05-21 21:38:00.000,,ASY,FELG(5>K),141.0,1392-35236,2022-05-21 15:35:00.000,,,NA,,,MOORES,60.0,,Lotek,gps-pinpoint,55680
+230315,MOOR_230315_2022,Calidris canutus,2022-05-21 21:51:00.000,,ASY,FEDB(H0Y),146.0,H75098,2022-05-21 15:35:00.000,,,"'{culmenInMillimeters:39.9,theadInMilimeters:68, wingInMillimeters:134}'",,,MOORES,60.0,,Lotek,gps-pinpoint,55694
+230304,MOOR_230304_2022,Calidris canutus,2022-05-21 22:06:00.000,,ASY,FELG(6>M),147.0,1392-35252,2022-05-21 15:35:00.000,,,"'{culmenInMillimeters:35,theadInMilimeters:65.8, wingInMillimeters:166}'",,,MOORES,60.0,,Lotek,gps-pinpoint,55683
+230308,FORT_230308_2022,Calidris canutus,2022-05-25 22:02:00.000,,ASY,FELG(=TE),178.0,1332-69665,2022-05-25 16:33:00.000,,,"'{culmenInMillimeters:37.2,theadInMilimeters:66.9, wingInMillimeters:171}'",,,FORTESCU,60.0,,Lotek,gps-pinpoint,55687
+230317,FORT_230317_2022,Calidris canutus,2022-05-25 22:08:00.000,,ASY,FELG(1X6),188.0,1332-62385,2022-05-25 16:33:00.000,,,"'{culmenInMillimeters:35.8,theadInMilimeters:64.6, wingInMillimeters:176}'",,"The band no. of this re-trap was read three times in two independent teams. While in the DE records as originally 1332-62185, it is believed DE has made a FS or data entry error. There was a similar situation in 2019 that documents that 62158-186 was entered for 358-386. This retrap is further proof of the error.",FORTESCU,60.0,,Lotek,gps-pinpoint,55696
+230314,FORT_230314_2022,Calidris canutus,2022-05-25 22:20:00.000,,ASY,FELG(M6*),188.0,1332-55516,2022-05-25 16:33:00.000,,,"'{culmenInMillimeters:38.6,theadInMilimeters:66.1, wingInMillimeters:172}'",,,FORTESCU,60.0,,Lotek,gps-pinpoint,55693
+230310,FORT_230310_2022,Calidris canutus,2022-05-25 22:32:00.000,,ASY,FELG(=93),205.0,1332-73220,2022-05-25 16:33:00.000,,,"'{culmenInMillimeters:37.7,theadInMilimeters:67.5, wingInMillimeters:173}'",,,FORTESCU,60.0,,Lotek,gps-pinpoint,55689
+230312,FORT_230312_2022,Calidris canutus,2022-05-25 22:48:00.000,,ASY,FELG(M2*),169.0,1332-98175,2022-05-25 16:33:00.000,,,"'{culmenInMillimeters:37.9,theadInMilimeters:67, wingInMillimeters:179}'",,,FORTESCU,60.0,,Lotek,gps-pinpoint,55691
+230311,FORT_230311_2022,Calidris canutus,2022-05-25 22:59:00.000,,ASY,FELG(4>N),163.0,1392-35224,2022-05-25 16:33:00.000,,,"'{culmenInMillimeters:31.3,theadInMilimeters:60.8, wingInMillimeters:170}'",,,FORTESCU,60.0,,Lotek,gps-pinpoint,55690
+230307,FORT_230307_2022,Calidris canutus,2022-05-25 22:59:00.000,,ASY,FELG(+94),175.0,1332-73082,2022-05-25 16:33:00.000,,,"'{culmenInMillimeters:37.6,theadInMilimeters:67.6, wingInMillimeters:168}'",,,FORTESCU,60.0,,Lotek,gps-pinpoint,55686
+230299,FORT_230299_2022,Calidris canutus,2022-05-25 23:02:00.000,,ASY,FELG(L8*),173.0,1332-69167,2022-05-25 16:33:00.000,,,"'{culmenInMillimeters:38.2,theadInMilimeters:65.9, wingInMillimeters:170}'",,,FORTESCU,60.0,,Lotek,gps-pinpoint,55678
+230306,FORT_230306_2022,Calidris canutus,2022-05-25 23:09:00.000,,SY,FELG(T8*),132.0,1392-35423,2022-05-25 16:33:00.000,,,"'{culmenInMillimeters:34.7,theadInMilimeters:63.2, wingInMillimeters:164}'",,,FORTESCU,60.0,,Lotek,gps-pinpoint,55685
+234234,MOOR_234234_2022,Calidris canutus,2022-05-29 02:03:00.000,,ASY,FELG(4L>),203.0,1392-35476,2022-05-28 20:35:00.000,,,"'{culmenInMillimeters:36.8,theadInMilimeters:67.4, wingInMillimeters:170}'",,,MOORES,60.0,,Lotek,gps-pinpoint,2530
+234233,MOOR_234233_2022,Calidris canutus,2022-05-29 02:03:00.000,,ASY,FELG(4M>),156.0,1392-35475,2022-05-28 20:35:00.000,,,"'{culmenInMillimeters:40,theadInMilimeters:69.7, wingInMillimeters:174}'",,,MOORES,60.0,,Lotek,gps-pinpoint,2524
+234235,MOOR_234235_2022,Calidris canutus,2022-05-29 02:14:00.000,,SY,FELG(4H>),143.0,1392-35479,2022-05-28 20:35:00.000,,,"'{culmenInMillimeters:37.1,theadInMilimeters:64.8, wingInMillimeters:161}'",,,MOORES,60.0,,Lotek,gps-pinpoint,2525
+234236,MOOR_234236_2022,Calidris canutus,2022-05-29 03:07:00.000,,ASY,FELG(4E>),192.0,1392-35480,2022-05-28 20:35:00.000,,,"'{culmenInMillimeters:34.7,theadInMilimeters:62.7, wingInMillimeters:169}'",,,MOORES,60.0,,Lotek,gps-pinpoint,2528
+234240,FORT_234240_2022,Calidris canutus,2022-05-31 04:05:00.000,,ASY,FEO(C3J),211.0,9822-04691,2022-05-30 22:50:00.000,,,"'{culmenInMillimeters:32.1,theadInMilimeters:63, wingInMillimeters:179}'",,,FORTESCU,60.0,,Lotek,gps-pinpoint,2523
+234239,FORT_234239_2022,Calidris canutus,2022-05-31 04:09:00.000,,ASY,FELG(4C>),195.0,1332-69115,2022-05-30 22:50:00.000,,,"'{culmenInMillimeters:37.3,theadInMilimeters:66.6, wingInMillimeters:172}'",,,FORTESCU,60.0,,Lotek,gps-pinpoint,2529
+234238,FORT_234238_2022,Calidris canutus,2022-05-31 04:17:00.000,,ASY,FELG(=16),192.0,1332-64736,2022-05-30 22:50:00.000,,,"'{culmenInMillimeters:31.8,theadInMilimeters:62.3, wingInMillimeters:168}'",,,FORTESCU,60.0,,Lotek,gps-pinpoint,2526
+234237,FORT_234237_2022,Calidris canutus,2022-05-31 04:20:00.000,,ASY,FELG(5Y>),150.0,1392-35151,2022-05-30 22:50:00.000,,,"'{culmenInMillimeters:35.4,theadInMilimeters:65.1, wingInMillimeters:170}'",,,FORTESCU,60.0,,Lotek,gps-pinpoint,2537
+241167,PEIXE_241167_2023,Calidris canutus,2023-04-08 22:00:00.000,,ASY,FEB(H5J),139.0,H87417,,-31.329307,-50.988404,"'{culmenInMillimeters:32.9,theadInMilimeters:60.8, wingInMillimeters:170}'",Larry,,PEIXE,,,UK,microwave telemetry,
+241166,PEIXE_241166_2023,Calidris canutus,2023-04-08 22:00:00.000,,ASY,FEB(H5H),149.0,H87416,,-31.329307,-50.988404,"'{culmenInMillimeters:34.7,theadInMilimeters:61.1, wingInMillimeters:160}'",Larry,,PEIXE,,,UK,microwave telemetry,
+242573,MOOR_242573_2023,Calidris canutus,2023-04-08 23:41:00.000,,ASY,FEB(E1K),127.0,1392-25660,,,,"'{culmenInMillimeters:36.9,theadInMilimeters:67, wingInMillimeters:174}'",,capt color (FEB(A6M)/-:-/-),MOORES,,,Lotek,Sunbird,43366
+242574,MOOR_242574_2023,Calidris canutus,2023-04-08 23:41:00.000,,ASY,FELG(KA*),104.0,1392-24770,,,,"'{culmenInMillimeters:37.9,theadInMilimeters:67.3, wingInMillimeters:166}'",,,MOORES,,,Lotek,Sunbird,43367
+240162,PEIXE_240162_2023,Calidris canutus,2023-04-10 22:00:00.000,,ASY,FEB(H6H),122.0,H87420,,-31.290044,-50.955205,"'{culmenInMillimeters:34.3,theadInMilimeters:62.2, wingInMillimeters:177}'",Larry,,PEIXE,,,Lotek,Sunbird,42834
+240167,PEIXE_240167_2023,Calidris canutus,2023-04-10 22:00:00.000,,ASY,FEB(H6A),160.0,H87423,,-31.290044,-50.955205,"'{culmenInMillimeters:40,theadInMilimeters:69.8, wingInMillimeters:180}'",Larry,,PEIXE,,,Lotek,Sunbird,42839
+240165,PEIXE_240165_2023,Calidris canutus,2023-04-10 22:00:00.000,,ASY,FDJ(JEK),149.0,133255821,,-31.290044,-50.955205,"'{culmenInMillimeters:37.3,theadInMilimeters:66.4, wingInMillimeters:149}'",Larry,,PEIXE,,,Lotek,Sunbird,42837
+240166,PEIXE_240166_2023,Calidris canutus,2023-04-10 22:00:00.000,,ASY,FEB(H5L),149.0,H87426,,-31.290044,-50.955205,"'{culmenInMillimeters:33.7,theadInMilimeters:60, wingInMillimeters:166}'",Larry,,PEIXE,,,Lotek,Sunbird,42838
+240155,PEIXE_240155_2023,Calidris canutus,2023-04-10 22:00:00.000,,ASY,FEB(H5P),171.0,H87424,,-31.290044,-50.955205,"'{culmenInMillimeters:36,theadInMilimeters:64, wingInMillimeters:179}'",Larry,,PEIXE,,,Lotek,Sunbird,42827
+240164,PEIXE_240164_2023,Calidris canutus,2023-04-10 22:00:00.000,,ASY,FEB(H5K),161.0,H87425,,-31.290044,-50.955205,"'{culmenInMillimeters:32.4,theadInMilimeters:61.6, wingInMillimeters:168}'",Larry,,PEIXE,,,Lotek,Sunbird,42836
+240159,PEIXE_240159_2023,Calidris canutus,2023-04-10 22:00:00.000,,ASY,FEB(H6C),141.0,H87422,,-31.290044,-50.955205,"'{culmenInMillimeters:36.3,theadInMilimeters:66.5, wingInMillimeters:168}'",Larry,,PEIXE,,,Lotek,Sunbird,42831
+240160,PEIXE_240160_2023,Calidris canutus,2023-04-10 22:00:00.000,,ASY,FEB(H6E),122.0,H87421,,-31.290044,-50.955205,"'{culmenInMillimeters:33.8,theadInMilimeters:63.2, wingInMillimeters:168}'",Larry,,PEIXE,,,Lotek,Sunbird,42832
+240158,PEIXE_240158_2023,Calidris canutus,2023-04-10 22:00:00.000,,ASY,FEB(H6J),159.0,H87419,,-31.290044,-50.955205,"'{culmenInMillimeters:34.2,theadInMilimeters:62.8, wingInMillimeters:170}'",Larry,,PEIXE,,,Lotek,Sunbird,42830
+240157,PEIXE_240157_2023,Calidris canutus,2023-04-10 22:00:00.000,,ASY,FEB(H6K),151.0,H87418,,-31.290044,-50.955205,"'{culmenInMillimeters:35.3,theadInMilimeters:65.2, wingInMillimeters:182}'",Larry,,PEIXE,,,Lotek,Sunbird,42829
+240163,PEIXE_240163_2023,Calidris canutus,2023-04-11 22:00:00.000,,ASY,FEB(H5M),121.0,H87427,,-31.353038,-50.032,"'{culmenInMillimeters:35.8,theadInMilimeters:63.2, wingInMillimeters:167}'",Steph,,PEIXE,,,Lotek,Sunbird,42835
+238541,MOOR_238541_2023,Calidris canutus,2023-04-16 10:28:00.000,,ASY,FELG(3V7),130.0,1332-67576,2023-04-16 10:28:00.000,,,"'{culmenInMillimeters:39.9,theadInMilimeters:69.8, wingInMillimeters:180}'",,,MOORES,,,Lotek,sunbird,42235
+238548,PESCA_238548_2023,Calidris canutus,2023-04-21 10:00:00.000,,ASY,UKNOWN,189.0,H87433,2023-04-21 05:00:00.000,-31.822657,-50.56216,"'{culmenInMillimeters:35,theadInMilimeters:64, wingInMillimeters:166}'",Antonio,,PESCA,,,Lotek,sunbird,42242
+238539,PESCA_238539_2023,Calidris canutus,2023-04-21 10:00:00.000,,ASY,UKNOWN,170.0,H87428,2023-04-21 10:00:00.000,-31.822657,-50.56216,"'{culmenInMillimeters:38,theadInMilimeters:67, wingInMillimeters:175}'",Antonio,,PESCA,,,Lotek,sunbird,42233
+238551,PESCA_238551_2023,Calidris canutus,2023-04-21 10:00:00.000,,ASY,FEB(H5N),199.0,H87438,2023-04-21 10:00:00.000,-31.822657,-50.56216,"'{culmenInMillimeters:36,theadInMilimeters:67, wingInMillimeters:170}'",Antonio,,PESCA,,,Lotek,sunbird,42245
+238550,PESCA_238550_2023,Calidris canutus,2023-04-21 10:00:00.000,,ASY,UKNOWN,195.0,H87434,2023-04-21 10:00:00.000,-31.822657,-50.56216,"'{culmenInMillimeters:37.1,theadInMilimeters:67, wingInMillimeters:172}'",Antonio,,PESCA,,,Lotek,sunbird,42244
+238553,PESCA_238553_2023,Calidris canutus,2023-04-21 10:00:00.000,,ASY,,199.0,H87432,2023-04-21 05:00:00.000,-31.822657,-50.56216,"'{culmenInMillimeters:39,theadInMilimeters:68, wingInMillimeters:175}'",Antonio,,PESCA,,,Lotek,sunbird,42247
+238545,PESCA_238545_2023,Calidris canutus,2023-04-21 10:00:00.000,,ASY,UKNOWN,184.0,H87429,2023-04-21 05:00:00.000,-31.822657,-50.56216,"'{culmenInMillimeters:37,theadInMilimeters:65.1, wingInMillimeters:175}'",Antonio,,PESCA,,,Lotek,sunbird,42239
+238547,PESCA_238547_2023,Calidris canutus,2023-04-21 10:00:00.000,,ASY,UKNOWN,176.0,H87434,2023-04-21 05:00:00.000,-31.822657,-50.56216,"'{culmenInMillimeters:35,theadInMilimeters:63, wingInMillimeters:177}'",Antonio,,PESCA,,,Lotek,sunbird,42241
+238544,MOOR_238544_2023,Calidris canutus,2023-05-14 21:43:00.000,,ASY,FEW(EPV),138.0,802-64261,2023-05-14 16:43:00.000,,,"'{culmenInMillimeters:36.5,theadInMilimeters:64.9, wingInMillimeters:167}'",,,MOORES,,,Lotek,sunbird,42238
+240156,MOOR_240156_2023,Calidris canutus,2023-05-16 10:09:00.000,,ASY,FEW(JKA),105.0,1172-78992,,,,"'{culmenInMillimeters:36.2,theadInMilimeters:65.8, wingInMillimeters:177}'",,,MOORES,,,Lotek,Sunbird,42828
+238546,MOOR_238546_2023,Calidris canutus,2023-05-16 10:15:00.000,,ASY,FELG(+00),140.0,1332-68967,2023-05-16 05:15:00.000,,,"'{culmenInMillimeters:36.1,theadInMilimeters:65.6, wingInMillimeters:174}'",,,MOORES,,,Lotek,sunbird,42240
+242583,MOOR_242583_2023,Calidris canutus,2023-05-16 16:14:00.000,,ASY,FELG(J*U),145.0,1392-24080,,,,"{culmenInMillimeters:35.1,theadInMilimeters:65.4, wingInMillimeters:168}'",,feather and blood taken,MOORES,,,Lotek,Sunbird,43376
+232982,MOOR_232982_2023,Calidris canutus,2023-05-16 21:14:00.000,,ASY,FELG(Y37),151.0,1332-28220,2023-05-16 16:14:00.000,,,"'{culmenInMillimeters:39.9,theadInMilimeters:69.8, wingInMillimeters:180}'",,Green braided polyester,MOORES,,,Lotek,sunbird,41840
+238543,MOOR_238543_2023,Calidris canutus,2023-05-16 21:14:00.000,,ASY,FELG(*EP),143.0,1392-24884,2023-05-16 16:14:00.000,,,"'{culmenInMillimeters:40,theadInMilimeters:69.6, wingInMillimeters:171}'",,,MOORES,,,Lotek,sunbird,42237
+240161,MOOR_240161_2023,Calidris canutus,2023-05-16 21:53:00.000,,ASY,FEDG(J19),114.0,1332-54994,,,,"'{culmenInMillimeters:34.7,theadInMilimeters:63.6, wingInMillimeters:169}'",,,MOORES,,,Lotek,Sunbird,42833
+240168,MOOR_240168_2023,Calidris canutus,2023-05-16 23:00:00.000,,ASY,FEDG(J25),114.0,1332-98117,,,,"'{culmenInMillimeters:36.6,theadInMilimeters:65.6, wingInMillimeters:165}'",,,MOORES,,,Lotek,Sunbird,42840
+240169,MOOR_240169_2023,Calidris canutus,2023-05-16 23:35:00.000,,ASY,FELG(6>M),101.0,1392-35252,,,,"'{culmenInMillimeters:36.7,theadInMilimeters:65.3, wingInMillimeters:166}'",,,MOORES,,,Lotek,Sunbird,42841
+242582,NBRIG_242582_2023,Calidris canutus,2023-05-19 05:00:00.000,,ASY,FEDG(K89),186.0,1332-26479,,,,"{culmenInMillimeters:36.4,theadInMilimeters:66.2, wingInMillimeters:170}'",,blood taken,NBRIG,,SB/monofilament nylon,Lotek,Sunbird,43375
+242571,EAST_242571_2023,Calidris canutus,2023-05-19 22:00:00.000,,ASY,FELG(KA=),163.0,1332-69930,,,,"'{culmenInMillimeters:34.5,theadInMilimeters:64.3, wingInMillimeters:170}'",,Monofilament nylon,EASTPIT,,,Lotek,Sunbird,43364
+242570,EAST_242570_2023,Calidris canutus,2023-05-19 22:00:00.000,,ASY,FELG(=KH),178.0,1332-68228,,,,"'{culmenInMillimeters:40.6,theadInMilimeters:66.9, wingInMillimeters:172}'",,,EASTPIT,,,Lotek,Sunbird,43363
+242577,EAST_242577_2023,Calidris canutus,2023-05-19 22:24:00.000,,ASY,FEDG(J17),144.0,1392-25641,,,,"'{culmenInMillimeters:35.4,theadInMilimeters:65.4, wingInMillimeters:170}'",,,EASTPIT,,,Lotek,Sunbird,43370
+242580,EAST_242580_2023,Calidris canutus,2023-05-19 22:30:00.000,,ASY,FELG(L+L),117.0,1332-97010,,,,"'{culmenInMillimeters:34.9,theadInMilimeters:63.9, wingInMillimeters:169}'",,,EASTPIT,,,Lotek,Sunbird,43373
+238542,NBRIG_238542_2023,Calidris canutus,2023-08-15 05:00:00.000,,ASY,FEDG(EYM),167.0,1332-64616,2023-08-15 05:00:00.000,,,"'{culmenInMillimeters:34.5,theadInMilimeters:63.6, wingInMillimeters:172}'",,blood and Feather taken,NBRIG,,SB/monofilament nylon),Lotek,sunbird,42236
+242578,NBRIG_242578_2023,Calidris canutus,2023-08-15 05:00:00.000,,ASY,FELG(XJ>),176.0,1392-24959,,,,"{culmenInMillimeters:34.8,theadInMilimeters:63.6, wingInMillimeters:164}'",,,NBRIG,,,Lotek,Sunbird,43371
+242575,NBRIG_242575_2023,Calidris canutus,2023-08-15 05:00:00.000,,ASY,FEDG(K72),193.0,1332-26461,2023-08-15 05:00:00.000,,,"'{culmenInMillimeters:36.6,theadInMilimeters:67.4, wingInMillimeters:166}'",,blood taken,NBRIG,,SB/monofilament nylon,Lotek,Sunbird,43368
+242576,NBRIG_242576_2023,Calidris canutus,2023-08-15 05:00:00.000,,ASY,FEDG(K90),180.0,1332-26478,,,,"'{culmenInMillimeters:36.5,theadInMilimeters:66.9, wingInMillimeters:165}'",,blood taken,NBRIG,,SB/monofilament nylon,Lotek,Sunbird,43369
+242579,LDP_242579_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H8P),209.0,H108072,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:34.89,theadInMillimeters:64.79, wingInMillimeters:171}'",Antonio Brum,Blood sample taken,PEIXE,,,Lotek,Sunbird,43372
+255007,LDP_255007_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H7P),202.0,H108062,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:33.13,theadInMillimeters:64.70, wingInMillimeters:172}'",Antonio Brum,Blood sample taken,PEIXE,,,,,
+261440,LDP_261440_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H8J),220.0,H108067,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:35.76,theadInMillimeters:67.37, wingInMillimeters:173}'",Antonio Brum,Blood sample taken,PEIXE,,,,,
+261441,LDP_261441_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H7C),214.0,H108054,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:36.73,theadInMillimeters:66.38, wingInMillimeters:172}'",Antonio Brum,Blood sample taken,PEIXE,,,,,
+261442,LDP_261442_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H8L),180.0,H108069,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:34.99,theadInMillimeters:67.18, wingInMillimeters:163}'",Antonio Brum,Blood sample taken,PEIXE,,,,,
+262940,LDP_262940_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H7N),194.0,H108061,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:31.24,theadInMillimeters:61.94, wingInMillimeters:175}'",Antonio Brum,Blood sample taken,PEIXE,,,,,
+262941,LDP_262941_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H8H),206.0,H108066,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:35.18,theadInMillimeters:66.80, wingInMillimeters:176}'",Antonio Brum,Blood sample taken,PEIXE,,,,,
+262942,LDP_262942_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H8A),147.0,H108063,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:35.38,theadInMillimeters:64.93, wingInMillimeters:167}'",Antonio Brum,Blood sample taken,PEIXE,,,,,
+262944,LDP_262944_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H7H),208.0,H108056,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:34.38,theadInMillimeters:65.35, wingInMillimeters:181}'",Antonio Brum,Blood sample taken,PEIXE,,,,,
+262945,LDP_262945_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H7E),220.0,H108055,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:35.40,theadInMillimeters:64.56, wingInMillimeters:175}'",Antonio Brum,Blood sample taken,PEIXE,,,,,
+262946,LDP_262946_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H8K),173.0,H108068,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:32.38,theadInMillimeters:64.23, wingInMillimeters:170}'",Antonio Brum,Blood sample taken,PEIXE,,,,,
+262947,LDP_262947_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H7L),196.0,H108059,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:36.10,theadInMillimeters:65.85, wingInMillimeters:171}'",Antonio Brum,Blood sample taken,PEIXE,,,,,
+262948,LDP_262948_2024,Calidris canutus,2024-04-24 05:00:00.000,,ASY,FEDB(H7M),195.0,H108060,2024-04-24 05:00:00.000,-31.104722,-50.923611,"{culmenInMillimeters:34.31,theadInMillimeters:65.51, wingInMillimeters:170}'",Antonio Brum,Blood sample taken,PEIXE,,,,,
+260801,EASTPT_260801_2024,Calidris canutus,2024-05-14 14:51:00.000,,ASY,FEW(JKL),133.0,1182-00543,2024-05-14 13:16:00.000,39.193878,-75.026276,"{culmenInMillimeters:33.8,theadInMillimeters:61.4, wingInMillimeters:170}'",Stephanie Feigin,Blood sample taken,EASTPIT,,,,,
+260816,EASTPT_260816_2024,Calidris canutus,2024-05-14 15:10:00.000,,ASY,FELG(=25),130.0,1332-73801,2024-05-14 13:16:00.000,39.193878,-75.026276,"{culmenInMillimeters:34.7,theadInMillimeters:63.9, wingInMillimeters:173}'",Stephanie Feigin,Blood sample taken,EASTPIT,,,,,
+260803,EASTPT_260803_2024,Calidris canutus,2024-05-14 15:24:00.000,,ASY,FELG(J*T),126.0,1293-24081,2024-05-14 13:16:00.000,39.193878,-75.026276,"{culmenInMillimeters:33.0,theadInMillimeters:64.1, wingInMillimeters:170}'",Stephanie Feigin,Blood sample taken,EASTPIT,,,,,
+240170,MOOR_240170_2024,Calidris canutus,2024-05-16 16:58:00.000,,ASY,FELG(+Y2),126.0,1392-36202,2024-05-16 16:05:00.000,39.186626,-74.945922,"{culmenInMillimeters:35.6,theadInMillimeters:65.5, wingInMillimeters:174}'",Stephanie Feigin,Blood sample taken,MOORES,,,Lotek,Sunbird,42842
+240172,MOOR_240172_2024,Calidris canutus,2024-05-16 19:48:00.000,,ASY,FELG(HX>),127.0,1332-74742,2024-05-16 16:05:00.000,39.186626,-74.945922,"{culmenInMillimeters:35.3,theadInMillimeters:67.6, wingInMillimeters:168}'",Stephanie Feigin,Blood sample taken,MOORES,,,Lotek,Sunbird,42844
+260815,REEDSN_260815_2024,Calidris canutus,2024-05-21 20:12:00.000,,ASY,FEDB(+93),179.0,1252-25148,2024-05-21 15:30:00.000,39.126233,-74.891789,"{culmenInMillimeters:37.9,theadInMillimeters:66.9, wingInMillimeters:172}'",Stephanie Feigin,Blood sample taken,REEDSNOR,,,,,
+260805,KIMBSO_260805_2024,Calidris canutus,2024-05-23 14:12:00.000,,ASY,FEW(MLE),144.0,1172-78880,2024-05-23 12:57:00.000,39.100986,-74.896388,"{culmenInMillimeters:33.7,theadInMillimeters:62.4, wingInMillimeters:163}'",Stephanie Feigin,Blood sample taken,KIMBLESO,,,,,
+240173,AVAL_240173_2024,Calidris canutus,2024-10-02 13:47:00.000,,ASY,FEDG(*KH),122.0,1392-35742,2024-10-02 13:14:00.000,39.081118,-74.729786,"{culmenInMillimeters:37.1,theadInMillimeters:64.8, wingInMillimeters:150}'",Stephanie Feigin,Blood sample taken,AVALON,,,Lotek,Sunbird,42845
+260806,AVAL_260806_2024,Calidris canutus,2024-10-02 13:50:00.000,,ASY,FEDG(AA6),124.0,1332-26502,2024-10-02 13:14:00.000,39.081118,-74.729786,"{culmenInMillimeters:30.0,theadInMillimeters:60.8, wingInMillimeters:165}'",Stephanie Feigin,Blood sample taken,AVALON,,,,,
+240171,AVAL_240171_2024,Calidris canutus,2024-10-02 14:01:00.000,,ASY,FEDG(AA8),111.0,1392-35751,2024-10-02 13:14:00.000,39.081118,-74.729786,"{culmenInMillimeters:33.9,theadInMillimeters:59.8, wingInMillimeters:161}'",Stephanie Feigin,Blood sample taken,AVALON,,,Lotek,Sunbird,42843
+260818,AVAL_260818_2024,Calidris canutus,2024-10-02 14:07:00.000,,ASY,FEDG(AA9),128.0,1332-26504,2024-10-02 13:14:00.000,39.081118,-74.729786,"{culmenInMillimeters:36.5,theadInMillimeters:65.6, wingInMillimeters:159}'",Stephanie Feigin,Blood sample taken,AVALON,,,,,
+240175,AVAL_240175_2024,Calidris canutus,2024-10-02 14:10:00.000,,ASY,FEDG(*JU),116.0,1392-35731,2024-10-02 13:14:00.000,39.081118,-74.729786,"{culmenInMillimeters:33.9,theadInMillimeters:64.3, wingInMillimeters:171}'",Stephanie Feigin,Blood sample taken,AVALON,,,Lotek,Sunbird,42847
+260809,AVAL_260809_2024,Calidris canutus,2024-10-02 14:20:00.000,,ASY,FEDG(AC0),128.0,1332-26505,2024-10-02 13:14:00.000,39.081118,-74.729786,"{culmenInMillimeters:38.1,theadInMillimeters:64.6, wingInMillimeters:172}'",Stephanie Feigin,Blood sample taken,AVALON,,,,,
+260810,AVAL_260810_2024,Calidris canutus,2024-10-02 14:31:00.000,,ASY,FEDG(AC1),126.0,1332-26506,2024-10-02 13:14:00.000,39.081118,-74.729786,"{culmenInMillimeters:32.2,theadInMillimeters:63.2, wingInMillimeters:168}'",Stephanie Feigin,Blood sample taken,AVALON,,,,,
+260808,AVAL_260808_2024,Calidris canutus,2024-10-02 14:47:00.000,,ASY,FEDG(AC3),121.0,1332-26508,2024-10-02 13:14:00.000,39.081118,-74.729786,"{culmenInMillimeters:35.1,theadInMillimeters:64.8, wingInMillimeters:173}'",Stephanie Feigin,Blood sample taken,AVALON,,,,,
+260820,AVAL_260820_2024,Calidris canutus,2024-10-02 14:54:00.000,,ASY,FEDG(AC4),116.0,1332-26509,2024-10-02 13:14:00.000,39.081118,-74.729786,"{culmenInMillimeters:36.2,theadInMillimeters:64.2, wingInMillimeters:168}'",Stephanie Feigin,Blood sample taken,AVALON,,,,,
+238540,,,,,,,,,,,,,,,,,,Lotek,sunbird,42234
+238549,,,,,,,,,,,,,,,,,,Lotek,sunbird,42243
+238552,,,,,,,,,,,,,,,,,,Lotek,sunbird,42246
+238554,,,,,,,,,,,,,,,,,,,,
+238555,,,,,,,,,,,,,,,,,,,,
+238556,,,,,,,,,,,,,,,,,,,,
+238557,,,,,,,,,,,,,,,,,,,,
+238558,,,,,,,,,,,,,,,,,,,,
+238559,,,,,,,,,,,,,,,,,,,,
+238560,,,,,,,,,,,,,,,,,,,,
+238561,,,,,,,,,,,,,,,,,,,,
+238562,,,,,,,,,,,,,,,,,,,,
+238563,,,,,,,,,,,,,,,,,,,,
+238564,,,,,,,,,,,,,,,,,,,,
+238565,,,,,,,,,,,,,,,,,,,,
+238566,,,,,,,,,,,,,,,,,,,,
+238567,,,,,,,,,,,,,,,,,,,,
+238568,,,,,,,,,,,,,,,,,,,,
+238569,,,,,,,,,,,,,,,,,,,,
+238570,,,,,,,,,,,,,,,,,,,,
+238571,,,,,,,,,,,,,,,,,,,,
+238572,,,,,,,,,,,,,,,,,,,,
+238573,,,,,,,,,,,,,,,,,,,,
+238574,,,,,,,,,,,,,,,,,,,,
+238575,,,,,,,,,,,,,,,,,,,,
+238576,,,,,,,,,,,,,,,,,,,,
+238577,,,,,,,,,,,,,,,,,,,,
+238578,,,,,,,,,,,,,,,,,,,,
+238579,,,,,,,,,,,,,,,,,,,,
+238580,,,,,,,,,,,,,,,,,,,,
+238581,,,,,,,,,,,,,,,,,,,,
+238582,,,,,,,,,,,,,,,,,,,,
+238583,,,,,,,,,,,,,,,,,,,,
+238590,,,,,,,,,,,,,,,,,,,,
+238592,,,,,,,,,,,,,,,,,,,,
+238593,,,,,,,,,,,,,,,,,,,,
+238595,,,,,,,,,,,,,,,,,,,,
+238596,,,,,,,,,,,,,,,,,,,,
+238597,,,,,,,,,,,,,,,,,,,,
+238599,,,,,,,,,,,,,,,,,,,,
+238600,,,,,,,,,,,,,,,,,,,,
+238601,,,,,,,,,,,,,,,,,,,,
+238602,,,,,,,,,,,,,,,,,,,,
+238606,,,,,,,,,,,,,,,,,,,,
+238607,,,,,,,,,,,,,,,,,,,,
+238608,,,,,,,,,,,,,,,,,,,,
+238609,,,,,,,,,,,,,,,,,,,,
+240174,,,,,,,,,,,,,,,,,,Lotek,Sunbird,42846
+242572,,,,,,,,,,,,,,,,,,,,43365
+242581,,,,,,,,,,,,,,,,,,Lotek,Sunbird,43374
+260800,,,,,,,,,,,,,,,,,,,,
+260802,,,,,,,,,,,,,,,,,,,,
+260804,,,,,,,,,,,,,,,,,,,,
+260807,,,,,,,,,,,,,,,,,,,,
+260811,,,,,,,,,,,,,,,,,,,,
+260812,,,,,,,,,,,,,,,,,,,,
+260813,,,,,,,,,,,,,,,,,,,,
+260814,,,,,,,,,,,,,,,,,,,,
+260817,,,,,,,,,,,,,,,,,,,,
+260819,,,,,,,,,,,,,,,,,,,,
+261434,,,,,,,,,,,,,,,,,,,,
+261435,,,,,,,,,,,,,,,,,,,,
+261436,,,,,,,,,,,,,,,,,,,,
+261437,,,,,,,,,,,,,,,,,,,,
+261438,,,,,,,,,,,,,,,,,,,,
+261439,,,,,,,,,,,,,,,,,,,,
+261443,,,,,,,,,,,,,,,,,,,,
+261444,,,,,,,,,,,,,,,,,,,,
+261445,,,,,,,,,,,,,,,,,,,,
+261446,,,,,,,,,,,,,,,,,,,,
+261447,,,,,,,,,,,,,,,,,,,,
+261448,,,,,,,,,,,,,,,,,,,,
+261449,,,,,,,,,,,,,,,,,,,,
+261450,,,,,,,,,,,,,,,,,,,,
+261451,,,,,,,,,,,,,,,,,,,,
+261452,,,,,,,,,,,,,,,,,,,,
+261453,,,,,,,,,,,,,,,,,,,,
+262943,,,,,,,,,,,,,,,,,,,,
+280804,,,,,,,,,,,,,,,,,,,,
+280805,,,,,,,,,,,,,,,,,,,,
+280806,,,,,,,,,,,,,,,,,,,,
+280807,,,,,,,,,,,,,,,,,,,,
+280808,,,,,,,,,,,,,,,,,,,,
+280809,,,,,,,,,,,,,,,,,,,,
+280810,,,,,,,,,,,,,,,,,,,,
+280811,,,,,,,,,,,,,,,,,,,,
+280812,,,,,,,,,,,,,,,,,,,,
+280813,,,,,,,,,,,,,,,,,,,,
+280827,,,,,,,,,,,,,,,,,,,,
+285989,,,,,,,,,,,,,,,,,,,,
+285990,,,,,,,,,,,,,,,,,,,,
+285991,,,,,,,,,,,,,,,,,,,,
+285992,,,,,,,,,,,,,,,,,,,,
+285993,,,,,,,,,,,,,,,,,,,,
+285994,,,,,,,,,,,,,,,,,,,,
+285995,,,,,,,,,,,,,,,,,,,,
+285996,,,,,,,,,,,,,,,,,,,,
+285997,,,,,,,,,,,,,,,,,,,,
+,PESCA_238542_2023,Calidris canutus,,,,,,H87437,,,,,,,,,,,,

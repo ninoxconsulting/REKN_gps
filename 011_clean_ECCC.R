@@ -8,9 +8,22 @@ library(readxl)
 library(readr)
 library(dplyr)
 
+# gens directory: 
 
+data_folder <- file.path("../../02_data/REKN_gps/data")
+output_folder <- file.path("../../02_data/REKN_gps/output_temp")
+
+# TODO: 
+# appears a number fo tags are missing reference data. Did not go through entire list but these are ones previously identified as
+# missing deployment information (check main tracking sheet) and also some new ones that have tracks but not info. 
+# reached out to theo (dec 29th so see if there is missing info available.)
+
+
+# cams directory
 data_folder <- file.path("./02_data/REKN_gps/data") # "./" refers to the current working directory, with the subsequent folders below
 output_folder <- file.path("./02_data/REKN_gps/output_temp")
+
+
 
 raw_dat <- file.path(data_folder, "movebank_locations_20251210")
 
@@ -19,15 +32,22 @@ raw_dat <- file.path(data_folder, "movebank_locations_20251210")
 
 keyyy <- read_csv(file.path(data_folder, "movebank_reference", "movebank_ref_all_deployments.csv")) %>% # removed "ECCC_" prefix from ref_all csv based on file name
   dplyr:: filter(Project == "ECCC") %>%
-  dplyr::select(track_data, ArgosID, Banding_or_recapture_Date)%>%
-  rename("tag.id" = ArgosID)%>%
-  dplyr::mutate(deploy.on.date = ymd(Banding_or_recapture_Date)) |> 
+  dplyr::select(track_data, ArgosID, Banding_or_recapture_Date) %>%
+  rename("tag.id" = ArgosID) %>%
+  dplyr::mutate(deploy.on.date = dmy(Banding_or_recapture_Date)) |> 
   dplyr::mutate(deploy.on.date.final = make_datetime(
          year = year(deploy.on.date), month = month(deploy.on.date), 
          day = day(deploy.on.date), hour = 09, min = 00, sec = 00 )) #|> 
   #dplyr::select(tag.id, track, deploy.on.date.final)
 keyyy <- dplyr::select(keyyy, c(track_data, tag.id, deploy.on.date.final))
 
+# generate a list from previous ref data where there was no banding data. 
+keyyy_id_with_ref_2023 <- read_csv(file.path(data_folder, "movebank_reference", "movebank_ref_all_deployments.csv")) %>% # removed "ECCC_" prefix from ref_all csv based on file name
+  dplyr:: filter(Project == "ECCC") %>%
+  dplyr::select(track_data, ArgosID, Banding_or_recapture_Date) %>%
+  rename("tag.id" = ArgosID) |> 
+  dplyr::filter(is.na(Banding_or_recapture_Date)) |> 
+  mutate(tag.id = as.numeric(tag.id))
 
 
 list.files(file.path(data_folder, "movebank_reference"))
@@ -50,8 +70,9 @@ brep <- brep %>%
   mutate(tag.local.identifier = tag.id)%>% 
   filter(!is.na(tag.id))
 
-#uref <- unique(brep$tag.id)
-# 121 tags on refernce dataset
+# check how many tags in reference data 
+uref <- unique(brep$tag.id)
+# 203 tags on reference dataset
 
 # read in the location data 
 btemp <- read.csv(file.path(raw_dat, filesoi))
@@ -64,22 +85,29 @@ bout <- btemp %>%
                 tag.local.identifier, height.above.ellipsoid)%>%
   mutate(date_time = ymd_hms(timestamp))
 
-
-#uids <- sort(unique(bout$tag.local.identifier))
-
-#setdiff (uref, uids)
-#[1] 230313 238581 238590 238596 238608
-# these tags have no loccation data associated with them 
+# check how many unique tags in location data
+uids <- sort(unique(bout$tag.local.identifier))
 
 #setdiff (uids, uref)
 
+# review the tags that have no reference data associated with them
 all_dat <- left_join(bout, brep )%>%
   filter(!is.na(location.long), 
          !is.na(location.lat))
 
-#clean_sf <- st_as_sf(all_dat, coords = c("location.long", "location.lat"), crs = st_crs(4326))
-# st_write(clean_sf, file.path(output_folder, "rekn_eccc_test.gpkg"), append = F)
-# 
+sum_all_dat <- all_dat |> 
+  group_by(tag.id) |> 
+  filter(deploy.on.date == "") |> 
+  summarise(count = n())
+
+sum_all_dat <- left_join(keyyy_id_with_ref_2023, sum_all_dat)
+
+
+
+clean_sf <- st_as_sf(all_dat, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+st_write(clean_sf, file.path(output_folder, "rekn_eccc_test.gpkg"), append = F)
+
+
 
 
 #head(all_dat)

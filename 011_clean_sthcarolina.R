@@ -10,6 +10,7 @@ library(stringr)
 library(readxl)
 library(dplyr)
 
+# to do - could add some more reference data - emailed Felicia to check if available. 
 
 
 # gens directory: 
@@ -18,10 +19,10 @@ output_folder <- file.path("../../02_data/REKN_gps/output_temp")
 
 
 # Set Input and Output folder paths #
-data_folder <- file.path("./02_data/REKN_gps/data")
-output_folder <- file.path("./02_data/REKN_gps/output_temp")
+#data_folder <- file.path("./02_data/REKN_gps/data")
+#output_folder <- file.path("./02_data/REKN_gps/output_temp")
 
-raw_dat <- file.path(data_folder, "movebank_locations_20251210")
+raw_dat <- file.path(data_folder, "movebank_locations_20251229")
 
 # Set keyword to use to pull desired datasets
 key = "Southeast USA" # changed from South Carolina based on the name of the downloaded files for this area
@@ -34,21 +35,24 @@ filesoi <- filesoi[2]
 
 # Read in reference data 
 brep <- read.csv(file.path(raw_dat, filesoi_ref))
-brep <- brep %>% 
-  rename("animal.ring.id" = animal.id) #%>%
-  #mutate(study.site = "KIAWAH") # TODO: check if these are all deployed here?
+brep <- brep |> 
+  mutate("animal.ring.id" = animal.id) |> 
+  mutate(animal.ring.id = ifelse(str_detect(animal.ring.id, "-"),animal.ring.id, NA)) |> 
+  mutate(tag.local.identifier = tag.id) |> 
+  select(-animal.nickname)|> 
+  dplyr::mutate(deploy_date_time = ymd_hms(deploy.on.date))|> 
+  dplyr::mutate(deploy_date = as_date(deploy_date_time)) 
 
-brep <- brep %>%
-  mutate(animal.marker.id = NA) # adding a blank column for animal.marker.id in order to be compatible in later joins (mark as NA)
 
-brep <- brep %>%
-  mutate(tag.local.identifier = tag.id)
+
+
 
 # Read in location data
 bout <- read.csv(file.path(raw_dat, filesoi))
 
 # calculate time differences
-bout <- bout  %>% mutate(date_time = ymd_hms(timestamp)) 
+bout <- bout  %>% mutate(date_time = ymd_hms(timestamp)) |> 
+  select(-manually.marked.outlier)
 
 # merge these together and output 
 
@@ -73,16 +77,14 @@ all_dat <- left_join(bout, brep)
 
 
 all_dat <- all_dat %>%
-  filter(!is.na(location.long))
- # mutate(id = seq(1, length(all_dat$tag.id), 1))%>%
-#  dplyr::mutate(deploy.on.date = ymd_hms(deploy.on.date))
+  filter(!is.na(location.long)) 
 
 # #save out file
 clean_save = all_dat  %>% mutate(proj = "sthcarolina_arctic")
-saveRDS(clean_save, file = file.path(output_folder, "rekn_sthcarolina_20251211.rds"))
+saveRDS(clean_save, file = file.path(output_folder, "rekn_sthcarolina_20251230.rds"))
 
 
 # write out 
-clean_sf <- st_as_sf(all_dat, coords = c("location.long", "location.lat"), crs = st_crs(4326))
-st_write(clean_sf, file.path(output_folder, "pt_sth_20251229.gpkg"), append = F)
+#clean_sf <- st_as_sf(all_dat, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+#st_write(clean_sf, file.path(output_folder, "pt_sth_20251230.gpkg"), append = F)
 

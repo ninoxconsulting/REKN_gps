@@ -36,13 +36,10 @@ old_loc <- read.csv(file.path(previous_ref_dat, "location_data_raw.csv"))
 secyr <- readRDS(file.path(raw_dat, "rekn_secondyr_20251230.rds")) 
 sth <- readRDS(file.path(raw_dat, "rekn_sthcarolina_20251230.rds"))   
 new <- readRDS(file.path(raw_dat, "rekn_newstead_20251230.rds"))
-
-# still to add ECCC
-eccc <- readRDS(file.path(raw_dat, "rekn_eccc_20240708.rds")) 
+eccc <- readRDS(file.path(raw_dat, "rekn_eccc_20251230.rds")) 
 
 
-
-all <- bind_rows(secyr, sth, new) |> #, eccc) |> 
+all <- bind_rows(secyr, sth, new, eccc) |> #, eccc) |> 
   dplyr::mutate(animal.taxon = "Calidris canutus") |> 
   dplyr::mutate(deploy_date_time = ymd_hms(deploy.on.date)) |> 
   dplyr::mutate(date_time = ymd_hms(timestamp))

@@ -175,8 +175,12 @@ all_dat <- all_dat  |>
 
 all_dat <- left_join(all_dat, keyyy)%>% 
   dplyr::select(-deploy.on.date)%>% 
-  rename("deploy.on.date1" = deploy.on.date.final)%>%
-  dplyr::mutate(deploy.on.date = ymd_hms(deploy.on.date1)) 
+  rename("deploy.on.date" = deploy.on.date.final)%>%
+  dplyr::mutate(deploy.on.date = ymd_hms(deploy.on.date)) |> 
+  dplyr::mutate(deploy_date_time = ymd_hms(deploy.on.date))|> 
+  dplyr::mutate(deploy_date = as_date(deploy_date_time)) |> 
+  dplyr::mutate(deploy.on.date = as.character(deploy.on.date)) |> 
+  dplyr::mutate(tag.serial.no = as.character(tag.serial.no))
 
 # 
 # checks <- all_dat %>% dplyr::filter(is.na(deploy.on.date)) |> 
@@ -197,6 +201,6 @@ all_dat <- left_join(all_dat, keyyy)%>%
 clean_save = all_dat %>% mutate(proj = "ECCC")
 saveRDS(clean_save, file = file.path(output_folder, "rekn_eccc_20251230.rds"))
 
-clean_sf <- st_as_sf(all_dat, coords = c("location.long", "location.lat"), crs = st_crs(4326))
-st_write(clean_sf, file.path(output_folder, "rekn_eccc_test.gpkg"), append = F)
+#clean_sf <- st_as_sf(all_dat, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+#st_write(clean_sf, file.path(output_folder, "rekn_eccc_test.gpkg"), append = F)
 # 

@@ -26,12 +26,18 @@ previous_ref_dat <- file.path(data_folder, "compiled_REKN_data2023")
 old_ref <- read.csv(file.path(previous_ref_dat, "reference_data_edited.csv"))
 # read in the previous location data 
 old_loc <- read.csv(file.path(previous_ref_dat, "location_data_raw.csv"))
+next_id <- max(old_loc$id)+1 # get last id value #88765
+old_compiled <- read.csv(file.path(raw_dat, "compiled_20240711.csv"))
 
-
-
+oldtags <- unique(old_compiled$tag.id)
+oldref <- unique(old_ref$tag.id)
 #filesoi <- list.files(raw_dat)
 
-#list the data files
+
+
+
+
+#list the data files to compile
 
 secyr <- readRDS(file.path(raw_dat, "rekn_secondyr_20251230.rds")) 
 sth <- readRDS(file.path(raw_dat, "rekn_sthcarolina_20251230.rds"))   
@@ -39,16 +45,59 @@ new <- readRDS(file.path(raw_dat, "rekn_newstead_20251230.rds"))
 eccc <- readRDS(file.path(raw_dat, "rekn_eccc_20251230.rds")) 
 
 
-all <- bind_rows(secyr, sth, new, eccc) |> #, eccc) |> 
-  dplyr::mutate(animal.taxon = "Calidris canutus") |> 
+all <- bind_rows(secyr, sth, new, eccc) |> 
+  dplyr::mutate(individual.taxon.canonical.name = "Calidris canutus") |> 
   dplyr::mutate(deploy_date_time = ymd_hms(deploy.on.date)) |> 
-  dplyr::mutate(date_time = ymd_hms(timestamp))
+  dplyr::mutate(date_time = ymd_hms(timestamp)) |> 
+  dplyr::mutate(year = year(date_time)) |> 
+  filter(year <=2025) |> 
+  mutate(tag.model = case_when(
+#    tag.model == "gps-pinpoint" ~ "Lotek PinPoint GPS-Argos 75", 
+    tag.model == "PinPoint 75" ~ "Lotek PinPoint GPS-Argos 75", 
+    tag.model ==  "Sunbird" ~ "Sunbird Solar Argos",
+    tag.model ==  "sunbird" ~ "Sunbird Solar Argos",
+    #tag.model == "microwave telemetry"~ "Solar 2-g PTT",
+    .default = as.character(tag.model))) %>%
+  mutate(tag.manufacturer.name = case_when(
+    tag.model == "Lotek Wireless" ~ "Lotek", 
+    TRUE ~ as.character(tag.manufacturer.name)))
 
 
-#94081
 
-write.csv(all, file.path(raw_dat, "compiled_20251230.csv"))
+
+
+#length(all$event.id) #343112   drop future dates #336823
+
+## remove all dates that are future 
+#sort(unique(all$year))
+
+# filter the post 2023 data 
+post_2023 <- all |> filter(year>2023)
+
+# # check which tags are in the old and new daat
+# newtags <- unique(post_2023$tag.id)
+# #oldtags[oldtags %in% newtags]
+# oldref[oldref %in% newtags]
 # 
+# newtags[newtags %in% oldtags]
+# newtags[newtags %in% oldref]
+# oldref[oldref %in% newtags]
+
+
+
+# write out everything. 
+write.csv(all, file.path(raw_dat, "compiled_20251230.csv"))
+
+# write out the post 2023 data 
+write.csv(post_2023, file.path(raw_dat, "compiled_post202320251230.csv"))
+
+#clean_sf <- st_as_sf(all, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+#st_write(clean_sf, file.path(output_folder, "rekns_20251230.gpkg"), append = F)
+
+
+
+# dont filter by visible as this seems to drop many points, and not all clearly outliers
+
 # # check the values 
 summ <- all %>%
   group_by(tag.id, proj) |>
@@ -61,17 +110,20 @@ summ <- unique_id %>%
   group_by(proj) |>
   count()
 # 
-# unique(all$proj)
-# unique(all$algorithm.marked.outlier)
-# unique(all$import.marked.outlier)
-# unique(all$study.site)
-# 
+ unique(all$proj)
+ unique(all$algorithm.marked.outlier)
+ unique(all$import.marked.outlier)
+ unique(all$study.site)
+ unique(all$animal.id)
+ unique(all$deployment.id)
+
+ # 
 
 
 #######################################
 # filter records than occur before deplopyment 
 
-out <- all %>%
+out <- post_2023 %>%
     mutate(pre_dep = ifelse(date_time >= deploy_date_time, 1, 0 )) |> 
     mutate(pre_dep = ifelse(is.na(pre_dep), 1, pre_dep)) |> 
     filter(pre_dep == 1) |> 
@@ -89,18 +141,21 @@ out <- out %>%
   mutate(month = month(date_time ),
          day = day(date_time),
          hour = hour(date_time),
-         minute = minute(date_time)) %>%
-  filter(year<=2023) %>%
-  #filter(year>=2019) %>%
+         minute = minute(date_time)) |>
+  mutate(Event = event.id ) |> 
+  # filter the dodgy location values
+  filter(location.lat <90 & location.lat >= -90) |> 
+  filter(location.long <180 & location.long >= -180) |> 
   arrange(date_time, by_group = tag.id)
 
-#length(out$tag.id)  # 88787
-#length(unique(out$tag.id)) #356
+#length(out$tag.id)  #  256886
+#length(unique(out$tag.id)) #177
 
-out <- out %>%
+out <- out |> 
   group_by(tag.id) |> 
   mutate(diff = difftime(date_time, lag(date_time),  units = c("hours")), 
          diff = as.numeric(diff)) 
+
 
 
 ############################################################################
@@ -112,6 +167,7 @@ bdd_det <- out  |>
   mutate(location.long_prior = lag(location.long, 1L),
          location.lat_prior = lag(location.lat, 1L))
 
+
 bdd_det <- bdd_det |> 
   rowwise() %>%
   dplyr::mutate(gcd_m = distHaversine(c(location.long_prior,location.lat_prior), c(location.long, location.lat)),
@@ -122,28 +178,28 @@ bdd_det <- bdd_det |>
 
 #length(unique(bdd_det$tag.id))
 
-
 ## Add id values 
+totlength = length(bdd_det$tag.id) + next_id-1
 
 bdd_det <- bdd_det %>%
-  dplyr::mutate(id = seq(1, length(bdd_det$tag.id), 1))
+  dplyr::mutate(id = seq(next_id, totlength, 1))
 
 
 # write out the entire dataset 
-#write.csv(bdd_det, file.path(output_folder, "compiled_20240711.csv"))
-#clean_sf <- st_as_sf(bdd_det, coords = c("location.long", "location.lat"), crs = st_crs(4326))
-#st_write(clean_sf, file.path(output_folder, "rekns_20240711.gpkg"), append = F)
+write.csv(bdd_det, file.path(output_folder, "compiled_post2023_20251230.csv"))
+clean_sf <- st_as_sf(bdd_det, coords = c("location.long", "location.lat"), crs = st_crs(4326))
+st_write(clean_sf, file.path(output_folder, "rekns_post2023_20251230.gpkg"), append = F)
 
-# 
-# ## get list of unique id in which to only need to do this once. 
-# id_summ <- bdd_det |> 
-#   group_by(proj, tag.id, animal.id) |> 
-#   count()%>% 
-#   mutate(subspecies = ifelse(proj == "Johnson_GPS", "roselarri", "rufa"))
-# 
-# # write out the csv to be used to summarise tag movements. 
-# write.csv(id_summ, file.path(raw_dat, "final_tags_list_blank.csv"))
-# 
+
+# # ## get list of unique id in which to only need to do this once. 
+# id_summ <- bdd_det |>
+#   group_by(proj, tag.id, animal.id) |>
+#   count()#%>%
+#   #mutate(subspecies = ifelse(proj == "Johnson_GPS", "roselarri", "rufa"))
+# # 
+# # # write out the csv to be used to summarise tag movements. 
+#  write.csv(id_summ, file.path(raw_dat, "final_tags_list_blank_2025.csv"))
+# # 
 
 
 ## Split data into the refernce and location datasets and output only most important columns
@@ -151,13 +207,16 @@ bdd_det <- bdd_det %>%
 
 # extract reference information 
 ref <- bdd_det %>% 
-  dplyr::select( animal.id, animal.life.stage, animal.marker.id, 
-                animal.mass,animal.ring.id, animal.sex, animal.taxon, "attachment.type", 
-                "capture.timestamp",  "deploy.on.date" ,"deploy.on.latitude", "deploy.on.longitude" , 
-                "deploy.on.measurements", "deploy.on.person" , "deployment.comments", 
-                "duty.cycle", "tag.beacon.frequency"   ,   "tag.manufacturer.name",
-                "tag.mass", "tag.id", "tag.serial.no" ,  "tag.model", "study.site", proj,
-                deploy.off.date,"deploy_date_time", "duty.cycle" ,"tag.comments", "track_data") %>%
+  dplyr::select( animal.id, animal.life.stage, animal.marker.id, "animal.comments",
+                animal.mass, animal.ring.id, animal.sex, animal.taxon, "animal.taxon.detail", 
+                "attachment.type", individual.taxon.canonical.name,individual.local.identifier,
+                "capture.timestamp", "capture.method" , tag.local.identifier,
+                "deploy.on.date" ,"deploy.on.latitude", "deploy.on.longitude" ,deployment.end.type, 
+                "deploy.on.measurements", "deploy.on.person" , "deployment.comments", "deployment.id",
+                #"duty.cycle", 
+                "tag.beacon.frequency"   ,   "tag.manufacturer.name",
+                "tag.mass", "tag.id", "tag.serial.no" ,  "tag.model", "study.site", proj, "study.name", 
+                deploy.off.date,"deploy_date","deploy_date_time" ,"tag.comments", "track_data") %>%
   distinct()
 
 #length(unique(ref$tag.id))
@@ -175,8 +234,11 @@ loc <- bdd_det %>% dplyr::select("proj", id, "tag.id", tag.model, "location.lat"
                              "argos.pass.duration" , "argos.semi.major" , "argos.semi.minor"  ,            
                               "argos.sensor.1" , "argos.sensor.2" , "argos.sensor.3" ,               
                               "argos.sensor.4" , "argos.valid.location.algorithm", 
-                             "location.lat_prior" , "location.long_prior","Event" ,                     
-                             "height.above.ellipsoid"  , "argos.altitude") %>%
+                             "location.lat_prior" , "location.long_prior","Event" ,                  
+                             "height.above.ellipsoid" , "argos.sat.id", "argos.transmission.timestamp",
+                             "external.temperature","outlier.comments" ,"mortality.status",sensor.type,
+                             visible
+                             ) |> 
   unique()
 
 

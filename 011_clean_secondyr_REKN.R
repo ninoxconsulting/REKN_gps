@@ -37,10 +37,13 @@ ndatr <- read.csv(file.path(raw_dat, filesoi)) |>
 # Read in reference data
 nref <- read.csv(file.path(raw_dat, filesoi_ref)) |> 
   mutate(animal.taxon = "Calidris canutus") |> 
+  rowwise() |> 
+  mutate(animal.comments = paste0(animal.comments, ", latest date born:", as.character(animal.latest.date.born))) |> 
  #select(-animal.taxon.detail) |> 
   mutate(animal.id = deployment.id) |> 
   dplyr::mutate(deploy_date_time = ymd_hms(deploy.on.date))|> 
-  dplyr::mutate(deploy_date = as_date(deploy_date_time)) 
+  dplyr::mutate(deploy_date = as_date(deploy_date_time)) |> 
+  select(-animal.latest.date.born, -attachment.body.part, -deployment.end.type, -tag.readout.method)
 
 
 all_dat <- left_join(ndatr, nref) |> 

@@ -11,7 +11,8 @@ library(readxl)
 library(dplyr)
 
 # to do - could add some more reference data - emailed Felicia to check if available. 
-
+# note the three tags which were included in the previous dataset all ended transmission before of 2023. 
+# all new tags started in May 2024
 
 # gens directory: 
 data_folder <- file.path("../../02_data/REKN_gps/data")

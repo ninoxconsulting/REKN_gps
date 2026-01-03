@@ -167,7 +167,6 @@ bdd_det <- out  |>
   mutate(location.long_prior = lag(location.long, 1L),
          location.lat_prior = lag(location.lat, 1L))
 
-
 bdd_det <- bdd_det |> 
   rowwise() %>%
   dplyr::mutate(gcd_m = distHaversine(c(location.long_prior,location.lat_prior), c(location.long, location.lat)),
@@ -256,9 +255,26 @@ a <- ref %>% group_by(tag.id)%>%count()
 
 
 # write out the csv to be used to summarise tag movements. 
-write.csv(ref, file.path(final_dat, "reference_data_raw.csv"))
+write.csv(ref, file.path(final_dat, "reference_data_raw_2025.csv"))
 
 # note reviewed the refernce data and removed or deleted duplicate references
 
-write.csv(loc, file.path(final_dat, "location_data_raw.csv"))
+write.csv(loc, file.path(final_dat, "location_data_raw_2025.csv"))
+
+
+# merge the old and new reference data - this will need more edits 
+
+
+old_ref <- read.csv(file.path(previous_ref_dat, "reference_data_edited.csv")) |> 
+  mutate(tag.serial.no = as.character(tag.serial.no)) |> 
+  mutate(deploy_date_time = ymd_hm(deploy_date_time))
+
+tt <- full_join(old_ref, ref)
+
+
+write.csv(tt, file.path(final_dat, "reference_data_raw_2020_2025.csv"))
+
+# THis is then manully edited to combine and refine data to "reference_data_raw_2020_2025_edited.csv"
+
+
 

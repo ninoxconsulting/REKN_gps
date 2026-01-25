@@ -6,23 +6,31 @@ library(sf)
 library(stringr)
 library(readxl)
 library(dplyr)
+library(readr)
 
 
 #data_folder <- file.path("../../02_data/REKN_gps/data")
 raw_dat <- file.path("../../02_data/REKN_gps/output_temp")
 final_dat <- file.path("../../02_data/REKN_gps/output_final")
+out.plots <- file.path("../../02_data/REKN_gps/output_final/figures_2026")
 
 
 # read in the ref data
-ref <- read_xlsx(file.path(final_dat, "reference_data_raw_2020_2025_edited.xlsx"))
+ref <- read_csv(file.path(final_dat, "reference_data_raw_2020_2025_edited_20260124.csv"))
 
-loc <- read_csv(file.path(final_dat, "location_data_raw_2025.csv"))
+# read in combined location data 
+loc <- read_csv(file.path(final_dat, "location_data_2017_2025.csv"))
 
-#df_all <- st_read(file.path(final_dat,"rekn_moveclass_20240716.gpkg" ))
+# read in moveclass data 
+df_all <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_edited.gpkg"))
 
-df_all <- file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_edited.gpkg")
-loc <- st_read(df_all)
 
+# read in the key 
+
+tagls <- read_csv(file.path(final_dat, "final_tags_list_edited_20260123.csv"))
+
+ref_y <- left_join(ref, tagls, by = "tag.id") |> 
+  filter(usable =="y" )
 
 # clean up the spatial resolution # can remove these cols. 
 #unique(loc$argos.lc)
@@ -56,7 +64,7 @@ tag.proj <-  ref %>%
 # tag number per tag type
 tag.types <- ref %>% 
   dplyr::select(tag.id, tag.model, proj) %>%
-  group_by(tag.model, proj) |> 
+  group_by(tag.model) |> 
   summarise(no.of.tags = length(unique(tag.id)))
 
 # type of fix per tag model (accuracy per tag type - only relevant for pinpoint)
@@ -69,7 +77,7 @@ tag.types <- ref %>%
 
 ### Capture location 
 
-study.site <- ref |> 
+study.site <- ref_y |> 
   dplyr::select(tag.id, study.site, deploy.on.date, deploy.on.latitude,  deploy.on.longitude ) |> 
   group_by(study.site) |> 
   summarise(no.of.tags = length(unique(tag.id)))

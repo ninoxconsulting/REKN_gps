@@ -25,6 +25,15 @@ loc <- read_csv(file.path(final_dat, "location_data_2017_2025.csv"))
 df_all <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_edited.gpkg"))
 
 
+
+# drop the fields n
+df_all <- df_all |> 
+  select(-c(movement_final_old, bearing, diff, gcd_m, speed_mhr, algorithm.marked.outlier, location.lat_prior, location.long_prior, Event)) |> 
+  select(-timestamp)
+
+st_write(df_all, (file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_movetype_20260125.gpkg")))
+
+
 # read in the key 
 
 tagls <- read_csv(file.path(final_dat, "final_tags_list_edited_20260123.csv"))

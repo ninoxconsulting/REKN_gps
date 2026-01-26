@@ -25,6 +25,7 @@ loc <- read_csv(file.path(final_dat, "location_data_2017_2025.csv"))
 
 # read in moveclass data 
 df_all <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_edited.gpkg"))
+#st_write(df_all, (file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_movetype_20260125.gpkg")))
 
 
 # filter the uncertain locations 

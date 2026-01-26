@@ -7,6 +7,7 @@ library(stringr)
 library(readxl)
 library(dplyr)
 library(ggplot2)
+library(readr)
 
 
 #data_folder <- file.path("../../02_data/REKN_gps/data")
@@ -69,3 +70,29 @@ global
 ggsave(file.path(out.plots,"figure2_rose_rufa.jpg"), width = 30, height = 25,units = "cm", dpi = 600)
 
 
+###
+
+
+west_tag = 282287
+
+allsf <- allsf |> filter(tag.id == west_tag)
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+#Americas <- world %>% dplyr::filter(region_un == "Americas")
+#Americas <- world %>% dplyr::filter(continent == "North America")
+# entire north America 
+global <- ggplot(data = world) +
+  geom_sf(color = "grey") +
+  geom_sf(data = allsf, size = 1, colour = "darkblue" , alpha = 0.3) + #aes(fill = movement_dir, colour = movement_dir))+#colour = "dark blue") +
+  #scale_color_viridis_d(option = "magma",begin = 0.1)+
+  #facet_wrap(~subspecies)+
+  # geom_point(ru, aes(x = lng, y = lat), size = 4) +
+  xlab("Longitude") + ylab("Latitude") +
+  coord_sf(xlim = c(-170, -20), ylim = c(0, 80), expand = FALSE)+
+  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
+  theme_bw()+
+  theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+global
+ggsave(file.path(out.plots,"figure3_282287_rufa.jpg"), width = 30, height = 25,units = "cm", dpi = 600)

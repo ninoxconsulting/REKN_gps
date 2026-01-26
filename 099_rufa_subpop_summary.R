@@ -171,6 +171,64 @@ global
 
 
 
+## plots for Western  regions 
+
+
+pop_id <- pop %>% 
+  select("tag.id" , "proj", "subspecies", "subpop", 
+         "north", "breeding" , "south","wintering" ,  
+         "type", "usable"  ) |> 
+  filter(usable == 'y') %>% 
+  filter(subspecies == "rufa") %>%
+  filter(subpop == "West") 
+
+rufa_ids <- pop_id$tag.id
+
+## read in compiled data with movements and limit to rufa 
+
+# read in moveclass data 
+dfsubset <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_movetype_20260125.gpkg"))
+
+dfsubset <-dfsubset |> 
+  filter(tag.id %in% rufa_ids ) %>% 
+  filter(movement_final != "uncertain_location")
+
+
+## read in compiled data with movements and limit to rufa 
+# read in moveclass data 
+# df_sth <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_movetype_20260125.gpkg")) |> 
+#   filter(tag.id %in% rufa_ids ) %>% 
+#   filter(movement_final != "uncertain_location") |> 
+#   filter(movement_final %in% c("south_stopover", "wintering")) 
+
+dfsubset <- cbind(dfsubset, st_coordinates(dfsubset))
+
+dfsubset <- dfsubset |> 
+     filter(movement_final != "uncertain_location") |> 
+     filter(movement_final %in% c("south_stopover", "north_stopover")) 
+
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+Americas <- world %>% dplyr::filter(region_un == "Americas")
+
+# entire north America 
+global <- ggplot(data = Americas) +
+  geom_sf(color = "grey") +
+  geom_sf(data = dfsubset , size = 1.5, aes(fill = movement_final, colour = movement_final), alpha = 0.2)+#colour = "dark blue") +
+  #scale_color_viridis_d()+
+  facet_wrap(~movement_final)+
+  # geom_point(ru, aes(x = lng, y = lat), size = 4) +
+  xlab("Longitude") + ylab("Latitude") +
+  coord_sf(xlim = c(-140, -50), ylim = c(10, 80), expand = FALSE)+
+  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
+  theme_bw()+
+  theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank(), 
+        legend.position="none")
+
+global
+
+ggsave(file.path(out.plots,"figure8_rufa_west_Stopovers.jpg"), width = 15, height = 30,units = "cm", dpi = 600)
 
 
 

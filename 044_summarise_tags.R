@@ -8,6 +8,8 @@ library(readxl)
 library(dplyr)
 library(readr)
 library(ggplot2)
+library(viridis)
+#install.packages("viridisLite")
 
 
 #data_folder <- file.path("../../02_data/REKN_gps/data")
@@ -56,7 +58,6 @@ unique(ref$tag.comments)
 
 ref <- ref |> 
   dplyr::filter(!tag.comments %in% c("tag failed"))
-
 
 
 # read in the key 
@@ -155,7 +156,6 @@ sex_sum <- ref_y |>
   group_by(animal.sex, proj) |> 
   summarise(no.of.tags = length(unique(tag.id)))
 
-
 age_sum <- ref_y |> 
   dplyr::select(tag.id, study.site, proj, animal.life.stage) |> 
   #group_by(animal.life.stage , study.site) |> 
@@ -178,6 +178,11 @@ rids <- ref %>%
   dplyr::select(animal.ring.id, tag.id, proj) %>% 
   group_by(animal.ring.id, tag.id ) %>%
   count()
+
+
+
+
+
 
 
 
@@ -429,9 +434,6 @@ dur <- left_join(table_max, table_min, by = join_by(tag.id)) |>
   rowwise() |> 
   dplyr::mutate(duration = max - min ) |>  # days 
   mutate(dur_days = round( as.numeric(duration))) |> 
-#  mutate(dur_min = round(as.numeric(duration)/60,1))%>%  
-#  mutate(dur_hrs = round(as.numeric(dur_min)/60,1))%>%  
-#  mutate(dur_days = round( dur_hrs/24,1))%>%  
   mutate(year = year(min))  
 
 
@@ -459,8 +461,6 @@ dur_hist
 
 
 
-
-
 # duration of tag per tag type 
 
 dur_type <- dur %>% 
@@ -473,18 +473,12 @@ dur_hist <- ggplot(dur_type, aes(x= dur_days, fill = tag.model)) +
 
 dur_hist
 
-aa <- dur_type |> select(tag.id , dur_days, tag.model, proj)%>%
-  distinct()
 
-
-
-p1 <- ggplot(aa, aes(x= dur_days)) +
-  geom_histogram()
-
+# generate the summary values for tabel in report
 
 dur_type_sum <- dur_type |> select(tag.id , dur_days, tag.model)%>%
   distinct()%>% 
-  filter(dur_days>0) |> 
+  filter(dur_days<340) |>  # note this drops the one pinpony 355 - so totals need to account for this. 
   group_by( tag.model) |> 
   summarise(count = n(),
             min = min(dur_days), 
@@ -492,55 +486,48 @@ dur_type_sum <- dur_type |> select(tag.id , dur_days, tag.model)%>%
             mean_dur = mean(dur_days), 
             sd = sd(dur_days))
 
-ggplot(dur_type_sum) +
-  geom_bar( aes(x=tag.model , y=mean_dur), stat="identity", fill="skyblue", alpha=0.7) +
-  geom_errorbar( aes(x=tag.model, ymin=mean_dur -sd, ymax=mean_dur+sd), width=0.4, colour="orange", alpha=0.9, size=1.3)
+
+durdf <- dur_type |> 
+  select(tag.id , dur_days, tag.model,attachment.type  ) |> 
+  filter(tag.id !=194904)
 
 
-ggplot(dur_type, aes(x=tag.model, y=dur_days)) + 
-  geom_bar(stat = "identity")
+ggplot( durdf, aes(y=dur_days , x=tag.model, fill = tag.model)) +
+  geom_violin(width=1, alpha=0.2) +
+  geom_boxplot(width=0.1, color="darkgrey", alpha=0.9) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_bw() +
+  theme(
+    legend.position="none",
+    plot.title = element_text(size=11)
+  ) +
+  #ggtitle("A Violin wrapping a boxplot") +
+  xlab("")+
+  ylab("duration (days)")
+
+
+ggsave(filename = fs::path(out.plots, "figure3_tag_duration.jpg"), 
+       width = 13, height = 13, units = "cm")
+
+
+## attachment type ################################
+
+durdf
+
+atttype <- durdf |> 
+  group_by(attachment.type,tag.model) |> 
+  summarise(count = n(),
+            min = min(dur_days), 
+            max = max(dur_days),
+            mean_dur = mean(dur_days), 
+            sd = sd(dur_days)) |> 
+  filter(!is.na(attachment.type )) |> 
+  filter(tag.model == "Sunbird Solar Argos") |> 
+  select(-tag.model)
 
 
 
-# add the group by
-ggplot(dur_type, aes(tag.id, dur_days,)) +
-  geom_col(aes(fill = proj))#, position = position_stack(reverse = TRUE))
 
-ggplot(dur_type, aes(x = forcats::fct_reorder(as.factor(tag.id), dur_days), y = dur_days)) +
-  geom_col(aes(fill = proj))+
-  facet_wrap(~proj, scales = "free_x")#, position = position_stack(reverse = TRUE))
-
-
-# 
-# 
-# # duration looking at dates 
-# 
-# # plot total duration of collar data 
-# ggplot(dur, aes(y=factor(tag.id))) +
-#   geom_segment(aes(x=min, xend=max, y=factor(tag.id), yend=factor(tag.id)), linewidth = 1)+
-#   xlab("Date") + ylab("Tag") 
-# 
-# 
-# # plot total duration of collar data 
-# ggplot(dur, aes(y=factor(tag.id))) +
-#   geom_segment(aes(x=min, xend=max, y=factor(tag.id), yend=factor(tag.id),colour = proj), linewidth = 1)+
-#   scale_color_discrete()+
-#   xlab("Date") + ylab("Tag") 
-# 
-# 
-# # plot total duration of collar data 
-# ggplot(dur, aes(y=factor(proj))) +
-#   geom_segment(aes(x=min, xend=max, y=factor(proj), yend=factor(proj), colour = proj), linewidth = 3)+
-#   scale_color_discrete()+
-#   xlab("Date") + ylab("Tag") 
-# 
-# 
-# # plot total duration of collar data 
-# ggplot(dur, aes(y=factor(tag.id))) +
-#   geom_segment(aes(x=min, xend=max, y=factor(tag.id), yend=factor(tag.id)), linewidth = 1)+
-#   xlab("Date") + ylab("Tag") +
-#   facet_wrap(~proj, scales = "free")
-# 
 
 
 
@@ -548,7 +535,7 @@ ggplot(dur_type, aes(x = forcats::fct_reorder(as.factor(tag.id), dur_days), y = 
 
 # seasonality by tag 
 
-bs <- all |> 
+bs <- loc |> 
   dplyr::select(month, year, tag.id) %>% 
   distinct() %>%
   group_by(month, year) %>%
@@ -570,6 +557,12 @@ ggplot(bs, aes(x = as.factor(month), y = n, fill = as.factor(year))) +
   theme_bw()+
   xlab("month")+ ylab("count")+
   theme(legend.position = "none")
+
+
+
+ggsave(filename = fs::path(out.plots, "figure6_tag_seasonality.jpg"), 
+       width = 25, height = 20, units = "cm")
+
 
 
 ####################################################################################

@@ -535,6 +535,13 @@ atttype <- durdf |>
 
 # seasonality by tag 
 
+se_py <- loc |> 
+  dplyr::select(year, tag.id) %>% 
+  distinct() |> 
+  group_by( year) %>%
+  count() |> 
+  rename("no"= n)
+
 bs <- loc |> 
   dplyr::select(month, year, tag.id) %>% 
   distinct() %>%
@@ -542,26 +549,35 @@ bs <- loc |>
   count()
 # mutate(sdate = ymd(ddate))
 
-# no of tags per month (all years)
 
-ggplot(bs, aes(x = as.factor(month), y = n)) +
-  geom_col() 
+bss <- left_join(bs, se_py) |> 
+  rowwise() |> 
+  mutate(yr_no = paste0(year, " (",no,")"))
+
+
 
 
 # By year 
-ggplot(bs, aes(x = as.factor(month), y = n, fill = as.factor(year))) +
+ggplot(bss, aes(x = as.factor(month), y = n, fill = as.factor(yr_no))) +
   geom_col(position = position_dodge2(width = 0.9, preserve = "single"))+
   scale_fill_viridis_d()+
   #geom_bar(stat = "identity", position = "dodge") #+
-  facet_wrap(~year)+
+  facet_wrap(~yr_no)+
   theme_bw()+
   xlab("month")+ ylab("count")+
   theme(legend.position = "none")
 
 
-
-ggsave(filename = fs::path(out.plots, "figure6_tag_seasonality.jpg"), 
+ggsave(filename = fs::path(out.plots, "figure4_tag_seasonality.jpg"), 
        width = 25, height = 20, units = "cm")
+
+
+
+# add number of tags to facet 
+
+
+
+
 
 
 

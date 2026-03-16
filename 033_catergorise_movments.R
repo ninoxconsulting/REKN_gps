@@ -134,8 +134,6 @@ st_write(clean_sf, file.path(raw_dat, "locations_raw_2025", "loc_20251230_raw.gp
 
 ############################################################################
 
-
-
 # manually review the reference dataset (reference_data_raw_2020_2025_edited.xlsx)
 # keep as xlsx due to date issues. 
 
@@ -149,9 +147,7 @@ st_write(clean_sf, file.path(raw_dat, "locations_raw_2025", "loc_20251230_raw.gp
 
 
 
-
 #201139 - deleted one values in new dataset as error (newstead)
-
 
 
 ####################################################################################

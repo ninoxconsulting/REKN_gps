@@ -7,39 +7,74 @@ library(stringr)
 library(readxl)
 library(dplyr)
 library(readr)
+library(ggplot2)
 
 
 #data_folder <- file.path("../../02_data/REKN_gps/data")
 raw_dat <- file.path("../../02_data/REKN_gps/output_temp")
-final_dat <- file.path("../../02_data/REKN_gps/output_final")
+final_dat <- file.path("../../02_data/REKN_gps/output_final/draft_outputs_2026")
 out.plots <- file.path("../../02_data/REKN_gps/output_final/figures_2026")
 
+# # read in the ref data
+# ref <- read_csv(file.path(final_dat, "reference_data_raw_2020_2025_edited_20260124.csv"))
+# 
+# # read in combined location data 
+# loc <- read_csv(file.path(final_dat, "location_data_2017_2025.csv"))
+# 
+# # read in moveclass data 
+# df_all <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_edited.gpkg"))
+# 
+# 
+# # drop the fields n
+# df_all <- df_all |> 
+#   select(-c(movement_final_old, bearing, diff, gcd_m, speed_mhr, algorithm.marked.outlier, location.lat_prior, location.long_prior, Event)) |> 
+#   select(-timestamp)
+# 
+# st_write(df_all, (file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_movetype_20260125.gpkg")))
+# 
 
-# read in the ref data
-ref <- read_csv(file.path(final_dat, "reference_data_raw_2020_2025_edited_20260124.csv"))
-
-# read in combined location data 
-loc <- read_csv(file.path(final_dat, "location_data_2017_2025.csv"))
-
-# read in moveclass data 
-df_all <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_edited.gpkg"))
 
 
 
-# drop the fields n
-df_all <- df_all |> 
-  select(-c(movement_final_old, bearing, diff, gcd_m, speed_mhr, algorithm.marked.outlier, location.lat_prior, location.long_prior, Event)) |> 
-  select(-timestamp)
+## March 2026
 
-st_write(df_all, (file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_movetype_20260125.gpkg")))
+# for the final analysis I am using the following files: 
+# in the folder: 
+# draft_outputs_2026
+
+# 1) final_tags_list_edited_20260126.csv - key for the tags to match type and duration of tag location 
+# 2) loc_2020_2025_movetype_20200125.gpkg = spatial datset with movement catergory 
+# 3) paths_2020_2025_movtype_20260128.gpkg = line to match movetype file above
+
+# movebank files 
+# 4) loc_data_2017_2025.csv = full columns for movebank upload
+# 5) referenc_data_2020_2025_20260124.csv = line to match movetype file above
+
+
+ref <- read_csv(file.path(final_dat, "reference_data_2020_2025_20260124.csv"))
+unique(ref$tag.comments)
+
+ref <- ref |> 
+  dplyr::filter(!tag.comments %in% c("tag failed"))
+
 
 
 # read in the key 
 
-tagls <- read_csv(file.path(final_dat, "final_tags_list_edited_20260123.csv"))
+tagls <- read_csv(file.path(final_dat, "final_tags_list_edited_20260126.csv"))
+tagls <- tagls |> 
+  select(tag.id, usable)
 
 ref_y <- left_join(ref, tagls, by = "tag.id") |> 
   filter(usable =="y" )
+
+
+
+# filtered location records to usable tags 
+loc <- read_csv(file.path(final_dat, "location_data_2017_2025.csv")) |> 
+  select(-c("...1", "...2")) |> 
+  filter(tag.id %in% ref_y$tag.id)
+
 
 # clean up the spatial resolution # can remove these cols. 
 #unique(loc$argos.lc)
@@ -49,8 +84,6 @@ ref_y <- left_join(ref, tagls, by = "tag.id") |>
 ## How many tags and types of tage 
 unique(ref$tag.model)
 
-
-
 # quick fix for location data
 #length(loc$proj)#
 #
@@ -58,9 +91,7 @@ unique(ref$tag.model)
 #  dplyr::filter(year > 2000)
 #length(loc$proj)
 
-
-
-
+tag.proj
 ### SUMMARY OF ANIMALS ## NOTE THIS IS THE FULL DATA SET (n = 353)
 
 # tags per project 
@@ -72,19 +103,24 @@ tag.proj <-  ref %>%
 
 # tag number per tag type
 tag.types <- ref %>% 
-  dplyr::select(tag.id, tag.model, proj) %>%
+  dplyr::select(tag.id, tag.model ) %>%
   group_by(tag.model) |> 
   summarise(no.of.tags = length(unique(tag.id)))
 
-# type of fix per tag model (accuracy per tag type - only relevant for pinpoint)
-#tag.types.model <- loc %>% 
+tag.types <- ref %>% 
+  dplyr::select(tag.id, tag.model, proj) %>%
+  group_by(tag.model, proj) |> 
+  summarise(no.of.tags = length(unique(tag.id)))
+
+# # type of fix per tag model (accuracy per tag type - only relevant for pinpoint)
+# tag.types.model <- loc %>%
 #  dplyr::select(tag.id, tag.model, proj, gps.fix.type.raw) %>%
-#  group_by(gps.fix.type.raw, tag.model) |> 
+#  group_by(gps.fix.type.raw, tag.model) |>
 #  summarise(no.of.tags = length(unique(tag.id)))
 
 
 
-### Capture location 
+### Capture location # usable tags
 
 study.site <- ref_y |> 
   dplyr::select(tag.id, study.site, deploy.on.date, deploy.on.latitude,  deploy.on.longitude ) |> 
@@ -109,23 +145,32 @@ study.site.proj <- ref |>
 
 
 
-
 ### Summary statistics
 
 ## Age / sex of individuals 
 
 ## capture age and sex 
-sex_sum <- ref |> 
+sex_sum <- ref_y |> 
   dplyr::select(tag.id, study.site, proj, animal.life.stage, animal.sex) |> 
   group_by(animal.sex, proj) |> 
   summarise(no.of.tags = length(unique(tag.id)))
 
-age_sum <- ref |> 
+
+age_sum <- ref_y |> 
   dplyr::select(tag.id, study.site, proj, animal.life.stage) |> 
   #group_by(animal.life.stage , study.site) |> 
   group_by(animal.life.stage, proj ) |> 
   #group_by(animal.life.stage ) |> 
   summarise(no.of.tags = length(unique(tag.id)))
+
+age_sum <- ref_y |> 
+  dplyr::select(tag.id, study.site, proj, animal.life.stage) |> 
+  #group_by(animal.life.stage , study.site) |> 
+  group_by(animal.life.stage,study.site ) |> 
+  #group_by(animal.life.stage ) |> 
+  summarise(no.of.tags = length(unique(tag.id)))
+
+
 
 
 # ring-id for subpop information
@@ -140,32 +185,255 @@ rids <- ref %>%
 
 ### Duration statistics 
 
+
+# the tags that need editing 
+# 232985 - drop anything after 2022 as reords appearing in 2023 and 2025
+loc_1 <- loc |> 
+  filter(tag.id == 232985) |> 
+  filter(year <= 2022)
+
+loc <- loc |> 
+  filter(tag.id != 232985)
+
+loc <- bind_rows(loc, loc_1)
+
+
+#232982
+#potential dropped tag in southert wintering grounds 
+#migration in 2023 tagged in delaware bay, breeding in arctic, return to TDF on 
+#2023-10-14 - tag continued to transmitt from location for 2024 - june then again in 2025 April - Dec
+
+loc_1 <- loc |> 
+  filter(tag.id == 232982) |> 
+  filter(year <=2023)
+
+loc <- loc |> 
+  filter(tag.id != 232982)
+
+loc <- bind_rows(loc, loc_1)
+
+#240164
+#potential dropped tag along hudson Bay 
+#migration in 2023  breeding in arctic, return sth dropped tag in HB
+# last date in 2023? 
+# recorded in 2024 an 2025 in same locations 
+
+loc_1 <- loc |> 
+  filter(tag.id == 240164) |> 
+  filter(year <=2023)
+
+loc <- loc |> 
+  filter(tag.id != 240164)
+
+loc <- bind_rows(loc, loc_1)
+
+#240159
+#potential dropped tag in breedign area
+#migration in 2023  breeding in arctic from Brazil
+# last date in 2023? 
+# recorded in 2024 an 2025 in same locations 
+
+loc_1 <- loc |> 
+  filter(tag.id == 240159) |> 
+  filter(year <=2023)
+
+loc <- loc |> 
+  filter(tag.id != 240159)
+
+loc <- bind_rows(loc, loc_1)
+
+# tag 242574
+loc_1 <- loc |> 
+  filter(tag.id == 242574) |> 
+  filter(year <=2023)
+
+loc <- loc |> 
+  filter(tag.id != 242574)
+
+loc <- bind_rows(loc, loc_1)
+
+
+# tag 238555
+loc_1 <- loc |> 
+  filter(tag.id == 238555) |> 
+  filter(year <=2023)
+
+loc <- loc |> 
+  filter(tag.id != 238555)
+
+loc <- bind_rows(loc, loc_1)
+
+
+# tag 238561
+loc_1 <- loc |> 
+  filter(tag.id == 238561) |> 
+  filter(year <=2023)
+
+loc <- loc |> 
+  filter(tag.id != 238561)
+
+loc <- bind_rows(loc, loc_1)
+
+# tag 238576
+loc_1 <- loc |> 
+  filter(tag.id == 238576) |> 
+  filter(year <=2023)
+
+loc <- loc |> 
+  filter(tag.id != 238576)
+
+loc <- bind_rows(loc, loc_1)
+
+# tag 213841
+loc_1 <- loc |> 
+  filter(tag.id == 213841) |> 
+  filter(year <=2022)
+
+loc <- loc |> 
+  filter(tag.id != 213841)
+
+loc <- bind_rows(loc, loc_1)
+
+
+
+# tag 240167 - static after wintering 
+loc_1 <- loc |> 
+  filter(tag.id == 240167) |> 
+  filter(year <= 2023) 
+
+loc <- loc |> 
+  filter(tag.id != 240167)
+
+loc <- bind_rows(loc, loc_1)
+
+
+
+# tag 242570 - static on departure
+loc_1 <- loc |> 
+  filter(tag.id == 242570) |> 
+  filter(year <= 2023) 
+
+loc <- loc |> 
+  filter(tag.id != 242570)
+
+loc <- bind_rows(loc, loc_1)
+
+
+# tag 242580 - static 
+loc_1 <- loc |> 
+  filter(tag.id == 242580) |> 
+  filter(year <= 2023) 
+
+loc <- loc |> 
+  filter(tag.id != 242580)
+
+loc <- bind_rows(loc, loc_1)
+
+
+# tag 240172 - static 
+loc_1 <- loc |> 
+  filter(tag.id == 240172) |> 
+  filter(year <= 2024) 
+
+loc <- loc |> 
+  filter(tag.id != 240172)
+
+loc <- bind_rows(loc, loc_1)
+
+
+# tag 260698 - static 
+loc_1 <- loc |> 
+  filter(tag.id == 260698) |> 
+  filter(year <= 2024) 
+
+loc <- loc |> 
+  filter(tag.id != 260698)
+
+loc <- bind_rows(loc, loc_1)
+
+
+# tag 232986 - static 
+loc_1 <- loc |> 
+  filter(tag.id == 232986) |> 
+  filter(year <= 2022) 
+
+loc <- loc |> 
+  filter(tag.id != 232986)
+
+loc <- bind_rows(loc, loc_1)
+
+# tag 240171 - static 
+loc_1 <- loc |> 
+  filter(tag.id == 240171) |> 
+  filter(year <= 2024) 
+
+loc <- loc |> 
+  filter(tag.id != 240171)
+
+loc <- bind_rows(loc, loc_1)
+
+
+# tag 240175 - static 
+loc_1 <- loc |> 
+  filter(tag.id == 240175) |> 
+  filter(year <= 2024) 
+
+loc <- loc |> 
+  filter(tag.id != 240175)
+
+loc <- bind_rows(loc, loc_1)
+
+
+# # tag 240175 - static 
+# loc_1 <- loc |> 
+#   filter(tag.id == 240175) |> 
+#   filter(year <= 2024) 
+# 
+# loc <- loc |> 
+#   filter(tag.id != 240175)
+# 
+# loc <- bind_rows(loc, loc_1)
+# 
+
+
+
+
+
+
+
+
+# calculate the duration of the updated version of data 
+
 range(loc$year)
 
-table_max <- loc %>% 
-  dplyr::mutate(date_time = ymd_hms(date_time)) |> 
-  dplyr::select(tag.id, date_time) %>% 
+table_max <- loc |> 
+  dplyr::mutate(date_time1 = ymd_hm(date_time))|> 
+  dplyr::select(tag.id, date_time1) |> 
   # group_by(tag.local.identifier)%>%  -->
-  slice_max(date_time, by = tag.id) |> 
+  slice_max(date_time1, by = tag.id) |> 
   distinct()
+
 colnames(table_max)<- c("tag.id","max") 
 
 table_min <-  loc %>% 
-  dplyr::mutate(date_time = ymd_hms(date_time)) |>   
-  dplyr::select(tag.id, date_time) %>%  
+  dplyr::mutate(date_time1 = ymd_hm(date_time)) |>   
+  dplyr::select(tag.id, date_time1) %>%  
   # group_by(tag.local.identifier)%>%   
-  slice_min(date_time, by = tag.id)  |> 
+  slice_min(date_time1, by = tag.id)  |> 
   distinct()
 
 colnames(table_min)<- c("tag.id", "min")  
 
-dur <- left_join(table_max, table_min, by = join_by(tag.id)) %>%  
-  distinct() %>%  
-  dplyr::mutate(duration = max - min ) %>%  
-  mutate(dur_min = round(as.numeric(duration)/60,1))%>%  
-  mutate(dur_hrs = round(as.numeric(dur_min)/60,1))%>%  
-  mutate(dur_days = round( dur_hrs/24,1))%>%  
+dur <- left_join(table_max, table_min, by = join_by(tag.id)) |> 
+  distinct() |>   
+  rowwise() |> 
+  dplyr::mutate(duration = max - min ) |>  # days 
+  mutate(dur_days = round( as.numeric(duration))) |> 
+#  mutate(dur_min = round(as.numeric(duration)/60,1))%>%  
+#  mutate(dur_hrs = round(as.numeric(dur_min)/60,1))%>%  
+#  mutate(dur_days = round( dur_hrs/24,1))%>%  
   mutate(year = year(min))  
+
 
 dur_plot <- ggplot(dur, aes(y=factor(tag.id))) +  
   geom_segment(aes(x=min, xend=max, y=factor(tag.id), yend=factor(tag.id)), size=1)+  

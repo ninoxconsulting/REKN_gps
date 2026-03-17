@@ -184,38 +184,16 @@ rids <- ref %>%
 
 
 
-
-
-
-
 ### Duration statistics 
-
+# remove the outlier values for the following tags 
 
 # the tags that need editing 
-# 232985 - drop anything after 2022 as reords appearing in 2023 and 2025
-loc_1 <- loc |> 
-  filter(tag.id == 232985) |> 
-  filter(year <= 2022)
+# 1) 232985 - drop anything after 2022 as reords appearing in 2023 and 2025
 
-loc <- loc |> 
-  filter(tag.id != 232985)
-
-loc <- bind_rows(loc, loc_1)
-
-
-#232982
+# 2)  232982
 #potential dropped tag in southert wintering grounds 
 #migration in 2023 tagged in delaware bay, breeding in arctic, return to TDF on 
 #2023-10-14 - tag continued to transmitt from location for 2024 - june then again in 2025 April - Dec
-
-loc_1 <- loc |> 
-  filter(tag.id == 232982) |> 
-  filter(year <=2023)
-
-loc <- loc |> 
-  filter(tag.id != 232982)
-
-loc <- bind_rows(loc, loc_1)
 
 #240164
 #potential dropped tag along hudson Bay 
@@ -223,188 +201,39 @@ loc <- bind_rows(loc, loc_1)
 # last date in 2023? 
 # recorded in 2024 an 2025 in same locations 
 
-loc_1 <- loc |> 
-  filter(tag.id == 240164) |> 
-  filter(year <=2023)
-
-loc <- loc |> 
-  filter(tag.id != 240164)
-
-loc <- bind_rows(loc, loc_1)
-
 #240159
 #potential dropped tag in breedign area
 #migration in 2023  breeding in arctic from Brazil
 # last date in 2023? 
 # recorded in 2024 an 2025 in same locations 
+loc_sub <- loc |> 
+  mutate(outlier.comments = case_when(
+    tag.id == 232985 & year >2022 ~ "outlier",
+    tag.id == 232982 & year >2023 ~ "outlier",
+    tag.id == 240164 & year >2023 ~ "outlier",
+    tag.id == 240159 & year >2023 ~ "outlier",
+    tag.id == 242574 & year >2023 ~ "outlier",
+    tag.id == 238555 & year >2023 ~ "outlier",
+    tag.id == 238561 & year >2023 ~ "outlier",
+    tag.id == 238576 & year >2023 ~ "outlier",
+    tag.id == 213841 & year >2022 ~ "outlier", #check this one
+    tag.id == 240167 & year >2023 ~ "outlier",
+    tag.id == 242570 & year >2023 ~ "outlier",
+    tag.id == 242580 & year >2023 ~ "outlier",
+    tag.id == 240172 & year >2024 ~ "outlier",
+    tag.id == 260698 & year >2024 ~ "outlier",
+    tag.id == 232986 & year >2022 ~ "outlier",
+    tag.id == 240171 & year >2024 ~ "outlier",
+    tag.id == 240175 & year >2024 ~ "outlier",
+    TRUE ~ as.character(outlier.comments)
+  ))
 
-loc_1 <- loc |> 
-  filter(tag.id == 240159) |> 
-  filter(year <=2023)
-
-loc <- loc |> 
-  filter(tag.id != 240159)
-
-loc <- bind_rows(loc, loc_1)
-
-# tag 242574
-loc_1 <- loc |> 
-  filter(tag.id == 242574) |> 
-  filter(year <=2023)
-
-loc <- loc |> 
-  filter(tag.id != 242574)
-
-loc <- bind_rows(loc, loc_1)
-
-
-# tag 238555
-loc_1 <- loc |> 
-  filter(tag.id == 238555) |> 
-  filter(year <=2023)
-
-loc <- loc |> 
-  filter(tag.id != 238555)
-
-loc <- bind_rows(loc, loc_1)
+write_csv(loc_sub, fs::path(final_dat, "location_data_2017_2025_usable_no_outliers.csv"))
 
 
-# tag 238561
-loc_1 <- loc |> 
-  filter(tag.id == 238561) |> 
-  filter(year <=2023)
-
-loc <- loc |> 
-  filter(tag.id != 238561)
-
-loc <- bind_rows(loc, loc_1)
-
-# tag 238576
-loc_1 <- loc |> 
-  filter(tag.id == 238576) |> 
-  filter(year <=2023)
-
-loc <- loc |> 
-  filter(tag.id != 238576)
-
-loc <- bind_rows(loc, loc_1)
-
-# tag 213841
-loc_1 <- loc |> 
-  filter(tag.id == 213841) |> 
-  filter(year <=2022)
-
-loc <- loc |> 
-  filter(tag.id != 213841)
-
-loc <- bind_rows(loc, loc_1)
-
-
-
-# tag 240167 - static after wintering 
-loc_1 <- loc |> 
-  filter(tag.id == 240167) |> 
-  filter(year <= 2023) 
-
-loc <- loc |> 
-  filter(tag.id != 240167)
-
-loc <- bind_rows(loc, loc_1)
-
-
-
-# tag 242570 - static on departure
-loc_1 <- loc |> 
-  filter(tag.id == 242570) |> 
-  filter(year <= 2023) 
-
-loc <- loc |> 
-  filter(tag.id != 242570)
-
-loc <- bind_rows(loc, loc_1)
-
-
-# tag 242580 - static 
-loc_1 <- loc |> 
-  filter(tag.id == 242580) |> 
-  filter(year <= 2023) 
-
-loc <- loc |> 
-  filter(tag.id != 242580)
-
-loc <- bind_rows(loc, loc_1)
-
-
-# tag 240172 - static 
-loc_1 <- loc |> 
-  filter(tag.id == 240172) |> 
-  filter(year <= 2024) 
-
-loc <- loc |> 
-  filter(tag.id != 240172)
-
-loc <- bind_rows(loc, loc_1)
-
-
-# tag 260698 - static 
-loc_1 <- loc |> 
-  filter(tag.id == 260698) |> 
-  filter(year <= 2024) 
-
-loc <- loc |> 
-  filter(tag.id != 260698)
-
-loc <- bind_rows(loc, loc_1)
-
-
-# tag 232986 - static 
-loc_1 <- loc |> 
-  filter(tag.id == 232986) |> 
-  filter(year <= 2022) 
-
-loc <- loc |> 
-  filter(tag.id != 232986)
-
-loc <- bind_rows(loc, loc_1)
-
-# tag 240171 - static 
-loc_1 <- loc |> 
-  filter(tag.id == 240171) |> 
-  filter(year <= 2024) 
-
-loc <- loc |> 
-  filter(tag.id != 240171)
-
-loc <- bind_rows(loc, loc_1)
-
-
-# tag 240175 - static 
-loc_1 <- loc |> 
-  filter(tag.id == 240175) |> 
-  filter(year <= 2024) 
-
-loc <- loc |> 
-  filter(tag.id != 240175)
-
-loc <- bind_rows(loc, loc_1)
-
-
-# # tag 240175 - static 
-# loc_1 <- loc |> 
-#   filter(tag.id == 240175) |> 
-#   filter(year <= 2024) 
-# 
-# loc <- loc |> 
-#   filter(tag.id != 240175)
-# 
-# loc <- bind_rows(loc, loc_1)
-# 
-
-
-
-
-
-
+loc <- loc_sub |> 
+  filter(is.na(outlier.comments))
+  
 
 
 # calculate the duration of the updated version of data 
@@ -450,6 +279,10 @@ dur_hist <- ggplot(dur, aes(x= dur_days))+
   xlab("duration (days)")   
 
 dur_hist  
+
+
+
+write.csv(dur, fs::path(final_dat, "duration_tags_2025_outliers_removed.csv"))
 
 # p_duration <- ggplot(dloc, aes(factor(month), fill = factor(year)))+  
 #   geom_bar(position = "dodge") +
@@ -573,30 +406,12 @@ ggsave(filename = fs::path(out.plots, "figure4_tag_seasonality.jpg"),
 
 
 
-# add number of tags to facet 
-
-
 
 
 
 
 
 ####################################################################################
-
-
-
-
-
-
-
-
-
-
-
-
-#   
-#   
-# 
 # ######################################################################
 # ## Filter tags which cant be used 
 # 

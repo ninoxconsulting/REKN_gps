@@ -18,28 +18,27 @@ library(ggplot2)
 
 #data_folder <- file.path("../../02_data/REKN_gps/data")
 raw_dat <- file.path("../../02_data/REKN_gps/output_temp")
-final_dat <- file.path("../../02_data/REKN_gps/output_final")
+final_dat <- file.path("../../02_data/REKN_gps/output_final/draft_outputs_2026")
 out.plots <- file.path("../../02_data/REKN_gps/output_final/figures_2026")
 
 
+
 # read in the ref data
-ref <- read_csv(file.path(final_dat, "reference_data_raw_2020_2025_edited_20260124.csv"))
+ref <- read_csv(file.path(final_dat, "reference_data_2020_2025_20260124.csv"))
 ref_due <- ref %>% 
   select(proj, tag.id, tag.model, study.site)
-# read in combined location data 
-loc <- read_csv(file.path(final_dat, "location_data_2017_2025.csv"))
 
+
+# read in combined location data 
+#loc <- read.csv( fs::path(final_dat, "location_data_2017_2025_usable_no_outliers.csv"))
+#loc <- loc |> 
+#  filter(is.na(outlier.comments))
 
 # read in the key 
-# read in the stopover data
-pop <- read_csv(file.path(final_dat, "final_tags_list_edited_20260123.csv"))
+pop <- read_csv(file.path(final_dat, "final_tags_list_edited_20260126.csv"))
 
-
-# read in duration tags
-#dur <- read_csv( file.path(out.plots, "duration_per_tag_353.csv"))
 
 # read in the sub_population list 
-
 pop_id <- pop %>% 
   select("tag.id" , "proj", "subspecies", "subpop", 
          "north", "breeding" , "south","wintering" ,  
@@ -56,14 +55,11 @@ rufa_ids <- pop_id$tag.id
 # read in moveclass data 
 dfsubset <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_movetype_20260125.gpkg"))
 
-dfsubset <-dfsubset |> 
+df_all <- dfsubset |> 
   filter(tag.id %in% rufa_ids ) %>% 
   filter(movement_final != "uncertain_location")
 
 
-### SUMMARY OF SUB populations 
-
-## 
 # count number of 
 pop_sum <- pop_id |> 
   group_by(subpop)%>% 
@@ -76,8 +72,7 @@ pop_sum <- pop_id |>
   count()
 
 
-### Figure 6: Movement types 
-
+### Figure 9: Movement types 
 df_limit <- dfsubset %>% 
   filter(movement_final %in% c("breeding", "north_stopover", "south_stopover", "wintering"))
 
@@ -103,134 +98,131 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"figure3_rufa_movmentclass.jpg"), width = 15, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"figure9_rufa_movmentclass.jpg"), width = 15, height = 30,units = "cm", dpi = 600)
 
 
 
 
-## plots for south wintering regions 
-
-pop_sth <- pop %>% 
-  select("tag.id" , "proj", "subspecies", "subpop", 
-         "north", "breeding" , "south","wintering" ,  
-         "type", "usable"  ) |> 
-  filter(usable == 'y') %>% 
-  filter(subspecies == "rufa") |> 
-  filter(subpop == "South") |> 
-  filter(wintering == "y")
-
-
-rufa_ids <- pop_sth$tag.id
-
-
-## read in compiled data with movements and limit to rufa 
-# read in moveclass data 
-df_sth <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_movetype_20260125.gpkg")) |> 
-  filter(tag.id %in% rufa_ids ) %>% 
-  filter(movement_final != "uncertain_location") |> 
-  filter(movement_final %in% c("south_stopover", "wintering")) 
-
-df_sth <- cbind(df_sth, st_coordinates(df_sth))
-
-
-# p <- ggplot(df_sth, aes(x = X, y = Y)) +
-#   # This would create filled polygons that we use for create our polygon
-#   geom_density2d_filled() +
-#   geom_point() +
-#   geom_density_2d()
-
-
-
-world <- ne_countries(scale = "medium", returnclass = "sf")
-Americas <- world %>% dplyr::filter(region_un == "Americas")
-
-# entire north America 
-global <- ggplot(data = Americas) +
-  geom_sf(color = "grey") +
-  geom_sf(data = df_sth , size = 1.5, aes(fill = movement_final, colour = movement_final), alpha = 0.2)+#colour = "dark blue") +
-  #scale_color_viridis_d()+
-  facet_wrap(~movement_final)+
-  # geom_point(ru, aes(x = lng, y = lat), size = 4) +
-  xlab("Longitude") + ylab("Latitude") +
-  coord_sf(xlim = c(-130, -30), ylim = c(-60, 80), expand = FALSE)+
-  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
-  theme_bw()+
-  theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank(), 
-        legend.position="none")
-
-global
-
-#ggsave(file.path(out.plots,"figure3_rufa_movmentclass.jpg"), width = 15, height = 30,units = "cm", dpi = 600)
-
-
-
-
-
-
-
-
-
-## plots for Western  regions 
-
-
-pop_id <- pop %>% 
-  select("tag.id" , "proj", "subspecies", "subpop", 
-         "north", "breeding" , "south","wintering" ,  
-         "type", "usable"  ) |> 
-  filter(usable == 'y') %>% 
-  filter(subspecies == "rufa") %>%
-  filter(subpop == "West") 
-
-rufa_ids <- pop_id$tag.id
-
-## read in compiled data with movements and limit to rufa 
-
-# read in moveclass data 
-dfsubset <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_movetype_20260125.gpkg"))
-
-dfsubset <-dfsubset |> 
-  filter(tag.id %in% rufa_ids ) %>% 
-  filter(movement_final != "uncertain_location")
-
-
-## read in compiled data with movements and limit to rufa 
-# read in moveclass data 
+# 
+# 
+# ## plots for south wintering regions 
+# 
+# pop_sth <- pop %>% 
+#   select("tag.id" , "proj", "subspecies", "subpop", 
+#          "north", "breeding" , "south","wintering" ,  
+#          "type", "usable"  ) |> 
+#   filter(usable == 'y') %>% 
+#   filter(subspecies == "rufa") |> 
+#   filter(subpop == "South") |> 
+#   filter(wintering == "y")
+# 
+# 
+# rufa_ids <- pop_sth$tag.id
+# 
+# 
+# ## read in compiled data with movements and limit to rufa 
+# # read in moveclass data 
 # df_sth <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_movetype_20260125.gpkg")) |> 
 #   filter(tag.id %in% rufa_ids ) %>% 
 #   filter(movement_final != "uncertain_location") |> 
 #   filter(movement_final %in% c("south_stopover", "wintering")) 
-
-dfsubset <- cbind(dfsubset, st_coordinates(dfsubset))
-
-dfsubset <- dfsubset |> 
-     filter(movement_final != "uncertain_location") |> 
-     filter(movement_final %in% c("south_stopover", "north_stopover")) 
-
-
-world <- ne_countries(scale = "medium", returnclass = "sf")
-Americas <- world %>% dplyr::filter(region_un == "Americas")
-
-# entire north America 
-global <- ggplot(data = Americas) +
-  geom_sf(color = "grey") +
-  geom_sf(data = dfsubset , size = 1.5, aes(fill = movement_final, colour = movement_final), alpha = 0.2)+#colour = "dark blue") +
-  #scale_color_viridis_d()+
-  facet_wrap(~movement_final)+
-  # geom_point(ru, aes(x = lng, y = lat), size = 4) +
-  xlab("Longitude") + ylab("Latitude") +
-  coord_sf(xlim = c(-140, -50), ylim = c(10, 80), expand = FALSE)+
-  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
-  theme_bw()+
-  theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank(), 
-        legend.position="none")
-
-global
-
-ggsave(file.path(out.plots,"figure8_rufa_west_Stopovers.jpg"), width = 15, height = 30,units = "cm", dpi = 600)
-
-
+# 
+# df_sth <- cbind(df_sth, st_coordinates(df_sth))
+# 
+# 
+# # p <- ggplot(df_sth, aes(x = X, y = Y)) +
+# #   # This would create filled polygons that we use for create our polygon
+# #   geom_density2d_filled() +
+# #   geom_point() +
+# #   geom_density_2d()
+# 
+# 
+# 
+# world <- ne_countries(scale = "medium", returnclass = "sf")
+# Americas <- world %>% dplyr::filter(region_un == "Americas")
+# 
+# # entire north America 
+# global <- ggplot(data = Americas) +
+#   geom_sf(color = "grey") +
+#   geom_sf(data = df_sth , size = 1.5, aes(fill = movement_final, colour = movement_final), alpha = 0.2)+#colour = "dark blue") +
+#   #scale_color_viridis_d()+
+#   facet_wrap(~movement_final)+
+#   # geom_point(ru, aes(x = lng, y = lat), size = 4) +
+#   xlab("Longitude") + ylab("Latitude") +
+#   coord_sf(xlim = c(-130, -30), ylim = c(-60, 80), expand = FALSE)+
+#   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
+#   theme_bw()+
+#   theme(axis.text.x=element_blank(),
+#         axis.text.y=element_blank(), 
+#         legend.position="none")
+# 
+# global
+# 
+# #ggsave(file.path(out.plots,"figure3_rufa_movmentclass.jpg"), width = 15, height = 30,units = "cm", dpi = 600)
+# 
+#
+# 
+# 
+# ## plots for Western  regions 
+# 
+# 
+# pop_id <- pop %>% 
+#   select("tag.id" , "proj", "subspecies", "subpop", 
+#          "north", "breeding" , "south","wintering" ,  
+#          "type", "usable"  ) |> 
+#   filter(usable == 'y') %>% 
+#   filter(subspecies == "rufa") %>%
+#   filter(subpop == "West") 
+# 
+# rufa_ids <- pop_id$tag.id
+# 
+# ## read in compiled data with movements and limit to rufa 
+# 
+# # read in moveclass data 
+# dfsubset <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_movetype_20260125.gpkg"))
+# 
+# dfsubset <-dfsubset |> 
+#   filter(tag.id %in% rufa_ids ) %>% 
+#   filter(movement_final != "uncertain_location")
+# 
+# 
+# ## read in compiled data with movements and limit to rufa 
+# # read in moveclass data 
+# # df_sth <- st_read(file.path(raw_dat, "locations_raw_2025", "loc_2020_2025_movetype_20260125.gpkg")) |> 
+# #   filter(tag.id %in% rufa_ids ) %>% 
+# #   filter(movement_final != "uncertain_location") |> 
+# #   filter(movement_final %in% c("south_stopover", "wintering")) 
+# 
+# dfsubset <- cbind(dfsubset, st_coordinates(dfsubset))
+# 
+# dfsubset <- dfsubset |> 
+#      filter(movement_final != "uncertain_location") |> 
+#      filter(movement_final %in% c("south_stopover", "north_stopover")) 
+# 
+# 
+# world <- ne_countries(scale = "medium", returnclass = "sf")
+# Americas <- world %>% dplyr::filter(region_un == "Americas")
+# 
+# # entire north America 
+# global <- ggplot(data = Americas) +
+#   geom_sf(color = "grey") +
+#   geom_sf(data = dfsubset , size = 1.5, aes(fill = movement_final, colour = movement_final), alpha = 0.2)+#colour = "dark blue") +
+#   #scale_color_viridis_d()+
+#   facet_wrap(~movement_final)+
+#   # geom_point(ru, aes(x = lng, y = lat), size = 4) +
+#   xlab("Longitude") + ylab("Latitude") +
+#   coord_sf(xlim = c(-140, -50), ylim = c(10, 80), expand = FALSE)+
+#   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
+#   theme_bw()+
+#   theme(axis.text.x=element_blank(),
+#         axis.text.y=element_blank(), 
+#         legend.position="none")
+# 
+# global
+# 
+# ggsave(file.path(out.plots,"figure8_rufa_west_Stopovers.jpg"), width = 15, height = 30,units = "cm", dpi = 600)
+# 
+# 
 
 
 
@@ -258,8 +250,8 @@ ggsave(file.path(out.plots,"figure8_rufa_west_Stopovers.jpg"), width = 15, heigh
 dur_type <- df_all %>% 
   group_by(tag.id, movement_final) |> 
   mutate(min_ts = min(date_time),
-         max_ts = max(date_time))%>% 
-  select(tag.id,min_ts, max_ts, movement_final)%>% 
+         max_ts = max(date_time)) %>% 
+  select(tag.id, min_ts, max_ts, movement_final)%>% 
   st_drop_geometry() |> 
   distinct() %>% 
   mutate(min = ymd_hms(min_ts)) |> 
@@ -278,7 +270,6 @@ dur_type <- df_all %>%
 
 dur_type_move <- left_join(dur_type , pop_id)
 
-
 write.csv(dur_type_move , file.path(out.plots, "rufa_duration_movement_type_rufa.csv"))
 
 
@@ -288,7 +279,7 @@ library(geosphere)
 
 df_stopover_subset <- df_all |> 
   group_by(tag.id) |> 
-  arrange(timestamp) |>
+  arrange(date_time) |>
   cbind(st_coordinates(df_all)) |> 
   mutate(movement_final_next = lead(movement_final, 1L)) |> 
   rowwise() |> 
@@ -305,7 +296,6 @@ df_stopover_subset <- df_all |>
   select(tag.id, date_time, tag.id.order, movement_final,movement_final_next, gcd_m_2 , toremove, toremove2) |> 
   rowwise() |> 
   mutate(keep = toremove + toremove2)
-
 
 
 st_write(df_stopover_subset , file.path(out.plots , "rufa_stopovers.gpkg"), append = FALSE)

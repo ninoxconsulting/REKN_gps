@@ -21,6 +21,7 @@ final_dat <- file.path("../../02_data/REKN_gps/output_final/draft_outputs_2026")
 out.plots <- file.path("../../02_data/REKN_gps/output_final/figures_2026")
 
 
+
 # read in the ref data
 ref <- read_csv(file.path(final_dat, "reference_data_2020_2025_20260124.csv"))
 ref_due <- ref %>% 
@@ -53,7 +54,6 @@ dur_type_move <- read_csv(file.path(out.plots, "rufa_duration_movement_type_rufa
  
 # ## generate a paired down version of the stopover locations for mapping only not for analysis 
  df_stopover_subset <- st_read(file.path(out.plots , "rufa_stopovers.gpkg"))
-
 
 
 #############################################################################

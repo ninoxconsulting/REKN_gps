@@ -87,7 +87,6 @@ wgwp_id |>
   count()
 
 
-
 # stopoverlocations
 wgwp_stopover <- df_stopover_subset |> 
   filter(tag.id %in% wgwp_id$tag.id) %>%
@@ -99,8 +98,8 @@ wgwp_stopover <- df_stopover_subset |>
   dplyr::select(-movement_final_next, -toremove, -toremove2, -keep)
 
 
-wgwp_stopover_test <- wgwp_stopover |> 
-  filter(tag.id == 228177)
+#wgwp_stopover_test <- wgwp_stopover |> 
+#  filter(tag.id == 228177)
 
 
 wgwp_dur <- dur_type_move %>% 

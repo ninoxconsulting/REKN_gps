@@ -511,10 +511,7 @@ global <- ggplot(data = Americas) +
   scale_color_viridis_d(name = "Movement Type", begin = 0.5) + 
   facet_wrap(~tag.id)+
   xlab("Longitude") + ylab("Latitude") +
-  #coord_sf(xlim = c(-130, -20), ylim = c(-60, 80), expand = FALSE)+
   coord_sf(xlim = c(-130, -50), ylim = c(10, 60), expand = FALSE)+
-  
-  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
         axis.text.y=element_blank())
@@ -525,17 +522,27 @@ ggsave(file.path(out.plots,"fig23_se_sthmigration_stopovers_pertag.jpg"), width 
 
 
 
+###########################################################
+
+# Map by month 
+
+global <- ggplot(data = Americas) +
+  geom_sf(color = "grey") +
+  geom_sf(data = se, size = 2.5, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
+  scale_color_viridis_d(name = "Movement Type") + 
+  facet_wrap(~month)+
+  xlab("Longitude") + ylab("Latitude") +
+  coord_sf(xlim = c(-130, -50), ylim = c(10, 80), expand = FALSE)+
+  theme_bw()+
+  theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+global
 
 
 
 
-
-
-
-
-
-
-
+## detailed descriptions 
 
 
 ##### Birds ######
@@ -734,9 +741,6 @@ ggsave(file.path(out.plots,"fig23_se_sthmigration_stopovers_pertag.jpg"), width 
 # 221858 - delaware bay (deploy) Nov 12-13)                 - sth Florida (Daytona Beach)(nov 15 - 26) # tag dies 
 
 
-
-
-
 # 260692 - sth Carolina (May 16 - may 18)- james bay (May 20-June 3) - Baffin is(June 6 - june 16) - Prince charles Is (east arctic) (june 17 - July 24) - sth to st laurence Qc (July 26 - Aug 4) - del bay (Aug 7-10) - sth carolina (same location (aug 8 -sep 9) - down and back up north to Cuba (Sep 11- Oct 21 -tag ends)
 # 260812 - sth Carolina (march 31 - may 25)- james bay (May 27-June 3) - Hudson Bay (JUne 3 - 13) - Matty Is(june 17 - july 18)- hudson bay (july 18-28) -sth carolina (same location (aug 5 - oct 19) - tag dies
 # 282291 - sth Carolina (may 18 - 20)- james bay (May 24-June 6) - prince wales (june 9 - july 12)- james Bay (july 15-aug 3) - turks caycos (aug 8 - Dec 4) - tag dies? potential other types
@@ -755,26 +759,36 @@ ggsave(file.path(out.plots,"fig23_se_sthmigration_stopovers_pertag.jpg"), width 
 # 282310-  sth Carolina (march 31 - may20)- james bay (may 22- sept 9) tag dropped. stops here
 
 
-### wintering? 
+
+
+
+
+### wintering - only includes tags that had some Dec records 
+
+# 221844 - atlantic shores - Deployed (nov 12 - 19) - Southport, NOrth Carolina (nov   Dec 6) # tag dies 
+# 221845- atlantic shores - Deployed (nov 12 - 18) - Pamlico sound,         NOrth Carolina (nov 19  Dec 5) # tag dies 
+# 221850- atlantic shores - Deployed (nov 12 - 13) - Pamlico sound,         NOrth Carolina (nov 14  -  Dec 5 ) # tag dies
+# 221856- atlantic shores - Deployed (nov 12 - 13) - Pamlico sound,         NOrth Carolina (nov 14  -  Dec 5 ) # tag dies
+# 260808 - Del Bay (Oct 2 - 25) -                                Nth carolina (Oct 25 - Nov 20) - tag dies 
+# 260810 - Del Bay (Oct 2 - Oct 24) - to                                    Nthcarolina (Oct 24 - Nov 14) - tag dies 
+# 240171 - Del bay (Oct 2 - 15) - sth to Virginia (Oct 16 - 30)           - north carolina (nov 9 - Feb 16 (next yr)- tag ends ? dropped?
+
+# 221866 - atlantic shores - Deployed (nov 12 - 13) - north Charlston,         - Sth Carolina (nov 16 - Dec 10 )
+# 260809 - Del Bay (Oct 2 - Nov 9) - to                                        - sth carolina (Nov 9 - Nov 26) - tag dies 
+# 242656- sth carolina Kiawah Beach (May 23) - EAST JAMES BAY (May 24 - June 3 ) _ 9 days - HB Nelson River (June 4-7) - multiple short stops Queen Maud Gulf Bird Sanctuary - Vic Island - breeding ground (June 10 - August 3) - hudson Bay(aug 8-16) - sth Carolina (Aug 20 -continued - tag dies Dec 16)
+# 260812 - sth Carolina (march 31 - may 25)- james bay (May 27-June 3) - Hudson Bay (JUne 3 - 13) - Matty Is(june 17 - july 18)- hudson bay (july 18-28) -sth carolina (same location (aug 5 - oct 19) - tag dies
+
+# 221860- atlantic shores - Deployed (nov 12 - 13) - Exmore,                - Virginia (nov 13-dec 5 ) # tag dies 
+
+# 221863- atlantic shores - Deployed (nov 12 - 22) - cAPE cARNAVERAL,       - Florida  (nov 24 - 26 ) # tag dies 
+# 240175 - Del bay (Oct 2 - 27) - multiple stops short georgia              - florida (Oct 29 - June 3 - tag dropped?
+
+# 234370 - Atlantic Coast deployed (August 26 -Dec 4)                     - Bahamas (Dec 6 - 14) - tags dies 
+# 282291 - sth Carolina (may 18 - 20)- james bay (May 24-June 6) - prince wales (june 9 - july 12)- james Bay (july 15-aug 3) - turks caycos (aug 8 - Dec 4) - tag dies? potential other types
 
 
 # 260692 - sth Carolina (May 16 - may 18)- james bay (May 20-June 3) - Baffin is(June 6 - june 16) - Prince charles Is (east arctic) (june 17 - July 24) - sth to st laurence Qc (July 26 - Aug 4) - del bay (Aug 7-10) - sth carolina (same location (aug 8 -sep 9) - down and back up north to Cuba (Sep 11- Oct 21 -tag ends)
-# 260812 - sth Carolina (march 31 - may 25)- james bay (May 27-June 3) - Hudson Bay (JUne 3 - 13) - Matty Is(june 17 - july 18)- hudson bay (july 18-28) -sth carolina (same location (aug 5 - oct 19) - tag dies
-# 282291 - sth Carolina (may 18 - 20)- james bay (May 24-June 6) - prince wales (june 9 - july 12)- james Bay (july 15-aug 3) - turks caycos (aug 8 - Dec 4) - tag dies? potential other types
-# 221844 - atlantic shores - Deployed (nov 12 - 19) - Southport, NOrth Carolina (nov   Dec 6) # tag dies 
-# 221845- atlantic shores - Deployed (nov 12 - 18) - Pamlico sound, NOrth Carolina (nov 19  Dec 5) # tag dies 
-# 221847 - atlantic shores - Deployed (nov 12 - 22) - Pamlico sound, NOrth Carolina (nov 11  - 25 ) # tag dies 
-# 221850- atlantic shores - Deployed (nov 12 - 13) - Pamlico sound, NOrth Carolina (nov 14  -  Dec 5 ) # tag dies
-# 221856- atlantic shores - Deployed (nov 12 - 13) - Pamlico sound, NOrth Carolina (nov 14  -  Dec 5 ) # tag dies 
-# 221860- atlantic shores - Deployed (nov 12 - 13) - Exmore, Virginia (nov 13- 14 ) # tag dies 
-# 221863- atlantic shores - Deployed (nov 12 - 22) - cAPE cARNAVERAL, Florida  (nov 24 - 26 ) # tag dies 
-# 221866 - atlantic shores - Deployed (nov 12 - 13) - north Charlston, Sth Carolina (nov 16 - Dec 10 )
-# 234370 - Atlantic Coast deployed (August 26 -Dec 4) - Bahamas (Dec 6 - 14) - tags dies 
-# 240171 - Del bay (Oct 2 - 15) - sth to Virginia (Oct 16 - 30) - north carolina (nov 9 - Feb 16 (next yr)- tag ends ? dropped?
-# 260808 - Del Bay (Oct 2 - 25) - sth to Nth carolina (Oct 25 - Nov 20) - tag dies 
-# 260809 - Del Bay (Oct 2 - Nov 9) - to sth carolina (Nov 9 - Nov 26) - tag dies 
-# 260810 - Del Bay (Oct 2 - Oct 24) - to Nthcarolina (Oct 24 - Nov 14) - tag dies 
-# 240175 - Del bay (Oct 2 - 27) - multiple stops short georgia - florida (Oct 29 - June 3 - tag dropped?
+
 
 
 

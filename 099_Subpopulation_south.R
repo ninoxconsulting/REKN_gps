@@ -64,9 +64,7 @@ south_id <- pop_id %>% filter(subpop == "South" ) |> arrange(type)
 #45 south and usable 
 
 # type of tags 
-south_id |> 
-  group_by(tag.model) |> 
-  count()
+south_id |> group_by(tag.model) |> count()
   
 # all locations 
 south <- df_all %>% 
@@ -84,9 +82,10 @@ durs <- dur |>
   filter(tag.id %in% south_id$tag.id) |> 
   arrange(desc(duration))
 
-south_dur <- dur_type_move %>% 
-  filter(tag.id %in% south_id$tag.id)
-
+# locations of deployment 
+south_id |> 
+  group_by(study.site) |> 
+  count()
 
 # stopoverlocations
 south_stopover <- df_stopover_subset |> 
@@ -99,11 +98,13 @@ south_stopover <- df_stopover_subset |>
   dplyr::select(-movement_final_next, -toremove, -toremove2, -keep)
 
 
+south_dur <- dur_type_move %>% 
+  filter(tag.id %in% south_id$tag.id)
+
 
 
 ########################################################
-# Geographic distributon of tags ## figure 11 = COmBINED
-
+# # Geographic distributon of tags ## figure 11 = COmBINED
 # 
 # world <- ne_countries(scale = "medium", returnclass = "sf")
 # Americas <- world %>% dplyr::filter(region_un == "Americas")
@@ -112,9 +113,9 @@ south_stopover <- df_stopover_subset |>
 # global <- ggplot(data = Americas) +
 #   geom_sf(color = "grey") +
 #   geom_sf(data = south, size = 1, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
-#   scale_color_viridis_d(name = "Movement Type") + 
+#   scale_color_viridis_d(name = "Movement Type") +
 #   xlab("Longitude") + ylab("Latitude") +
-#   coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
+#   coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
 #   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
 #   theme_bw()+
 #   theme(axis.text.x=element_blank(),
@@ -140,14 +141,43 @@ br <- nth_mi |>
   filter(dur_days >0)
 
 unique(br$tag.id)
-
 unique(nth_mi$study.site)
 
 
-# figure 
-
+# figure 12  ######### north stopovers 
+ 
 south_stopover_spring <- south |> 
-  filter(movement_final != "south_stopover")
+  filter(movement_final != "south_stopover")|> 
+  filter(movement_final != "deployment")
+
+# pair down the breeding  and select single locaion select only one breeding location for clarity
+south_breed <- south_stopover_spring %>% filter(movement_final == "breeding")|>
+  group_by(tag.id) |>
+  filter(movement_final == "breeding") |>
+  slice_head(, n = 1)
+
+# join back 
+south_stopover_spring <- south_stopover_spring |> 
+  filter(movement_final != "breeding")
+  
+south_stopover_spring <-  bind_rows(south_stopover_spring, south_breed)
+
+# pair down the winterign  and select single locaion select only one breeding location for clarity
+south_winter <- south_stopover_spring %>% filter(movement_final == "wintering")|>
+  group_by(tag.id) |>
+  filter(movement_final == "wintering") |>
+  slice_head(, n = 1)
+
+# join back 
+south_stopover_spring <- south_stopover_spring |> 
+  filter(movement_final != "wintering")
+
+south_stopover_spring <-  bind_rows(south_stopover_spring, south_winter )
+
+
+
+# plot the 
+
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
 Americas <- world %>% dplyr::filter(region_un == "Americas")
@@ -166,7 +196,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-#ggsave(file.path(out.plots,"fig11_south_stopovers__fall_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig12_south_stopovers__fall_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -179,7 +209,34 @@ global
 # Geographic distributon of tags ## figure 11 - fall
 
 south_stopover_fall <- south |> 
-  filter(movement_final != "north_stopover")
+  filter(movement_final != "north_stopover") |> 
+  filter(movement_final != "deployment")
+
+# pair down the breeding  and select single locaion select only one breeding location for clarity
+south_breed <- south_stopover_fall %>% filter(movement_final == "breeding")|>
+  group_by(tag.id) |>
+  filter(movement_final == "breeding") |>
+  slice_head(, n = 1)
+
+# join back 
+south_stopover_fall <- south_stopover_fall |> 
+  filter(movement_final != "breeding")
+
+south_stopover_fall <-  bind_rows(south_stopover_fall, south_breed)
+
+# pair down the winterign  and select single locaion select only one breeding location for clarity
+south_winter <- south_stopover_fall %>% filter(movement_final == "wintering")|>
+  group_by(tag.id) |>
+  filter(movement_final == "wintering") |>
+  slice_head(, n = 1)
+
+# join back 
+south_stopover_fall <- south_stopover_fall |> 
+  filter(movement_final != "wintering")
+
+south_stopover_fall <-  bind_rows(south_stopover_fall, south_winter )
+
+
 
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -191,7 +248,7 @@ global <- ggplot(data = Americas) +
   geom_sf(data = south_stopover_fall, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
   scale_color_viridis_d(name = "Movement Type") + 
   xlab("Longitude") + ylab("Latitude") +
-  coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
+  coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
@@ -199,7 +256,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-#ggsave(file.path(out.plots,"fig11_south_stopovers_spring_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig15_south_stopovers_spring_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -207,14 +264,31 @@ global
 
 ###############################################################################
 
-
 ### Figure 12
+#Northward migrats: #(n = 25)
+nrth.tag <- c(229312, 229314, 240165, 242579, 261440, 262941,262944,262948,
+            213835,213841, 240158,240159, 241166,255007, 261441,262940, 262945,
+            232982,261435,240167,240164,240168,241167, 282311, 262946)
 
-# Geographic distributon of all tag (all stopover data) tags 
+#South ward migrants: #(n = 20)
+sth.tg <-c(234375, 261434, 261436,261437,261438,261443,261450,261452,261453,
+            280804,280805,280806,280807,280808,280809,280811,280812,280813,285995,285996)
+
+south_fig <- south |> 
+  filter(movement_final != "deployment")
+
+
+### split into two groups 
+
+st.nth <- south_fig |> 
+  filter(tag.id %in% nrth.tag)
+
+
+# Geographic distributon of nth tags all stopover data) tags (n = 25)
 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = south, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
+  geom_sf(data = st.nth, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
   scale_color_viridis_d(name = "Movement Type") + 
   facet_wrap(~tag.id)+
   xlab("Longitude") + ylab("Latitude") +
@@ -226,7 +300,37 @@ global <- ggplot(data = Americas) +
 
 global
 
-#ggsave(file.path(out.plots,"fig12_south_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig12_south_north_migration_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+
+
+#############################
+#South ward migrants: #(n = 20)
+
+st.nth <- south_fig |> 
+  filter(tag.id %in% sth.tg) |> 
+ 
+  # Geographic distributon of nth tags all stopover data) tags 
+
+global <- ggplot(data = Americas) +
+  geom_sf(color = "grey") +
+  geom_sf(data = st.nth, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
+  #scale_fill_manual(values = cyl_colors)+
+  scale_color_viridis_d(name = "Movement Type", begin = 0.5) + 
+  facet_wrap(~tag.id)+
+  xlab("Longitude") + ylab("Latitude") +
+  coord_sf(xlim = c(-130, -20), ylim = c(-60, 70), expand = FALSE)+
+  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
+  theme_bw()+
+  theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+global
+
+ggsave(file.path(out.plots,"fig12_south_sth_migration_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+
+#"#440154FF" "#31688EFF" "#35B779FF" "#FDE725FF"
+
+
 
 
 ###############################################################################
@@ -269,12 +373,25 @@ ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, heig
 
 south_breed <- south %>% filter(movement_final == "breeding")
 
+#filtered breedign locations
+south_breed <- south_breed |>
+  group_by(tag.id) |>
+  filter(movement_final == "breeding") |>
+  slice_head(, n = 1)
+
+# wgwp_other <- wgwp_stopover |>
+#   filter(movement_final != "breeding")
+# 
+# wgwp_breed <- bind_rows(wgwp_breed, wgwp_other)
+
+
+
 # entire north America 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
   geom_sf(data = south_breed, size = 1.5, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
- # scale_color_viridis_d(name = "Tag ID") + 
-  scale_color_brewer(palette = "Spectral", name = 'Tag ID')+
+  scale_color_viridis_d(name = "Tag ID") + 
+  #scale_color_brewer(palette = "Spectral", name = 'Tag ID')+
   #facet_wrap(~movement_final)+
   # geom_point(ru, aes(x = lng, y = lat), size = 4) +
   # xlab("Longitude") + ylab("Latitude") +
@@ -293,7 +410,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-#ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig14_south_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -330,16 +447,6 @@ global
 #   232982 - arrive  15th Oct (mutliple stop sth brazil/ argentina) - tag died
 #   232982  - arrive Mar del plata October 1th - from Nth Sth Am.    
 #  
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -406,7 +513,6 @@ birdmapall
 ############################### 241166 - depart Lago de Piexe/ sth sth Am - May 1st 2023
 
 
-
 # #Depart Nth Brazil 
 # 240158 - depart Marahao, brazil  - may 15th 
 # 240159 - depart Marahao, brazil - may 24th
@@ -453,8 +559,6 @@ birdmapall
 # direct single stop ( 5), multiple stop inclu del bay (8)
 
 
-
-
 ############################################################
 # #Depart US mainland (add the birds tagged in USA) 
 
@@ -483,8 +587,9 @@ birdmapall
 
 
 
-# 
-# #Arrive/depart Hudson bay - noth bound 
+#########################################
+## Arrive/depart Hudson bay - north bound 
+
 # 213830 - depart del bay May 24th (2021) -                                       - James Bay (May 25 - June 5) ~11days - multiple hudson bay stops - arrive breeding area June june 20 - tag dies 
 # 282311 - tagged in sth carolina (may 18 -20)                                    - James Bay (may 26 - june 6) ~ 11 days- Victoria Is (June 7 - July 24) - James Bay (July 26 - August 11) - Surine (Aug 16 - sep 10)- Baihia San Blass (Sep 16 -20) tag dies
 # 240168 - tagged in DB May (16th = 30th)                                         - jAMES BAY (May 31 - June 2) - 3 days-  arrive prinec of wales isladn (June 6 -august 5th) - Hudson Bay (Aug 11 - 16) -direct to Guyana (aug 31 - Sep 9) - surinane (sept 12-15 tag dies )
@@ -507,95 +612,94 @@ birdmapall
 # 240167  - arrive virginia (june 3 - 12) then direct                             - nth Hudson bay (june 15-20) - 5 days  - Vic island (June 23 - july 22) - sth to Hudson bay (july27 - august 10th) - sth carolina (August 15 - 29) - Guyana (Sept 4 - Oct 1) - San Blas (OCt 8th - tag dropped)
 
 
- 
-
 
 ###########################################################
 # # arrive/depart breeding grounds 
 
-# 240168 arrive prinec of wales isladn Juen 6 and tag dies Sept 8th 
-# 232982 arrive Victoria is June 9th and July 16 th depart is  - DEPARTURE 
-# 240158 arrive Victoria is June 12th - til ? tag died 
-# 213841 arrive Victoria is june 14th - Sept 19 (tag died ?())# 213841 - Depart del Bay - june 1 (2021) - tagged in DB, james bay June (6 - 9), Hudson Bay stopover - breeding in Vic island (june 20th) tag died on breefing area  
-# 240159 arrive Victoria is June 17th and july 11 (last transmit)
-# 240166 arrive Victoria is june 22 and depart July 4th (tag died)
-#  arrive Coasts Is june 14th - july 2nd (tag died?) 
-# 240167 -june 21 and depart Jule 16th (full record)
-# 240164 arrive Prince of wales island june 29th - depart july 21 (full record)- DEPARTURE 
- 
+# 16 arrive in breeding ground and 7 southwards
+## Central Eastern arctic
+
+# Coasts is - 213835 - breeding potential coasts island(>) (  - june 14 - July 2nd - tag dies) tagged in delbay 
+# Southhamp is - 262940 - arrive virginia (may 26th -         - june 3rd ) several short stopover james and husdon bay - Sthampton is (June 15 - onwards - dropped tag?)
+# Nun. mainland 262945 - arrive sth carolina delBay           - june 1st)- hudson bay (june 4 -8) - nunavut mainland (june 9th - july 29 )- tag dropped - potnteil not breeding? 
+
+# Western Arctic
+### kind william 
+# 261435 - tagged in DB (depart May 30) - James Bay (June 1 - 8),     King william (June 9 - july 7) ~ 29 days       - sth - james Bay (July 8 - July 29) - direct to Brazil Maraha(August 16 - Sept1) - sth Bahia san blas (Sept 8-Oct 8) - sth to Tierra del Fuaego Nth (Oct 9th - tag drop)
+# 261441 - georgia/ dle bay - james bay (june 2-7) arrived            King william (june 16 - Sept - dropped tag?
+
+# vic is 
+# 213841 - Hudson Bay stopover - breeding in Vic island  ( june 20th - tag dies ) 
+# 232982 - Hudson Bay stopover - breeding in Vic island  ( june 12th - July 13)      ~ 30 days  - headed south - james bay (july 20- August 10)- direct Sth Am  - Belem (August 16 - Sept 28)- sth to Bahai San Blas (October -14) tag dropped after this time
+# 240158 - arrive Victoria is                              June 12th - til ? tag died 
+# 240159 - arrive Victoria is                              June 17th and july 11 (last transmit)
+# 240167 -nth Hudson bay (june 15-20)   -       Vic island (June 23 - july 22)        ~ 30 days     sth to Hudson bay (july27 - august 10th) - sth carolina (August 15 - 29) - Guyana (Sept 4 - Oct 1) - San Blas (OCt 8th - tag dropped)
+# 241166 -  hudson bay (june 14-19) -          victoria is (june 22 - july 4 - tag dies)
+# 241167  arrive virginia - James Bay (june 9-14) - Vic Is (Nun) June 21 - July 16    ~ 26 days   - sth james Bay july 23 - Aug 12) - French Guiana (Aug 15 - tag dies )
+# 282311 - tagged in sth carolina  James Bay - Victoria Is (June 7 - July 24)         ~ 47 days       - James Bay (July 26 - August 11) - Surine (Aug 16 - sep 10)- Baihia San Blass (Sep 16 -20) tag dies
+# 255007 - arrive virginia/Delaware   nth mainland nunavut (june 14-18), Victoria Is (June 21 - August - tag dropped?)
+
+#prince of wales 
+# 240164 - james bay (June 21- 25) -      Prince Of wales is (june 29 - July 21)  ~ 22 days - sth to hudscon bay (August 18 - tag dropped)
+# 240168 - tagged in DB May (16th = 30th) arrive prinec of wales isladn (June 6 -august 5th) ~ 59 days  - Hudson Bay (Aug 11 - 16) -direct to Guyana (aug 31 - Sep 9) - surinane (sept 12-15 tag dies )
+
+#Ave no 
+#59 + 22+ 47 + 26+30+30+29
+
 #To add
-# 213830 - depart del bay May 24th (2021) - arrive James Bay (May 25 - June 5th) - multiple hudson bay stops - arrive breeding area Vic island June june 20 - tag dies 
-# 213835 - Depart del Bay - june 1 (2021)- tagged in DB, - james bay June (4 - 8th), east side of Hudson Bay - breeding potential coasts island(>) (arrive june 14th tp July 2nd - tag dies) tagged in delbay (unknown arrival)
-# 213841 - Depart del Bay - june 1 (2021) - tagged in DB, james bay June (6 - 9), Hudson Bay stopover - breeding in Vic island (june 20th) tag died on breefing area  
-# 232982 - Depart del Bay - May 30th (2023) - tagged in DB, james bay June (1 - 3), Hudson Bay stopover - breeding in Vic island (june 12th - July 13) headed south - james bay (july 20- August 10)- direct Sth Am  - Belem (August 16 - Sept 28)- sth to Bahai San Blas (October -14) tag dropped after this time
-# 240161  - depart del bay - May 29 2023 - tagged in DB - James Bay (May 31 - June 6) _ prince charles Is (east) (june 16 - July 21) - sth hudson Bay /james bay (july 26 - August 12 - dropped tag)
-# 240164  - depart del bay - June 20th 2023 - multiple stops on mainland(arrive 2nd june) - james bay (June 21- 25) - Prince Of wales is (june 29 - July 21) - sth to hudscon bay (August 18 - tag dropped)
-
-# 261441 - arrive georgia (May 21 - 24th), nth carolina, virginia, dle bay (may 27th - 31st) - james bay (june 2-7) arrived King william Is(june 16 - Sept - dropped tag?)
-
-# 255007 - arrive virginia/Delaware bay (May 26th), delaware bay (may 27th - june 2nd) - james Bay (june 2-5), west hudson bay (june 6-12), nth mainland nunavut (june 14-18), Victoria Is (June 21 - August - tag dropped?)
-
-# 240167  - arrive virginia (june 3 - 12) then direct nth Hudson bay (june 15-20) - Vic island (June 23 - july 22) - sth to Hudson bay (july27 - august 10th) - sth carolina (August 15 - 29) - Guyana (Sept 4 - Oct 1) - San Blas (OCt 8th - tag dropped)
-
-# 261435 - tagged in DB (depart May 30) - James Bay (June 1 - 8), King william (June 9 - july 7) - sth - james Bay (July 8 - July 29) - direct to Brazil Maraha(August 16 - Sept1) - sth Bahia san blas (Sept 8-Oct 8) - sth to Tierra del Fuaego Nth (Oct 9th - tag drop)
-# 240168 - tagged in DB May (16th = 30th) arrive prinec of wales isladn (June 6 -august 5th) - Hudson Bay (Aug 11 - 16) -direct to Guyana (aug 31 - Sep 9) - surinane (sept 12-15 tag dies )
-
-# 241166 - arrive virginia (May 31st), depart june 9th to hudson bay (june 14-19) - victoria is (june 22 - july 4 - tag dies)
-# 282311 - tagged in sth carolina (may 18 -20) - James Bay (may 26 - june 6) - Victoria Is (June 7 - July 24) - James Bay (July 26 - August 11) - Surine (Aug 16 - sep 10)- Baihia San Blass (Sep 16 -20) tag dies
-# 241167  arrive virginia (may 28th - june 8th ) - James Bay (june 9-14) - Vic Is (Nun) June 21 - July 16 - sth james Bay july 23 - Aug 12) - French Guiana (Aug 15 - tag dies )
-
+# 213830  SE SUBSP - depart del bay May 24th (2021) - arrive James Bay (May 25 - June 5th) - multiple hudson bay stops - arrive breeding area Vic island June june 20 - tag dies 
+# 240161  SE_NSA - depart del bay - May 29 2023 - tagged in DB - James Bay (May 31 - June 6) _ prince charles Is (east) (june 16 - July 21) - sth hudson Bay /james bay (july 26 - August 12 - dropped tag)
 
 
 
 
 # south bound migration 
 
-# # arrival stopover HB
-# 232982 - From Vic Is  -  hudson bay and james bay (July 20 - August 10 ) James Bay  - DIRECT TO STH AM (arrive August 15th) 
-# 240164 - (TAG DIES - from Prince of Wales  - suuthern hudson Bay (near Nelson river) (August 18 -  Sept 23)  - ends here 
-# 240168- from Prince of wales - south Hudson bay (August 6 - 17th) then james bay (August 18 - 24) - direct Nth America                           
-# 241167 - from Vic is = ultiple short stop, then james bay single stop in hudson By (July 27th - August 10th) - direct to Sth AM 
-## 232982 - Depart del Bay - May 30th (2023) - tagged in DB, james bay June (1 - 3), Hudson Bay stopover - breeding in Vic island (june 12th - July 13) headed south - james bay (july 20- August 10)- direct Sth Am  - Belem (August 16 - Sept 28)- sth to Bahai San Blas (October -14) tag dropped after this time
-# 240161  - depart del bay - May 29 2023 - tagged in DB - James Bay (May 31 - June 6) _ prince charles Is (east) (june 16 - July 21) - sth hudson Bay /james bay (july 26 - August 12 - dropped tag)
-# 240164  - depart del bay - June 20th 2023 - multiple stops on mainland(arrive 2nd june) - james bay (June 21- 25) - Prince Of wales is (june 29 - July 21) - sth to hudscon bay (August 18 - tag dropped)
+# # arrival stopover HB - (n = 7)  
+# 232982 -  breeding in Vic island (june 12th - July 13)    - james bay (july 20- August 10)         ~ 20 days                - direct Sth Am  - Belem (August 16 - Sept 28)- sth to Bahai San Blas (October -14) tag dropped after this time
+# 240164  - breeding Prince Of wales (june 29 - July 21)    - Hudson bay (August 18 - tag dropped)   
+# 240167  - breeding Vic island (June 23 - july 22)         - Hudson bay (july 27 - august 10th)     ~14 days                 - sth carolina (August 15 - 29) - Guyana (Sept 4 - Oct 1) - San Blas (OCt 8th - tag dropped)
+# 240168- from Prince of wales -                            - Hudson bay (August 6 - 17th) then james bay (August 18 - 24)    - direct sth America                           
+# 241167 - from Vic is = ultiple short stop,                - Hudson bay (July 27th - August 10th)    ~14 days                - direct Sth AM 
+# 261435 - King william (June 9 - july 7) - sth             - james Bay (July 8 - July 29)            ~ 20 dyas               - direct to Brazil Maraha(August 16 - Sept1) - sth Bahia san blas (Sept 8-Oct 8) - sth to Tierra del Fuaego Nth (Oct 9th - tag drop)
+# 282311 - Victoria Is (June 7 - July 24)                   - James Bay (July 26 - August 11)        ~17 days                 - Surine (Aug 16 - sep 10)- Baihia San Blass (Sep 16 -20) tag dies
 
-# 240167  - arrive virginia (june 3 - 12) then direct nth Hudson bay (june 15-20) - Vic island (June 23 - july 22) - sth to Hudson bay (july27 - august 10th) - sth carolina (August 15 - 29) - Guyana (Sept 4 - Oct 1) - San Blas (OCt 8th - tag dropped)
-# 261435 - tagged in DB (depart May 30) - James Bay (June 1 - 8), King william (June 9 - july 7) - sth - james Bay (July 8 - July 29) - direct to Brazil Maraha(August 16 - Sept1) - sth Bahia san blas (Sept 8-Oct 8) - sth to Tierra del Fuaego Nth (Oct 9th - tag drop)
-# 240168 - tagged in DB May (16th = 30th) arrive prinec of wales isladn (June 6 -august 5th) - Hudson Bay (Aug 11 - 16) -direct to Guyana (aug 31 - Sep 9) - surinane (sept 12-15 tag dies )
 
-# 282311 - tagged in sth carolina (may 18 -20) - James Bay (may 26 - june 6) - Victoria Is (June 7 - July 24) - James Bay (July 26 - August 11) - Surine (Aug 16 - sep 10)- Baihia San Blass (Sep 16 -20) tag dies
-# 241167  arrive virginia (may 28th - june 8th ) - James Bay (june 9-14) - Vic Is (Nun) June 21 - July 16 - sth james Bay july 23 - Aug 12) - French Guiana (Aug 15 - tag dies )
+# 234375 - taggge in US
 
 
 
-# # stopover delaware bay                   
-# 234375 -  depart delaware bay August 31 - banded here - direct to sth am ()                     
+# # stopover delaware bay  ########################                 
+
+# # arrive wintering grounds - 
+# 232982 - US banded - arrive  15th Oct (mutliple stop sth brazil/ argentina) - tag died arrive Mar del plata October 1th - from Nth Sth Am. 
+# 240167 - FULL distribution - arrive virginia (june 3 - 12) then direct nth Hudson bay (june 15-20) - Vic island (June 23 - july 22) - sth to Hudson bay (july27 - august 10th) - sth carolina (August 15 - 29) - Guyana (Sept 4 - Oct 1) - San Blas (OCt 8th - tag dropped)
+# 261435 - US banded - tagged in DB (depart May 30) - James Bay (June 1 - 8), King william (June 9 - july 7) - sth - james Bay (July 8 - July 29) - direct to Brazil Maraha(August 16 - Sept1) - sth Bahia san blas (Sept 8-Oct 8) - sth to Tierra del Fuaego Nth (Oct 9th - tag drop)
+# 234375 - US banded -  depart delaware bay August 31 - banded here - direct to sth am ()                     
+# 262946 - Stayed on sth am continent 
+
+# 19 banded in Piexe (oct - Dec 2025)
 
 
-# 240167  - arrive virginia (june 3 - 12) then direct nth Hudson bay (june 15-20) - Vic island (June 23 - july 22) - sth to Hudson bay (july27 - august 10th) - sth carolina (August 15 - 29) - Guyana (Sept 4 - Oct 1) - San Blas (OCt 8th - tag dropped)
-# 261435 - tagged in DB (depart May 30) - James Bay (June 1 - 8), King william (June 9 - july 7) - sth - james Bay (July 8 - July 29) - direct to Brazil Maraha(August 16 - Sept1) - sth Bahia san blas (Sept 8-Oct 8) - sth to Tierra del Fuaego Nth (Oct 9th - tag drop)
 
 
-# 
-# 
-# 232982 - VicIs - Hudson Bay -                  - Marahoa - sth Brazil (multiple stops)
-# 234375 -                      DEL BAY (multiple) - GUYANA - sth Brazil
-# 240167 - VicIS - hudson Bay - DELBAY (multiple) -  GUYANA(multiple stops) - sth Brazil(multiple stops)
-# 241167 - VicIS -hudson Bay (multiple) -       - GUYANA
-# 
-# 
-# # arrive nth sth americs                      
-# 232982 - arrive  stheast maranhao (August 17th - Sept 28th) - diredct from HB         
-# 240167 - arrive October 8th - stayed to at least Dec 19th (tag ran out) - Reserva natural bahia San Blas (
-#   234375 - arrive Guyana Sept 4th - Sept 26th direct from nth america                   
-#   
-#   
-#   # arrive wintering grouds 
-#   232982 - arrive  15th Oct (mutliple stop sth brazil/ argentina) - tag died
-#   232982  - arrive Mar del plata October 1th - from Nth Sth Am.    
-#   
-#   
-#   
+########################################################################
+# Map by month 
+
+global <- ggplot(data = Americas) +
+  geom_sf(color = "grey") +
+  geom_sf(data = south, size = 2.5, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
+  scale_color_viridis_d(name = "Movement Type") + 
+  facet_wrap(~month)+
+  xlab("Longitude") + ylab("Latitude") +
+  coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
+  
+   theme_bw()+
+  theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+global
+
 
 
 
@@ -618,6 +722,23 @@ birdmapall
 # # 262945 - depart Lago de Piexe April 29 direct to carribeam (near Nasseau) May 8th - 19th -then sth carolina / delaware bay  to james and hudson bay then potenitla breeding? Arrive June 9th - tag dies here so unclear if is breeding?
 # # 232982 - US tagged 
 # # 261435 - US tagged
+
+# 213835 - Depart del Bay - june 1 (2021)- tagged in DB, - james bay June (4 - 8th), east side of Hudson Bay - breeding potential coasts island(>) (arrive june 14th tp July 2nd - tag dies) tagged in delbay (unknown arrival)
+# 213841 - Depart del Bay - june 1 (2021) - tagged in DB, james bay June (6 - 9), Hudson Bay stopover - breeding in Vic island (june 20th) tag died on breefing area  
+# 232982 - Depart del Bay - May 30th (2023) - tagged in DB, james bay June (1 - 3), Hudson Bay stopover - breeding in Vic island (june 12th - July 13) headed south - james bay (july 20- August 10)- direct Sth Am  - Belem (August 16 - Sept 28)- sth to Bahai San Blas (October -14) tag dropped after this time
+# 240158 - arrive Victoria is June 12th - til ? tag died 
+# 240159 - arrive Victoria is June 17th and july 11 (last transmit)
+# 240164 - depart del bay - June 20th 2023 - multiple stops on mainland(arrive 2nd june) - james bay (June 21- 25) - Prince Of wales is (june 29 - July 21) - sth to hudscon bay (August 18 - tag dropped)
+# 240167 - arrive virginia (june 3 - 12) then direct nth Hudson bay (june 15-20) - Vic island (June 23 - july 22) - sth to Hudson bay (july27 - august 10th) - sth carolina (August 15 - 29) - Guyana (Sept 4 - Oct 1) - San Blas (OCt 8th - tag dropped)
+# 240168 - tagged in DB May (16th = 30th) arrive prinec of wales isladn (June 6 -august 5th) - Hudson Bay (Aug 11 - 16) -direct to Guyana (aug 31 - Sep 9) - surinane (sept 12-15 tag dies )
+# 241166 - arrive virginia (May 31st), depart june 9th to hudson bay (june 14-19) - victoria is (june 22 - july 4 - tag dies)
+# 241167  arrive virginia (may 28th - june 8th ) - James Bay (june 9-14) - Vic Is (Nun) June 21 - July 16 - sth james Bay july 23 - Aug 12) - French Guiana (Aug 15 - tag dies )
+# 255007 - arrive virginia/Delaware bay (May 26th), delaware bay (may 27th - june 2nd) - james Bay (june 2-5), west hudson bay (june 6-12), nth mainland nunavut (june 14-18), Victoria Is (June 21 - August - tag dropped?)
+# 261435 - tagged in DB (depart May 30) - James Bay (June 1 - 8), King william (June 9 - july 7) - sth - james Bay (July 8 - July 29) - direct to Brazil Maraha(August 16 - Sept1) - sth Bahia san blas (Sept 8-Oct 8) - sth to Tierra del Fuaego Nth (Oct 9th - tag drop)
+# 261441 - arrive georgia (May 21 - 24th), nth carolina, virginia, dle bay (may 27th - 31st) - james bay (june 2-7) arrived King william Is(june 16 - Sept - dropped tag?
+# 262940 - arrive virginia (may 26th -       - june 3rd ) several short stopover james and husdon bay - Sthampton is (June 15 - onwards - dropped tag?)
+# 262945 - arrive sth carolina delBay        -june 1st)- hudson bay (june 4 -8) - nunavut mainland (june 9th - july 29 )- tag dropped - potnteil not breeding? 
+# 282311 - tagged in sth carolina (may 18 -20) - James Bay (may 26 - june 6) - Victoria Is (June 7 - July 24) - James Bay (July 26 - August 11) - Surine (Aug 16 - sep 10)- Baihia San Blass (Sep 16 -20) tag dies
 
 
 

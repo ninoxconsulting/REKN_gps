@@ -19,6 +19,7 @@ library(ggplot2)
 raw_dat <- file.path("../../02_data/REKN_gps/output_temp")
 final_dat <- file.path("../../02_data/REKN_gps/output_final/draft_outputs_2026")
 out.plots <- file.path("../../02_data/REKN_gps/output_final/figures_2026")
+common_loc <- file.path("../../02_data/REKN_gps/output_final/subsets_common")
 
 # read in the ref data
 ref <- read_csv(file.path(final_dat, "reference_data_2020_2025_20260124.csv"))
@@ -75,8 +76,21 @@ df_stopover_subset <- st_read(file.path(out.plots , "rufa_stopovers.gpkg"))%>%
 
 ### breeding grounds 
 
+# select tags that include breed and south migration 
+popbr <- pop |> 
+  filter(subspecies == "rufa") |> 
+  filter(usable == "y") |> 
+  filter(breeding == "y" & south == "y") |> 
+  filter(subpop %in% c("West", "SE", "NSA", "South")) |> 
+  select(tag.id, subpop )
+
+popbr |> group_by(subpop) |> count()
+
+
+
 br_stoppovers <- df_stopover_subset |>  filter(movement_final == "breeding")
 br_stoppovers <- br_stoppovers |> 
+  filter(tag.id %in% popbr$tag.id) |> 
   group_by(tag.id) |> 
   slice_sample(n = 1) |> 
   mutate(subpop_val = case_when(
@@ -124,32 +138,6 @@ global
 ggsave(file.path(out.plots,"fig29_common_rufa_breeding.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
-## breeding overlap
-
-br_dur <- df_all |>  filter(movement_final == "breeding") %>% 
-  group_by(tag.id)%>% 
-  mutate(start_date = week(min(date_time)),
-         end_date = week(max(date_time))) %>%
-  filter(type != "partial spring/breeding")  %>% 
-  st_drop_geometry()%>% 
-  select(-proj, -date_time, -type, -year, -month, -movement_final, -subspecies)%>% 
-  distinct() %>% 
-  mutate(region = case_when(
-    tag.id %in% c( 228166, 201146 , 232982, 242583,  241167,  240167, 213834,242656) ~ "Victoria Island",
-    tag.id %in% c( 242657, 240168, 240164) ~ "Prince of Wales Is.",
-    tag.id == 238544 ~ "Southampton Is.",
-    tag.id == 242580 ~ "Matty Is.",
-    tag.id == 242658 ~ "Prince Charles Is.",
-    tag.id == 232981 ~ "Baffin Is."
-    ))|> 
-  mutate(subpop_val = case_when(
-    subpop == "NSA" ~ "NSA",
-    subpop == "South" ~ "Southern",
-    subpop == "West" ~ "Western",
-    subpop == "SE" ~ "SE",
-  ))
-
-
 brr <- dur_type_move |> filter(movement_final == "breeding") |> 
   select(tag.id, min , max, year, subspecies, subpop) |> 
   filter(subspecies == "rufa") |> 
@@ -164,16 +152,17 @@ brr <- dur_type_move |> filter(movement_final == "breeding") |>
     tag.id %in% c( 242657, 240168, 240164,282289,282291,260817,282297) ~ "Prince of Wales Is.",
     tag.id %in% c(282294,282283,282309,261435,228184) ~ "King William",
     tag.id  %in% c(238544, 260803,281663,262940) ~ "Southampton Is.",
-    tag.id %in% c( 242580,260812) ~ "Matty Is.",
-    tag.id %in% c( 242658, 260692) ~ "Prince Charles Is.",
-    tag.id%in% c(232981, 261451) ~ "Baffin Is."
+    tag.id %in% c( 242580,260812) ~ "Matty Is."#,
+    #tag.id %in% c( 242658, 260692) ~ "Prince Charles Is.",
+    #tag.id%in% c(232981, 261451) ~ "Baffin Is."
   ))|> 
   mutate(subpop_val = case_when(
     subpop == "NSA" ~ "NSA",
     subpop == "South" ~ "Southern",
     subpop == "West" ~ "Western",
     subpop == "SE" ~ "SE",
-  ))
+  )) |> 
+  filter(tag.id %in% popbr$tag.id) 
   
 brr <- brr |> filter(!is.na(region)) 
 
@@ -194,7 +183,7 @@ ggplot(brr, aes(y=factor(region))) +
   #theme(legend.position = "none")
 
 
-ggsave(file.path(out.plots,"fig29_common_rufa_breeding_bars.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig29_common_rufa_breeding_bars.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
 
 
 ################################################################################
@@ -202,82 +191,41 @@ ggsave(file.path(out.plots,"fig29_common_rufa_breeding_bars.jpg"), width = 30, h
 ## Hudson Bay Sth stopovers 
 #############################################################################
 # 
-# hb_all <- st_read(file.path(final_dat,"Hudson_Bay_usage.gpkg" )) %>% 
-#   mutate(st_type = "hudson_bay")
-# jb_all <- st_read(file.path(final_dat,"James_Bay_usage.gpkg" )) %>% 
-#   mutate(st_type = "james_bay")
-# 
-# all <- rbind(hb_all, jb_all) %>%
-#   filter(tag.id %in% rufa_ids ) %>% 
-#   filter(movement_final != "uncertain_location")%>% 
-#   left_join(pop_id)%>% 
-#   filter(subpop %in% c("west", "SE", "NSA", "South")) %>% 
-#   select(tag.id, date_time, month, movement_final, subspecies, subpop, type, st_type, tag.id.order)%>% 
-#   filter(movement_final %in% c("north_stopover", "south_stopover")) %>%
-#   mutate(subpop_val = case_when(
-#   subpop == "NSA" ~ "NSA",
-#   subpop == "South" ~ "Southern",
-#   subpop == "west" ~ "Western",
-#   subpop == "SE" ~ "SE",
-# )) |> 
-# group_by(tag.id, st_type) |> 
-#   slice_min(n = 1,  order_by = tag.id.order) |> 
-#   mutate(subpop_val = case_when(
-#     subpop == "NSA" ~ "NSA",
-#     subpop == "South" ~ "Southern",
-#     subpop == "west" ~ "Western",
-#     subpop == "SE" ~ "SE",
-#   ))
-# 
+ hb_all <- st_read(file.path(common_loc,"Hudson_Bay_usage_2025.gpkg" )) %>% 
+   mutate(st_type = "hudson_bay")
+ jb_all <- st_read(file.path(common_loc,"James_Bay_usage_2025.gpkg" )) %>% 
+   mutate(st_type = "james_bay")
 
-
-df_stopover_subset <- st_read(file.path(out.plots , "rufa_stopovers.gpkg"))%>%
-  filter(keep >1) %>% 
-  dplyr::select(-movement_final_next, -toremove, -toremove2, -keep)%>% 
-  left_join(pop_id) %>% 
-  filter(subpop %in% c("West", "SE", "NSA", "South")) |> 
+all <- rbind(hb_all, jb_all) %>%
+  filter(tag.id %in% rufa_ids ) %>%
+  filter(movement_final != "uncertain_location")%>%
+  left_join(pop_id)%>%
+  filter(subpop %in% c("West", "SE", "NSA", "South")) %>%
+  select(tag.id, date_time, month, movement_final, subspecies, subpop, type, st_type, tag.id.order)%>%
+  filter(movement_final %in% c("north_stopover", "south_stopover")) %>%
   mutate(subpop_val = case_when(
-        subpop == "NSA" ~ "NSA",
-        subpop == "South" ~ "Southern",
-        subpop == "West" ~ "Western",
-        subpop == "SE" ~ "SE",
-      )) |> 
-  select(proj, tag.id, date_time, movement_final, subspecies, subpop, subpop_val) |> 
-  group_by(tag.id,movement_final) |> 
-  slice_sample(n = 5) |> 
-  mutate(subpop_val = case_when(
-    subpop == "NSA" ~ "NSA",
-    subpop == "South" ~ "Southern",
-    subpop == "West" ~ "Western",
-    subpop == "SE" ~ "SE",
-  ))
+  subpop == "NSA" ~ "NSA",
+  subpop == "South" ~ "Southern",
+  subpop == "West" ~ "Western",
+  subpop == "SE" ~ "SE",
+)) 
 
 
-
-
-df_all <- df_stopover_subset %>% 
-  filter(movement_final %in% c("north_stopover", "south_stopover")) 
+df_all <- all 
 
 ########################################################
 # Geographic distributon of tags ## figure 11 = COmBINED
 
-#df_all <- all %>% 
-#  filter(movement_final %in% c("north_stopover", "south_stopover")) 
-
 world <- ne_countries(scale = "medium", returnclass = "sf")
 Americas <- world %>% dplyr::filter(region_un == "Americas")
-#Americas <- world %>% dplyr::filter(continent == "North America")
 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = df_all, size = 2, alpha = 0.8, aes(colour = subpop_val, alpha = 0.7)) +#colour = "dark blue") +
+  geom_sf(data = df_all, size = 2, alpha = 0.6, aes(colour = subpop_val, alpha = 0.7)) +#colour = "dark blue") +
   scale_color_brewer(palette = "Set1", name = "Subpopulation")+
   xlab("Longitude") + ylab("Latitude") +
   facet_wrap(~movement_final) +
-  #coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
-  #coord_sf(xlim = c(-130, -20), ylim = c(-20, 80), expand = FALSE)+
   coord_sf(xlim = c(-100, -75), ylim = c(49, 65), expand = FALSE)+
-  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
         axis.text.y=element_blank())
@@ -286,206 +234,169 @@ global
 
 ggsave(file.path(out.plots,"fig29_common_husonBay.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
+####################################################
+## arrival dates - James Bay  NORTH - northward 
 
+# select tags that include breed as went through on north migration 
+popbr <- pop |> 
+  filter(subspecies == "rufa") |> 
+  filter(usable == "y") |> 
+  filter(breeding == "y") |> 
+  filter(subpop %in% c("West", "SE", "NSA", "South")) |> 
+  select(tag.id, subpop)
 
-#####################################################
+popbr |> group_by(subpop) |> count()
 
-## arrival dates - James Bay  NORTH 
+popbr |> select(tag.id, subpop) |> distinct()|> group_by(subpop) |> 
+  count()
 
+# which of these are found in hudson bay ? 
 jb <- all |> filter(st_type == "james_bay") |> 
   st_drop_geometry()%>% 
   filter(movement_final == "north_stopover") |> 
-  group_by(tag.id)%>%
-  mutate(start_date = yday(min(date_time)),
-         end_date = yday(max(date_time)))%>% 
-  select( -subspecies)%>%
-  distinct()%>% 
-  arrange(start_date)
+  select(tag.id) |> 
+  distinct() 
+
+# 21 - bird in james bay in nth migration 
   
-  
+james_stopovers <- df_stopover_subset|> 
+  filter(tag.id %in% jb$tag.id) |> 
+  st_drop_geometry()%>% 
+  filter(movement_final == "north_stopover") 
+
+
+james_stopovers |> select(tag.id, subpop) |> distinct()|> group_by(subpop) |> 
+  count()
+
+
+#######################################################################
 # arrival dates - Nelson River - NORTH 
 
-hb <- all |> filter(st_type == "hudson_bay") |> 
+
+# select tags that include breed as went through on north migration 
+popbr <- pop |> 
+  filter(subspecies == "rufa") |> 
+  filter(usable == "y") |> 
+  filter(south == "y") |> 
+  filter(subpop %in% c("West", "SE", "NSA", "South")) |> 
+  select(tag.id, subpop)
+
+popbr |> group_by(subpop) |> count()
+
+##popbr |> select(tag.id, subpop) |> distinct()|> group_by(subpop) |> 
+#  count()
+
+# which of these are found in hudson bay ? 
+jb <- all |> filter(st_type == "hudson_bay") |> 
   st_drop_geometry()%>% 
   filter(movement_final == "north_stopover") |> 
-  group_by(tag.id)%>%
-  mutate(start_date = yday(min(date_time)),
-         end_date = yday(max(date_time)))%>% 
-  select( -subspecies)%>%
-  distinct()%>% 
-  arrange(start_date)
+  select(tag.id) |> 
+  distinct() 
 
+# 19 - bird in james bay in nth migration 
 
-## UP TO HERE - STILL NEED TO DO A SOUTH MIGRATION 
-doubletop <- hb |> filter(tag.id %>% jb$tag.id)
-
-aa <- hb$tag.id
-bb <- jb$ tag.id
-
-aa[aa %in% bb]
-
-
-
-# depart dates - Nelson River - NORTH 
-
-hb_dep <-  rbind(hb_all, jb_all) %>%
-  filter(tag.id %in% rufa_ids ) %>% 
-  filter(movement_final != "uncertain_location")%>% 
-  left_join(pop_id)%>% 
-  filter(subpop %in% c("west", "SE", "NSA", "South")) %>% 
-  select(tag.id, date_time, month, movement_final, subspecies, subpop, type, st_type, tag.id.order)%>% 
-  filter(movement_final %in% c("north_stopover", "south_stopover")) %>%
-  mutate(subpop_val = case_when(
-    subpop == "NSA" ~ "NSA",
-    subpop == "South" ~ "Southern",
-    subpop == "west" ~ "Western",
-    subpop == "SE" ~ "SE",
-  )) |> 
-  group_by(tag.id, st_type) |> 
-  slice_max(n = 1,  order_by = tag.id.order) |> 
-  mutate(subpop_val = case_when(
-    subpop == "NSA" ~ "NSA",
-    subpop == "South" ~ "Southern",
-    subpop == "west" ~ "Western",
-    subpop == "SE" ~ "SE",
-  ))|> 
-  filter(st_type == "hudson_bay") |> 
+james_stopovers <- df_stopover_subset|> 
+  filter(tag.id %in% jb$tag.id) |> 
   st_drop_geometry()%>% 
-  filter(movement_final == "north_stopover") |> 
-  group_by(tag.id)%>%
-  mutate(start_date = yday(min(date_time)),
-         end_date = yday(max(date_time)))%>% 
-  select( -subspecies)%>%
-  distinct()%>% 
-  arrange(start_date)
+  filter(movement_final == "north_stopover") 
 
 
-
-
-
-
-
-## Overlap Dates 
-
-all_dur <- rbind(hb_all, jb_all) %>%
-  filter(tag.id %in% rufa_ids ) %>% 
-  filter(movement_final != "uncertain_location")%>% 
-  left_join(pop_id)%>% 
-  filter(subpop %in% c("west", "SE", "NSA", "South")) %>% 
-  select(tag.id, date_time, month, movement_final, subspecies, subpop, type, st_type, tag.id.order)%>% 
-  filter(movement_final %in% c("north_stopover", "south_stopover")) %>%
-  mutate(subpop_val = case_when(
-    subpop == "NSA" ~ "NSA",
-    subpop == "South" ~ "Southern",
-    subpop == "west" ~ "Western",
-    subpop == "SE" ~ "SE",
-  )) 
-
-br_dur <- all_dur |>  filter(movement_final %in% c("north_stopover", "south_stopover")) %>% 
-  group_by(tag.id)%>% 
-  mutate(start_date = week(min(date_time)),
-         end_date = week(max(date_time)))%>%
-  #filter(type != "partial spring/breeding")  %>% 
-  st_drop_geometry()%>% 
-  select( -date_time, -type, , -subspecies,-tag.id.order)%>% 
-  distinct() %>% 
-  mutate(subpop_val = case_when(
-    subpop == "NSA" ~ "NSA",
-    subpop == "South" ~ "Southern",
-    subpop == "west" ~ "Western",
-    subpop == "SE" ~ "SE",
-  )) |> 
-  distinct()
+james_stopovers |> select(tag.id, subpop) |> distinct()|> group_by(subpop) |> 
+  count()
 
 
 # 
-# 
-# ## figure of duration 
-# 
-# ggplot(br_dur, aes(y=factor(movement_final))) +
-#   geom_segment(aes(x=start_date, xend=end_date, y=factor(subpop_val), yend=factor(subpop_val),color=subpop_val), linewidth = 3)+
-#   scale_color_brewer(palette = "Set1", name = "Subpopulation")+
-#   xlim(10,40)+
-#   #(aes(x=start_date, y=factor(subpop), size = 2), colour = "blue") +
-#   #geom_point(aes(x=start_date, y=factor(subpop), size = 2), colour = "red") +
-#   facet_wrap(~movement_final) +
-#   #ggtitle("Breeding Locations") +
-#   #geom_text( aes(y = factor(region), x = depart_maxdate, label = count))+
-#   xlab("Week of Year") + ylab("breeeding regions") +
-#   theme_bw()
-# #theme(legend.position = "none")
-
-
-
-###############################################################################
-## Animated graphic? 
-###############################################################################
+# hb <- all |> filter(st_type == "hudson_bay") |> 
+#   st_drop_geometry()%>% 
+#   filter(movement_final == "north_stopover") |> 
+#   group_by(tag.id)%>%
+#   mutate(start_date = yday(min(date_time)),
+#          end_date = yday(max(date_time)))%>% 
+#   select( -subspecies)%>%
+#   distinct()%>% 
+#   arrange(start_date)
 # 
 # 
-# ani_dur <- df_all_points  |> 
-#   dplyr::mutate(date_day = yday(date_time)) 
+# ## UP TO HERE - STILL NEED TO DO A SOUTH MIGRATION 
+# doubletop <- hb |> filter(tag.id %>% jb$tag.id)
 # 
-# ani_dur_spring <- cbind (ani_dur, st_coordinates(df_all_points))   %>%
-#   st_drop_geometry() |> 
-#    filter(date_day <200) |> 
-#    filter(date_day >140) 
-# # #  dplyr::filter(date_day <230)
+# aa <- hb$tag.id
+# bb <- jb$ tag.id
+# 
+# aa[aa %in% bb]
 # 
 # 
 # 
-# ## Generate the plots: 
+# # depart dates - Nelson River - NORTH 
 # 
-# world <- ne_countries(scale = "medium", returnclass = "sf")
+# hb_dep <-  rbind(hb_all, jb_all) %>%
+#   filter(tag.id %in% rufa_ids ) %>% 
+#   filter(movement_final != "uncertain_location")%>% 
+#   left_join(pop_id)%>% 
+#   filter(subpop %in% c("west", "SE", "NSA", "South")) %>% 
+#   select(tag.id, date_time, month, movement_final, subspecies, subpop, type, st_type, tag.id.order)%>% 
+#   filter(movement_final %in% c("north_stopover", "south_stopover")) %>%
+#   mutate(subpop_val = case_when(
+#     subpop == "NSA" ~ "NSA",
+#     subpop == "South" ~ "Southern",
+#     subpop == "west" ~ "Western",
+#     subpop == "SE" ~ "SE",
+#   )) |> 
+#   group_by(tag.id, st_type) |> 
+#   slice_max(n = 1,  order_by = tag.id.order) |> 
+#   mutate(subpop_val = case_when(
+#     subpop == "NSA" ~ "NSA",
+#     subpop == "South" ~ "Southern",
+#     subpop == "west" ~ "Western",
+#     subpop == "SE" ~ "SE",
+#   ))|> 
+#   filter(st_type == "hudson_bay") |> 
+#   st_drop_geometry()%>% 
+#   filter(movement_final == "north_stopover") |> 
+#   group_by(tag.id)%>%
+#   mutate(start_date = yday(min(date_time)),
+#          end_date = yday(max(date_time)))%>% 
+#   select( -subspecies)%>%
+#   distinct()%>% 
+#   arrange(start_date)
 # 
-# Americas <- world %>% dplyr::filter(continent == "North America")
 # 
-# # entire north America 
-# global_north <- ggplot(data = Americas) +
-#   geom_sf(color = "grey") +
-#   geom_point(data = ani_dur_spring, aes(x = X, y = Y, colour = subpop), size = 3) +#colour = "dark blue") +
-#   scale_color_brewer(palette = "Set1", name = "Subpopulation")+
-#   #facet_wrap(~tag.id)+
-#   # geom_point(ru, aes(x = lng, y = lat), size = 4) +
-#   # xlab("Longitude") + ylab("Latitude") +
-#   #coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
-#   coord_sf(xlim = c(-110, -65), ylim = c(45, 70), expand = FALSE)+
-#   theme_bw()+
-#   labs(colour = "Subpopulation") + 
-#   theme(
-#     axis.text = element_blank(),
-#     axis.ticks = element_blank(),
-#     axis.title = element_blank(),
-#     legend.position = "bottom",
-#     legend.key.width = unit(3, "lines")
-#   )
 # 
-# global_north
 # 
-# p_animate_north <- global_north + 
-#   transition_time(date_day) + 
-#   labs(title = "Date: {round(frame_time)}") +
-#   #enter_fade()+
-#   #ease_aes('bounce-out')+
-#   enter_grow()  + enter_drift(x_mod = -1) + 
-#   shadow_wake(wake_length = 0.1, size = 1.5, colour = "grey", alpha = 0.5,falloff = "cubic-in")+
-#   exit_shrink() + exit_drift(x_mod = 5)
-#   
-#   #enter_drift(x_mod = -1) +
-#   #shadow_trail(max_frames = 5)+
-#   #shadow_wake(wake_length = 0.1, size = 2, colour = "grey", alpha = 0.8)+
-#   #exit_fly()
-#   #exit_shrink()
 # 
-# animate(
-#   p_animate_north, 
-#   width = 10, 
-#   height = 8, 
-#   units = "in", 
-#   res = 72, 
-#   fps = 1, #10 default  
-#   nframes = 50
-# )
-
+# 
+# 
+# ## Overlap Dates 
+# 
+# all_dur <- rbind(hb_all, jb_all) %>%
+#   filter(tag.id %in% rufa_ids ) %>% 
+#   filter(movement_final != "uncertain_location")%>% 
+#   left_join(pop_id)%>% 
+#   filter(subpop %in% c("west", "SE", "NSA", "South")) %>% 
+#   select(tag.id, date_time, month, movement_final, subspecies, subpop, type, st_type, tag.id.order)%>% 
+#   filter(movement_final %in% c("north_stopover", "south_stopover")) %>%
+#   mutate(subpop_val = case_when(
+#     subpop == "NSA" ~ "NSA",
+#     subpop == "South" ~ "Southern",
+#     subpop == "west" ~ "Western",
+#     subpop == "SE" ~ "SE",
+#   )) 
+# 
+# br_dur <- all_dur |>  filter(movement_final %in% c("north_stopover", "south_stopover")) %>% 
+#   group_by(tag.id)%>% 
+#   mutate(start_date = week(min(date_time)),
+#          end_date = week(max(date_time)))%>%
+#   #filter(type != "partial spring/breeding")  %>% 
+#   st_drop_geometry()%>% 
+#   select( -date_time, -type, , -subspecies,-tag.id.order)%>% 
+#   distinct() %>% 
+#   mutate(subpop_val = case_when(
+#     subpop == "NSA" ~ "NSA",
+#     subpop == "South" ~ "Southern",
+#     subpop == "west" ~ "Western",
+#     subpop == "SE" ~ "SE",
+#   )) |> 
+#   distinct()
 
 
 
@@ -497,13 +408,13 @@ br_dur <- all_dur |>  filter(movement_final %in% c("north_stopover", "south_stop
 
 #############################################################################
 
-db <- st_read(file.path(final_dat,"Delaware_Bay_usage.gpkg" )) 
+db <- st_read(file.path(common_loc,"Delaware_Bay_usage_2025.gpkg" )) 
 
 db <- db  %>%
   filter(tag.id %in% rufa_ids ) %>% 
   filter(movement_final != "uncertain_location")%>% 
   left_join(pop_id)%>% 
-  filter(subpop %in% c("west", "SE", "NSA", "South")) %>% 
+  filter(subpop %in% c("West", "SE", "NSA", "South")) %>% 
   select(tag.id, date_time, month, movement_final, subspecies, subpop, type,  tag.id.order)%>% 
   filter(movement_final %in% c("north_stopover", "south_stopover")) %>%
   mutate(subpop_val = case_when(
@@ -621,19 +532,19 @@ db_dep_dep <-  db_dep |>
 ###############################################################################
 
 
-db <- st_read(file.path(final_dat,"Northern_SthAm_usageV1.gpkg" )) 
+db <- st_read(file.path(common_loc,"Northern_SthAm_usage_2025.gpkg" )) 
 
 db <- db  %>%
   filter(tag.id %in% rufa_ids ) %>% 
   filter(movement_final != "uncertain_location")%>% 
   left_join(pop_id)%>% 
-  filter(subpop %in% c("west", "SE", "NSA", "South")) %>% 
+  filter(subpop %in% c("West", "SE", "NSA", "South")) %>% 
   select(tag.id, date_time, month, movement_final, subspecies, subpop, type,  tag.id.order)%>% 
   filter(movement_final %in% c("north_stopover", "south_stopover", "wintering")) %>%
   mutate(subpop_val = case_when(
     subpop == "NSA" ~ "NSA",
     subpop == "South" ~ "Southern",
-    subpop == "west" ~ "Western",
+    subpop == "West" ~ "Western",
     subpop == "SE" ~ "SE",
   ))
 
@@ -672,6 +583,7 @@ global <- ggplot(data = Americas) +
 global
 
 
+ggsave(file.path(out.plots,"fig33_common_nsa.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
 
 
 

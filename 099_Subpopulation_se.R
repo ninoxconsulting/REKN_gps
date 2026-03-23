@@ -1,4 +1,3 @@
-
 ##################################################################################
 
 # Rufa subpopulations 
@@ -167,7 +166,7 @@ Americas <- world %>% dplyr::filter(region_un == "Americas")
 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = se_stopover_spring, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
+  geom_sf(data = se_stopover_spring, size = 2, alpha = 0.7, aes(colour = movement_final)) +#colour = "dark blue") +
   scale_color_viridis_d(name = "Movement Type") + 
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -40), ylim = c(10, 80), expand = FALSE)+
@@ -177,7 +176,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig21_se_stopovers__fall_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig21_se_stopovers__fall_combined.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
 
 
 

@@ -67,10 +67,10 @@ wgwp_id <- pop_id %>% filter(subpop == "West" ) |> arrange(type)
 # all locations 
 wgwp <- df_all %>% 
   filter(tag.id %in% wgwp_id$tag.id) %>%
-#  mutate(movement_final = case_when(
-#  movement_final == "deployment" ~ "north_migration",
-#  .default = movement_final
-#)) %>% 
+  mutate(movement_final = case_when(
+  movement_final == "deployment" ~ "north_migration",
+  .default = movement_final
+)) %>% 
   filter(movement_final != "north_migration") |> 
   filter(movement_final != "south_migration") 
   
@@ -124,7 +124,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig11_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig11_west_stopovers_combined.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
 
 
 
@@ -157,7 +157,8 @@ wgwp_breed <- wgwp |>
   slice_head(, n = 1)
 
 wgwp_other <- wgwp_stopover |> 
-  filter(movement_final != "breeding")
+  filter(movement_final != "breeding") |> 
+  filter(movement_final != "deployment")    
 
 wgwp_breed <- bind_rows(wgwp_breed, wgwp_other)
 

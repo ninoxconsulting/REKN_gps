@@ -162,3 +162,6 @@ st_write(df_stopover_subset , file.path(out.plots , "rufa_stopovers.gpkg"), appe
 
 
 
+
+###############################################################################
+

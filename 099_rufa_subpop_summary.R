@@ -98,12 +98,9 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"figure9_rufa_movmentclass.jpg"), width = 15, height = 30,units = "cm", dpi = 600)
+#ggsave(file.path(out.plots,"figure9_rufa_movmentclass.jpg"), width = 15, height = 30,units = "cm", dpi = 600)
 
 
-
-
-# 
 # 
 # ## plots for south wintering regions 
 # 

@@ -226,17 +226,6 @@ ggsave(file.path(out.plots,"figure9_rufa_movmentclass.jpg"), width = 15, height 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 ############################################################################
 ### SUB POPULATION REVIEW 
 
@@ -304,6 +293,45 @@ st_write(df_stopover_subset , file.path(out.plots , "rufa_stopovers.gpkg"), appe
 
 ###################################################
 
+
+
+# all locations 
+den <- df_stopover_subset %>% 
+  filter(movement_final != "deployment") |> 
+  filter(movement_final != "north_migration") |> 
+  filter(movement_final != "south_migration") |> 
+  mutate(date = ymd(date_time))
+
+filter(keep >1) %>% 
+  dplyr::select(-movement_final_next, -toremove, -toremove2, -keep)
+
+
+
+
+global <- ggplot(data = Americas) +
+  geom_sf(color = "grey") +
+  #geom_sf(data = rf_sf,colour = "dark blue", alpha = 0.5, size = 0.7) +
+  geom_bin2d(data = df_ll, aes(x=lng, y=lat), bins = 50) +
+  facet_wrap(~arr_month, nrow = 3)+
+  scale_color_viridis_d() +
+  # geom_point(ru, aes(x = lng, y = lat), size = 4) +
+  xlab("Longitude") + ylab("Latitude") +
+  coord_sf(xlim =  c(-170.15, 0), ylim = c(0, 80), expand = FALSE)+
+  theme_minimal()+
+  theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        legend.position= 'none' )
+#legend.text=element_text(size=12))+
+#guides(color = guide_legend(override.aes = list(size = 6,alpha = 1)))
+
+global 
+
+jpeg(file.path(out.plots,"rose_density_month_facet.jpg"), width = 30, height = 25,units = "cm", res = 210)
+# 2. Create the plot
+global 
+# 3. Close the file
+dev.off()
+#ggsave(file.path(out.dir, "rufa_subpop_month_facet.jpg"))
 
 
 

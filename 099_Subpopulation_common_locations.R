@@ -107,6 +107,27 @@ br_summ <- br_stoppovers |> group_by(subpop) |>
   count()
 
 
+library(rnaturalearth)
+
+islands <- tibble::tribble(
+  ~name,                     ~lon,    ~lat,
+  "Banks I.",              -121.5,   73.0,
+  "Victoria I.",           -110.0,   70.5,
+  "Melville I.",           -111.5,   75.3,
+  #"Prince Patrick I.",     -119.5,   76.8,
+  "Bathurst I.",            -99.5,   75.8,
+  "Prince of Wales I.",     -99.0,   72.8,
+  "Somerset I.",            -93.3,   73.2,
+  "Devon I.",               -88.0,   75.3,
+  "King William I.",        -97.5,   69.0,
+  "Southampton I.",         -84.5,   64.5,
+  "Coats I.",               -82.5,   62.5,
+  "Prince Charles I.",      -76.2,   67.8,
+  "Baffin I.",              -70.0,   68.5,
+  "Bylot I.",               -78.6,   73.2
+)
+
+
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
 Americas <- world %>% dplyr::filter(continent == "North America")
@@ -123,19 +144,27 @@ global <- ggplot(data = Americas) +
   coord_sf(xlim = c(-120, -60), ylim = c(59, 78), expand = FALSE)+
   #coord_sf(xlim = c(-125, -60), ylim = c(50, 79), expand = FALSE)+
   theme_bw()+
+  geom_text(data = islands,
+            aes(x = lon, y = lat, label = name),
+            inherit.aes = FALSE,
+            colour = "grey25", size = 3, fontface = "italic")+
+ # labs(colour = "Tag ID") + 
+  
   #labs(colour = "Type") + 
   theme(
     axis.text = element_blank(),
     axis.ticks = element_blank(),
-    axis.title = element_blank()
+    axis.title = element_blank(),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 13))
     #legend.title = "", 
     #legend.position = "bottom",
     #legend.key.width = unit(3, "lines")
-  )
+
 
 global
 
-ggsave(file.path(out.plots,"fig29_common_rufa_breeding.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig29_common_rufa_breedingv2.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 brr <- dur_type_move |> filter(movement_final == "breeding") |> 
@@ -166,24 +195,41 @@ brr <- dur_type_move |> filter(movement_final == "breeding") |>
   
 brr <- brr |> filter(!is.na(region)) 
 
-
 ## figure of duration 
+# 
+# ggplot(brr, aes(y=factor(region))) +
+#   geom_segment(aes(x=start_date, xend=end_date, y=factor(subpop), yend=factor(subpop),color=subpop_val), linewidth = 3)+
+#   scale_color_brewer(palette = "Set1", name = "Subpopulation")+
+#   xlim(10,40)+
+#   #(aes(x=start_date, y=factor(subpop), size = 2), colour = "blue") +
+#   #geom_point(aes(x=start_date, y=factor(subpop), size = 2), colour = "red") +
+#   facet_wrap(~region) +
+#   #ggtitle("Breeding Locations") +
+#   #geom_text( aes(y = factor(region), x = depart_maxdate, label = count))+
+#   xlab("Week of Year") + ylab("breeeding regions") +
+#   theme_bw()
+#   #theme(legend.position = "none")
 
-ggplot(brr, aes(y=factor(region))) +
-  geom_segment(aes(x=start_date, xend=end_date, y=factor(subpop), yend=factor(subpop),color=subpop_val), linewidth = 3)+
-  scale_color_brewer(palette = "Set1", name = "Subpopulation")+
-  xlim(10,40)+
-  #(aes(x=start_date, y=factor(subpop), size = 2), colour = "blue") +
-  #geom_point(aes(x=start_date, y=factor(subpop), size = 2), colour = "red") +
+bar_n <- brr |>
+  ungroup() |>
+  group_by(region, subpop) |>
+  summarise(n = n_distinct(tag.id), .groups = "drop") |>
+  mutate(lab = paste0("(", n, ")"))
+
+ggplot(brr) +
+  geom_segment(aes(x = start_date, xend = end_date,
+                   y = factor(subpop), yend = factor(subpop),
+                   color = subpop_val), linewidth = 3) +
+  geom_text(data = bar_n,
+            aes(x = 42, y = factor(subpop), label = lab),
+            inherit.aes = FALSE, hjust = 1, size = 3.5, colour = "grey20") +
+  scale_color_brewer(palette = "Set1", name = "Subpopulation") +
+  coord_cartesian(xlim = c(10, 42)) +
   facet_wrap(~region) +
-  #ggtitle("Breeding Locations") +
-  #geom_text( aes(y = factor(region), x = depart_maxdate, label = count))+
-  xlab("Week of Year") + ylab("breeeding regions") +
+  xlab("Week of Year") + ylab("Breeding region") +
   theme_bw()
-  #theme(legend.position = "none")
 
-
-ggsave(file.path(out.plots,"fig29_common_rufa_breeding_bars.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig29_common_rufa_breeding_barsv2.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
 
 
 ################################################################################

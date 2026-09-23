@@ -13,6 +13,7 @@ library(stringr)
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(viridisLite) 
 
 
 #data_folder <- file.path("../../02_data/REKN_gps/data")
@@ -21,6 +22,17 @@ final_dat <- file.path("../../02_data/REKN_gps/output_final/draft_outputs_2026")
 out.plots <- file.path("../../02_data/REKN_gps/output_final/figures_2026")
 
 
+# 1. Generate the 4 specific hex codes from the viridis palette (e.g., option "D")
+viridis_colors <- viridis(4,option = "D")
+
+# 2. Name the colors by your specific factor levels to lock them in
+# Replace 'Cat1', 'Cat2', etc., with your actual factor level names
+color_mapping <- c(
+  "north_stopover" = viridis_colors[1],
+  "breeding" = viridis_colors[2],
+  "south_stopover" = viridis_colors[3],
+  "wintering" = viridis_colors[4]
+)
 
 # read in the ref data
 ref <- read_csv(file.path(final_dat, "reference_data_2020_2025_20260124.csv"))
@@ -74,6 +86,19 @@ wgwp <- df_all %>%
   filter(movement_final != "north_migration") |> 
   filter(movement_final != "south_migration") 
   
+wgwp$movement_final <- factor(wgwp$movement_final, levels=c("north_stopover", "breeding","south_stopover", "wintering"))
+
+df_all_seg <- df_all %>%
+  filter(tag.id %in% wgwp_id$tag.id) %>%
+  mutate(lon = st_coordinates(.)[, 1],
+         lat = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry() %>%
+  arrange(tag.id, date_time, tag.id.order) %>%
+  group_by(tag.id) %>%
+  mutate(lon_end = lead(lon),
+         lat_end = lead(lat)) %>%
+  ungroup() %>%
+  filter(!is.na(lon_end))
 
 ## western duration for tags 
 durw <- dur |> 
@@ -101,9 +126,23 @@ wgwp_stopover <- df_stopover_subset |>
 #wgwp_stopover_test <- wgwp_stopover |> 
 #  filter(tag.id == 228177)
 
-
 wgwp_dur <- dur_type_move %>% 
   filter(tag.id %in% wgwp_id$tag.id)
+
+# add lines 
+#tracks <- wgwp
+wgwp_seg <- wgwp %>%
+  mutate(lon = st_coordinates(.)[, 1],
+         lat = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry() %>%
+  arrange(tag.id, date_time, tag.id.order) %>%
+  group_by(tag.id) %>%
+  mutate(lon_end = lead(lon),
+         lat_end = lead(lat)) %>%
+  ungroup() %>%
+  filter(!is.na(lon_end))
+
+
 
 # Geographic distributon of tags ## figure 6 
 
@@ -113,8 +152,19 @@ Americas <- world %>% dplyr::filter(continent == "North America")
 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
+#  geom_segment(data = wgwp_seg,
+#               aes(x = lon, y = lat, xend = lon_end, yend = lat_end,
+##                   colour = movement_final),
+#               alpha = 0.3, linewidth = 0.4,
+#               inherit.aes = FALSE, show.legend = FALSE) +
+  geom_segment(data = df_all_seg,
+               aes(x = lon, y = lat, xend = lon_end, yend = lat_end,
+                   colour = movement_final),
+               alpha = 0.3, linewidth = 0.4,
+               inherit.aes = FALSE, show.legend = FALSE) +
   geom_sf(data = wgwp, size = 2.5,  aes(colour = movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") + 
+  #scale_color_viridis_d(name = "Movement Type") +
+  scale_color_manual(values = color_mapping,name = "Movement Type")+
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
   theme_bw()+
@@ -135,7 +185,12 @@ ggsave(file.path(out.plots,"fig11_west_stopovers_combined.jpg"), width = 20, hei
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
   geom_sf(data = wgwp, size = 2.5, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") + 
+  scale_color_manual(values = color_mapping,name = "Movement Type")+
+  geom_segment(data = df_all_seg,
+               aes(x = lon, y = lat, xend = lon_end, yend = lat_end,
+                   colour = movement_final),
+               alpha = 0.3, linewidth = 0.4,
+               inherit.aes = FALSE, show.legend = FALSE) +
   facet_wrap(~tag.id)+
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
@@ -165,18 +220,50 @@ wgwp_breed <- bind_rows(wgwp_breed, wgwp_other)
 
 ## Breeding locations 
 
+wgwp_breed_ids <- unique(wgwp_breed$tag.id)
+df_all_seg_breed <- df_all_seg |> 
+  filter(tag.id %in% wgwp_breed_ids)
+
+library(rnaturalearth)
+
+islands <- tibble::tribble(
+  ~name,                     ~lon,    ~lat,
+  "Banks I.",              -121.5,   73.0,
+  "Victoria I.",           -110.0,   70.5,
+  "Melville I.",           -111.5,   75.3,
+  #"Prince Patrick I.",     -119.5,   76.8,
+  "Bathurst I.",            -99.5,   75.8,
+  "Prince of Wales I.",     -99.0,   72.8,
+  "Somerset I.",            -93.3,   73.2,
+  "Devon I.",               -88.0,   75.3,
+  "King William I.",        -97.5,   69.0,
+  "Southampton I.",         -84.5,   64.5,
+  "Coats I.",               -82.5,   62.5,
+  "Prince Charles I.",      -76.2,   67.8,
+  "Baffin I.",              -70.0,   68.5,
+  "Bylot I.",               -78.6,   73.2
+)
 # entire north America 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = wgwp_breed, size = 3, aes(colour= movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") + 
+  geom_sf(data = wgwp_breed, size = 2.5, aes(colour= movement_final)) +#colour = "dark blue") +
+  #scale_color_viridis_d(name = "Movement Type") + 
+  geom_segment(data = df_all_seg_breed,
+               aes(x = lon, y = lat, xend = lon_end, yend = lat_end,
+                   colour = movement_final),
+               alpha = 0.3, linewidth = 0.4,
+               inherit.aes = FALSE, show.legend = FALSE) +
+  scale_color_manual(values = color_mapping,name = "Movement Type")+
   #facet_wrap(~tag.id)+
   # geom_point(ru, aes(x = lng, y = lat), size = 4) +
   # xlab("Longitude") + ylab("Latitude") +
   #coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
   coord_sf(xlim = c(-125, -60), ylim = c(55, 79), expand = FALSE)+
   theme_bw()+
-  #labs(colour = "Type") + 
+  geom_text(data = islands,
+            aes(x = lon, y = lat, label = name),
+            inherit.aes = FALSE,
+            colour = "grey25", size = 3, fontface = "italic")+
   theme(
     axis.text = element_blank(),
     axis.ticks = element_blank(),

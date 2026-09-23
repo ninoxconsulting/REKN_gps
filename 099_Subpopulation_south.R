@@ -12,7 +12,17 @@ library(stringr)
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(viridisLite) 
 
+
+# 1. Generate the 4 specific hex codes from the viridis palette (e.g., option "D")
+viridis_colors <- viridis(4,option = "D")
+color_mapping <- c(
+  "north_stopover" = viridis_colors[1],
+  "breeding" = viridis_colors[2],
+  "south_stopover" = viridis_colors[3],
+  "wintering" = viridis_colors[4]
+)
 
 #data_folder <- file.path("../../02_data/REKN_gps/data")
 raw_dat <- file.path("../../02_data/REKN_gps/output_temp")
@@ -173,9 +183,23 @@ south_stopover_spring <- south_stopover_spring |>
   filter(movement_final != "wintering")
 
 south_stopover_spring <-  bind_rows(south_stopover_spring, south_winter )
+south_stopover_spring_ids <- unique(south_stopover_spring$tag.id)
 
+df_all_seg <- df_all %>%
+  filter(tag.id %in% south_stopover_spring_ids) %>%
+  mutate(lon = st_coordinates(.)[, 1],
+         lat = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry() %>%
+  arrange(tag.id, date_time, tag.id.order) %>%
+  group_by(tag.id) %>%
+  mutate(lon_end = lead(lon),
+         lat_end = lead(lat)) %>%
+  ungroup() %>%
+  filter(!is.na(lon_end)) |> 
+  filter(month %in% c(1,2,3,4,5,6))
+# filter an end date of July? to capture northward migration. 
 
-
+unique(df_all_seg$month)
 # plot the 
 
 
@@ -186,7 +210,12 @@ Americas <- world %>% dplyr::filter(region_un == "Americas")
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
   geom_sf(data = south_stopover_spring, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") + 
+  scale_color_manual(values = color_mapping,name = "Movement Type")+
+  geom_segment(data = df_all_seg,
+               aes(x = lon, y = lat, xend = lon_end, yend = lat_end,
+                   colour = movement_final),
+               alpha = 0.3, linewidth = 0.4,
+               inherit.aes = FALSE, show.legend = FALSE) +
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
@@ -194,12 +223,9 @@ global <- ggplot(data = Americas) +
   theme(axis.text.x=element_blank(),
         axis.text.y=element_blank())
 
-global
+#global
 
-ggsave(file.path(out.plots,"fig12_south_stopovers__fall_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
-
-
-
+ggsave(plot = global, filename = file.path(out.plots,"fig12_south_stopovers_fall_combinedv2.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -234,9 +260,29 @@ south_winter <- south_stopover_fall %>% filter(movement_final == "wintering")|>
 south_stopover_fall <- south_stopover_fall |> 
   filter(movement_final != "wintering")
 
-south_stopover_fall <-  bind_rows(south_stopover_fall, south_winter )
+south_stopover_fall <-  bind_rows(south_stopover_fall, south_winter ) |> 
+  mutate(movement_final = droplevels(factor(movement_final,
+                                            levels = names(color_mapping))))
 
+df_all_seg <- df_all %>%
+  filter(tag.id %in% south_stopover_spring_ids) %>%
+  mutate(lon = st_coordinates(.)[, 1],
+         lat = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry() %>%
+  arrange(tag.id, date_time, tag.id.order) %>%
+  group_by(tag.id) %>%
+  mutate(lon_end = lead(lon),
+         lat_end = lead(lat)) %>%
+  ungroup() %>%
+  filter(!is.na(lon_end)) |> 
+  filter(month %in% c(7,8,9,10,11,12)) #|> 
+  #filter(movement_final %in% c("breeding" ,"south_migration" ,"south_stopover" , "wintering" )) |>
+  #mutate(movement_final = droplevels(factor(movement_final,
+  #                                          levels = names(color_mapping)))) |> 
+  #filter(!is.na(movement_final))
+  unique(df_all_seg$movement_final)
 
+# filter an end date of July? to capture northward migration. 
 
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -245,20 +291,25 @@ Americas <- world %>% dplyr::filter(region_un == "Americas")
 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = south_stopover_fall, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") + 
+  geom_segment(data = df_all_seg,
+               aes(x = lon, y = lat, xend = lon_end, yend = lat_end,
+                   colour = movement_final),
+               alpha = 0.3, linewidth = 0.4,
+               inherit.aes = FALSE, show.legend = FALSE) +
+  geom_sf(data = south_stopover_fall, size = 2, alpha = 0.8,
+          aes(colour = movement_final)) +
+  scale_color_manual(values = color_mapping,
+                     breaks = setdiff(names(color_mapping), "north_stopover"),
+                     name = "Movement Type") +
   xlab("Longitude") + ylab("Latitude") +
-  coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
-  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
-  theme_bw()+
-  theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank())
+  coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE) +
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank())
 
 global
 
-ggsave(file.path(out.plots,"fig15_south_stopovers_spring_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
-
-
+ggsave(plot = global, filename =file.path(out.plots,"fig15_south_stopovers_spring_combinedv2.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -289,7 +340,7 @@ st.nth <- south_fig |>
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
   geom_sf(data = st.nth, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") + 
+  scale_color_manual(values = color_mapping,name = "Movement Type")+
   facet_wrap(~tag.id)+
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -20), ylim = c(-60, 80), expand = FALSE)+
@@ -300,14 +351,14 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig12_south_north_migration_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(plot = global, filename = file.path(out.plots,"fig12_south_north_migration_stopovers_pertagv2.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 #############################
 #South ward migrants: #(n = 20)
 
 st.nth <- south_fig |> 
-  filter(tag.id %in% sth.tg) |> 
+  filter(tag.id %in% sth.tg) 
  
   # Geographic distributon of nth tags all stopover data) tags 
 
@@ -315,7 +366,7 @@ global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
   geom_sf(data = st.nth, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
   #scale_fill_manual(values = cyl_colors)+
-  scale_color_viridis_d(name = "Movement Type", begin = 0.5) + 
+  scale_color_manual(values = color_mapping,name = "Movement Type")+
   facet_wrap(~tag.id)+
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -20), ylim = c(-60, 70), expand = FALSE)+
@@ -326,7 +377,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig12_south_sth_migration_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(plot = global, filename = file.path(out.plots,"fig12_south_sth_migration_stopovers_pertagv2.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 #"#440154FF" "#31688EFF" "#35B779FF" "#FDE725FF"
 
@@ -338,6 +389,28 @@ ggsave(file.path(out.plots,"fig12_south_sth_migration_stopovers_pertag.jpg"), wi
 ### Figure 8 
 
 ## Breeding locations 
+
+
+library(rnaturalearth)
+
+islands <- tibble::tribble(
+  ~name,                     ~lon,    ~lat,
+  "Banks I.",              -121.5,   73.0,
+  "Victoria I.",           -110.0,   70.5,
+  "Melville I.",           -111.5,   75.3,
+  #"Prince Patrick I.",     -119.5,   76.8,
+  "Bathurst I.",            -99.5,   75.8,
+  "Prince of Wales I.",     -99.0,   72.8,
+  "Somerset I.",            -93.3,   73.2,
+  "Devon I.",               -88.0,   75.3,
+  "King William I.",        -97.5,   69.0,
+  "Southampton I.",         -84.5,   64.5,
+  "Coats I.",               -82.5,   62.5,
+  "Prince Charles I.",      -76.2,   67.8,
+  "Baffin I.",              -70.0,   68.5,
+  "Bylot I.",               -78.6,   73.2
+)
+
 
 south_breed <- south_stopover %>% filter(movement_final == "breeding")
 
@@ -364,7 +437,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig9_south_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -374,10 +447,10 @@ ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, heig
 south_breed <- south %>% filter(movement_final == "breeding")
 
 #filtered breedign locations
-south_breed <- south_breed |>
-  group_by(tag.id) |>
-  filter(movement_final == "breeding") |>
-  slice_head(, n = 1)
+#south_breed <- south_breed |>
+##  group_by(tag.id) |>
+#  filter(movement_final == "breeding") |>
+#  slice_head(, n = 1)
 
 # wgwp_other <- wgwp_stopover |>
 #   filter(movement_final != "breeding")
@@ -389,28 +462,203 @@ south_breed <- south_breed |>
 # entire north America 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = south_breed, size = 1.5, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Tag ID") + 
-  #scale_color_brewer(palette = "Spectral", name = 'Tag ID')+
-  #facet_wrap(~movement_final)+
-  # geom_point(ru, aes(x = lng, y = lat), size = 4) +
-  # xlab("Longitude") + ylab("Latitude") +
+  geom_sf(data = south_breed, size = 1, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
   #coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
   coord_sf(xlim = c(-120, -70), ylim = c(59, 78), expand = FALSE)+
   theme_bw()+
-  #labs(colour = "Type") + 
+  geom_text(data = islands,
+            aes(x = lon, y = lat, label = name),
+            inherit.aes = FALSE,
+            colour = "grey25", size = 3, fontface = "italic")+
+  labs(colour = "Tag ID") + 
   theme(
     axis.text = element_blank(),
     axis.ticks = element_blank(),
-    axis.title = element_blank()
-    #legend.title = "", 
-    #legend.position = "bottom",
-    #legend.key.width = unit(3, "lines")
-  )
+    axis.title = element_blank(),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 13))
+
 
 global
 
-ggsave(file.path(out.plots,"fig14_south_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(plot=global, filename = file.path(out.plots,"fig14_south_stopovers_combinedv2.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+
+
+
+
+###################################################################
+
+# figure 18 and 19 in report 
+
+f19 <- c(261443, 261438, 261437, 261434) 
+
+south_fig <- south |> 
+  filter(movement_final != "deployment") |> 
+  filter(tag.id %in% f19)
+
+
+df19 <- df_all |> 
+  filter(tag.id %in% f19) |> 
+  filter(visible == TRUE)
+
+
+df_all_seg <- df19 %>%
+  mutate(lon = st_coordinates(.)[, 1],
+         lat = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry() %>%
+  arrange(tag.id, date_time, tag.id.order) %>%
+  group_by(tag.id) %>%
+  mutate(lon_end = lead(lon),
+         lat_end = lead(lat)) %>%
+  ungroup() %>%
+  filter(!is.na(lon_end))
+
+
+unique(df_all_seg$movement_final)
+
+tag_ids <- as.character(sort(unique(df19$tag.id)))
+
+# Okabe-Ito colours: strongly distinct and colour-blind safe
+tag_cols <- setNames(c("#E69F00", "#0072B2", "#D55E00", "#009E73"), tag_ids)
+# Geographic distributon of nth tags all stopover data) tags (n = 25)
+
+global <- ggplot(data = Americas) +
+  geom_sf(color = "grey") +
+  geom_segment(data = df_all_seg,
+               aes(x = lon, y = lat, xend = lon_end, yend = lat_end,
+                   colour = as.character(tag.id)),
+               alpha = 0.4, linewidth = 0.5,
+               inherit.aes = FALSE, show.legend = FALSE) +
+  geom_sf(data = df19, size = 2, alpha = 0.8,
+          aes(colour = as.character(tag.id))) +
+  scale_colour_manual(values = tag_cols, name = "Tag ID") +
+  xlab("Longitude") + ylab("Latitude") +
+  labs(colour = "Tag ID") + 
+  coord_sf(xlim = c(-83, -42), ylim = c(-58, -25), expand = FALSE)+
+  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
+  theme_bw()+
+  #scale_colour_discrete(breaks = as.character(unique(df19$tag.id)),
+  #                      name = "Tag ID") +
+  theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 13))
+
+#global
+
+ggsave(plot = global, filename = file.path(out.plots,"fig19_south_tdf_bytag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+
+
+#############################
+## FIGURE @) 
+
+f20 <- c(261436, 285995 , 280805 , 262946, 261450) 
+tag_ids <- as.character(sort(f20))
+
+tag_cols <- setNames(c("#E69F00", "#0072B2", "#D55E00", "#009E73", "#CC79A7"), tag_ids)
+south_fig <- south |> 
+  filter(movement_final != "deployment") |> 
+  filter(tag.id %in% f20)
+
+df20 <- df_all |> 
+  filter(tag.id %in% f20) |> 
+  filter(visible == TRUE)
+
+df_all_seg <- df20 %>%
+  mutate(lon = st_coordinates(.)[, 1],
+         lat = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry() %>%
+  arrange(tag.id, date_time, tag.id.order) %>%
+  group_by(tag.id) %>%
+  mutate(lon_end = lead(lon),
+         lat_end = lead(lat)) %>%
+  ungroup() %>%
+  filter(!is.na(lon_end))
+
+#unique(df_all_seg$movement_final)
+
+# Geographic distributon of nth tags all stopover data) tags (n = 25)
+
+global <- ggplot(data = Americas) +
+  geom_sf(color = "grey") +
+ geom_segment(data = df_all_seg,
+               aes(x = lon, y = lat, xend = lon_end, yend = lat_end,
+                   colour = as.character(tag.id)),
+               alpha = 0.4, linewidth = 0.5,
+               inherit.aes = FALSE, show.legend = FALSE) +
+  geom_sf(data = df20, size = 2, alpha = 0.8,
+          aes(colour = as.character(tag.id))) +
+  scale_colour_manual(values = tag_cols, name = "Tag ID") +
+  xlab("Longitude") + ylab("Latitude") +
+  labs(colour = "Tag ID") + 
+  coord_sf(xlim = c(-80, -42), ylim = c(-50, -25), expand = FALSE)+
+  theme_bw()+
+  theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 13))
+
+global
+
+ggsave(plot = global, filename = file.path(out.plots,"fig20_south_tdf_bytag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+
+### Make inset : 
+
+
+global_inset <- ggplot(data = Americas) +
+  geom_sf(color = "grey") +
+#  geom_segment(data = df_all_seg,
+#               aes(x = lon, y = lat, xend = lon_end, yend = lat_end,
+#                   colour = as.character(tag.id)),
+#               alpha = 0.4, linewidth = 0.5,
+#               inherit.aes = FALSE, show.legend = FALSE) +
+  geom_sf(data = df20, size = 2, alpha = 0.4,
+          aes(colour = as.character(tag.id))) +
+  scale_colour_manual(values = tag_cols, name = "Tag ID") +
+  xlab("Longitude") + ylab("Latitude") +
+  labs(colour = "Tag ID") + 
+  coord_sf(xlim = c(-64, -60), ylim = c(-41.5, -38), expand = FALSE)+
+  theme_bw()+
+  theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 13))
+
+global_inset
+
+
+library(patchwork)
+
+# box on the main map marking the inset area
+global_boxed <- global +
+  annotate("rect", xmin = -64, xmax = -60, ymin = -41.5, ymax = -38,
+           fill = NA, colour = "black", linewidth = 0.6)
+
+# stripped-down inset
+global_inset <- ggplot(data = Americas) +
+  geom_sf(color = "grey") +
+  geom_sf(data = df20, size = 2, alpha = 0.4,
+          aes(colour = as.character(tag.id))) +
+  scale_colour_manual(values = tag_cols) +
+  coord_sf(xlim = c(-64, -60), ylim = c(-41.5, -38), expand = FALSE) +
+  theme_bw() +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "none",
+        plot.background = element_rect(colour = "black", linewidth = 0.7),
+        plot.margin = margin(2, 2, 2, 2))
+
+combined <- global_boxed +
+  inset_element(global_inset,
+                left = 0.60, bottom = 0.05, right = 0.98, top = 0.45,
+                align_to = "panel")
+
+combined
+
+ggsave(plot = combined,
+       filename = file.path(out.plots, "fig20_south_tdf_bytag_inset.jpg"),
+       width = 30, height = 30, units = "cm", dpi = 600)
 
 
 
@@ -449,10 +697,6 @@ ggsave(file.path(out.plots,"fig14_south_stopovers_combined.jpg"), width = 30, he
 #  
 
 
-
-
-
-
 ############## Migration map ###################
 
 south_stopover <- cbind(south_stopover, st_coordinates(south_stopover))
@@ -476,6 +720,23 @@ birdmapall <- leaflet(wgwp_stopover) %>%
                color = "grey",   opacity = 0.1, stroke = TRUE)# %>%
 
 birdmapall
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #deployemtn summary 
@@ -739,6 +1000,15 @@ global
 # 262940 - arrive virginia (may 26th -       - june 3rd ) several short stopover james and husdon bay - Sthampton is (June 15 - onwards - dropped tag?)
 # 262945 - arrive sth carolina delBay        -june 1st)- hudson bay (june 4 -8) - nunavut mainland (june 9th - july 29 )- tag dropped - potnteil not breeding? 
 # 282311 - tagged in sth carolina (may 18 -20) - James Bay (may 26 - june 6) - Victoria Is (June 7 - July 24) - James Bay (July 26 - August 11) - Surine (Aug 16 - sep 10)- Baihia San Blass (Sep 16 -20) tag dies
+
+
+###################################################################
+
+# figure 18 and 19 in report 
+
+
+
+
 
 
 

@@ -69,7 +69,7 @@ tagls <- tagls |>
 ref_y <- left_join(ref, tagls, by = "tag.id") |> 
   filter(usable =="y" )
 
-
+ref_yn <- left_join(ref, tagls, by = "tag.id")
 
 # filtered location records to usable tags 
 loc <- read_csv(file.path(final_dat, "location_data_2017_2025.csv")) |> 
@@ -92,7 +92,7 @@ unique(ref$tag.model)
 #  dplyr::filter(year > 2000)
 #length(loc$proj)
 
-tag.proj
+#tag.proj
 ### SUMMARY OF ANIMALS ## NOTE THIS IS THE FULL DATA SET (n = 353)
 
 # tags per project 
@@ -169,6 +169,19 @@ age_sum <- ref_y |>
   group_by(animal.life.stage,study.site ) |> 
   #group_by(animal.life.stage ) |> 
   summarise(no.of.tags = length(unique(tag.id)))
+
+
+age_sum <- ref_yn |> 
+  dplyr::select(tag.id, study.site, proj, animal.life.stage) |> 
+  #group_by(animal.life.stage , study.site) |> 
+ # group_by(animal.life.stage,study.site ) |> 
+  group_by(animal.life.stage ) |> 
+  summarise(no.of.tags = length(unique(tag.id)))
+
+
+age_sum
+
+
 
 
 

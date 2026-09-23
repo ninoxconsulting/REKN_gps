@@ -18,6 +18,15 @@ final_dat <- file.path("../../02_data/REKN_gps/output_final/draft_outputs_2026")
 out.plots <- file.path("../../02_data/REKN_gps/output_final/figures_2026")
 
 
+# 1. Generate the 4 specific hex codes from the viridis palette (e.g., option "D")
+viridis_colors <- viridis(4,option = "D")
+color_mapping <- c(
+  "north_stopover" = viridis_colors[1],
+  "breeding" = viridis_colors[2],
+  "south_stopover" = viridis_colors[3],
+  "wintering" = viridis_colors[4]
+)
+
 # read in the ref data
 ref <- read_csv(file.path(final_dat, "reference_data_2020_2025_20260124.csv"))
 ref_due <- ref %>% 
@@ -158,6 +167,24 @@ se_stopover_spring <- se_stopover_spring |>
 
 se_stopover_spring <-  bind_rows(se_stopover_spring, se_winter )
 
+se_stopover_spring_ids <- unique(se_stopover_spring$tag.id)
+
+df_all_seg <- df_all %>%
+  filter(tag.id %in% se_stopover_spring_ids) %>%
+  mutate(lon = st_coordinates(.)[, 1],
+         lat = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry() %>%
+  arrange(tag.id, date_time, tag.id.order) %>%
+  group_by(tag.id) %>%
+  mutate(lon_end = lead(lon),
+         lat_end = lead(lat)) %>%
+  ungroup() %>%
+  filter(!is.na(lon_end)) |> 
+  filter(month %in% c(1,2,3,4,5,6)) |> 
+  filter(movement_final != "breeding")
+# filter an end date of July? to capture northward migration. 
+
+
 ########################################################
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -166,17 +193,24 @@ Americas <- world %>% dplyr::filter(region_un == "Americas")
 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
+  scale_color_manual(values = color_mapping,
+                     breaks = setdiff(names(color_mapping), "south_stopover"),
+                     name = "Movement Type") +
+  geom_segment(data = df_all_seg,
+               aes(x = lon, y = lat, xend = lon_end, yend = lat_end,
+                   colour = "grey"),
+               alpha = 0.3, linewidth = 0.4,
+               inherit.aes = FALSE, show.legend = FALSE) +
   geom_sf(data = se_stopover_spring, size = 2, alpha = 0.7, aes(colour = movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") + 
   xlab("Longitude") + ylab("Latitude") +
+  labs(colour = "Tag ID") + 
   coord_sf(xlim = c(-130, -40), ylim = c(10, 80), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
         axis.text.y=element_blank())
 
-global
-
-ggsave(file.path(out.plots,"fig21_se_stopovers__fall_combined.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
+#global
+ggsave(plot= global, filename=file.path(out.plots,"fig21_se_stopovers_fall_combinedv2.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
 
 
 
@@ -213,6 +247,22 @@ se_stopover_fall <- se_stopover_fall |>
 
 se_stopover_fall <-  bind_rows(se_stopover_fall, se_winter )
 
+se_stopover_fall_ids <- unique(se_stopover_fall$tag.id)
+
+df_all_seg <- df_all %>%
+  filter(tag.id %in% se_stopover_fall_ids) %>%
+  mutate(lon = st_coordinates(.)[, 1],
+         lat = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry() %>%
+  arrange(tag.id, date_time, tag.id.order) %>%
+  group_by(tag.id) %>%
+  mutate(lon_end = lead(lon),
+         lat_end = lead(lat)) %>%
+  ungroup() %>%
+  filter(!is.na(lon_end)) |> 
+  filter(month %in% c(6,7,8,9,10,11,12)) |> 
+  filter(movement_final != "breeding")
+# filter an end date of July? to capture northward migration. 
 
 ##################################
 
@@ -222,8 +272,16 @@ Americas <- world %>% dplyr::filter(region_un == "Americas")
 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
+  scale_color_manual(values = color_mapping,
+                     breaks = setdiff(names(color_mapping), "north_stopover"),
+                     name = "Movement Type") +
+  geom_segment(data = df_all_seg,
+               aes(x = lon, y = lat, xend = lon_end, yend = lat_end,
+                   colour = "grey"),
+               alpha = 0.3, linewidth = 0.4,
+               inherit.aes = FALSE, show.legend = FALSE) +
   geom_sf(data = se_stopover_fall, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") + 
+  #scale_color_viridis_d(name = "Movement Type") + 
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -40), ylim = c(5, 80), expand = FALSE)+
   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
@@ -233,10 +291,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig21_south_stopovers_spring_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
-
-
-
+ggsave(plot = global, filename = file.path(out.plots,"fig21_southeast_stopovers_spring_combinedv2.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 ###############################################################################
 
@@ -327,7 +382,25 @@ ggsave(file.path(out.plots,"fig21_south_stopovers_spring_combined.jpg"), width =
 # #ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 # 
 
+library(rnaturalearth)
 
+islands <- tibble::tribble(
+  ~name,                     ~lon,    ~lat,
+  "Banks I.",              -121.5,   73.0,
+  "Victoria I.",           -110.0,   70.5,
+  "Melville I.",           -111.5,   75.3,
+  #"Prince Patrick I.",     -119.5,   76.8,
+  "Bathurst I.",            -99.5,   75.8,
+  "Prince of Wales I.",     -99.0,   72.8,
+  "Somerset I.",            -93.3,   73.2,
+  "Devon I.",               -88.0,   75.3,
+  "King William I.",        -97.5,   69.0,
+  "Southampton I.",         -84.5,   64.5,
+  "Coats I.",               -82.5,   62.5,
+  "Prince Charles I.",      -76.2,   67.8,
+  "Baffin I.",              -70.0,   68.5,
+  "Bylot I.",               -78.6,   73.2
+)
 
 ## Breeding locations - alternate 
 # pair down the breeding  and select single locaion select only one breeding location for clarity
@@ -336,13 +409,18 @@ se_breed <- se %>% filter(movement_final == "breeding")|>
   filter(movement_final == "breeding") |>
   slice_head(, n = 1)
 
-
 # entire north America 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = se_breed, size = 2, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Tag ID") + 
-  coord_sf(xlim = c(-120, -70), ylim = c(59, 78), expand = FALSE)+
+  geom_sf(data = se_breed, size = 3, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
+ # geom_sf(data = south_breed, size = 1, aes(colour= as.character(tag.id))) +#colour = "dark blue") 
+  #scale_color_viridis_d(name = "Tag ID") + 
+  coord_sf(xlim = c(-118, -69), ylim = c(61, 77), expand = FALSE)+
+  geom_text(data = islands,
+            aes(x = lon, y = lat, label = name),
+            inherit.aes = FALSE,
+            colour = "grey25", size = 3, fontface = "italic")+
+  labs(colour = "Tag ID") + 
   theme_bw()+
   theme(
     axis.text = element_blank(),
@@ -352,7 +430,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig22_se_breeding.jpg"), width = 25, height = 25,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig22_se_breedingv2.jpg"), width = 25, height = 25,units = "cm", dpi = 600)
 
 
 # 
@@ -462,7 +540,7 @@ Americas <- world %>% dplyr::filter(region_un == "Americas")
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
   geom_sf(data = st.nth, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") + 
+  scale_color_manual(values = color_mapping,name = "Movement Type")+
   facet_wrap(~tag.id)+
   xlab("Longitude") + ylab("Latitude") +
    coord_sf(xlim = c(-130, -50), ylim = c(10, 80), expand = FALSE)+
@@ -472,7 +550,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig22_se_nthmigration_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig22_se_nthmigration_stopovers_pertagv2.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 # Repeat for southwards birds 
@@ -508,16 +586,16 @@ global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
   geom_sf(data = st.nth, size = 2, alpha=0.8, aes(colour = movement_final)) +#colour = "dark blue") +
   scale_color_viridis_d(name = "Movement Type", begin = 0.5) + 
-  facet_wrap(~tag.id)+
+  facet_wrap(~tag.id)+#,  ncol = 4)+
   xlab("Longitude") + ylab("Latitude") +
-  coord_sf(xlim = c(-130, -50), ylim = c(10, 60), expand = FALSE)+
+  coord_sf(xlim = c(-100, -60), ylim = c(10, 50), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
         axis.text.y=element_blank())
 
 global
 
-ggsave(file.path(out.plots,"fig23_se_sthmigration_stopovers_pertag.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig23_se_sthmigration_stopovers_pertagv2.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 
@@ -674,7 +752,6 @@ global
 # 260812 - sth Carolina - james bay (May 27-June 3) - Hudson Bay (JUne 3 - 13)        - Matty Is        (june 17 - july 18)- hudson bay (july 18-28) -sth carolina (same location (aug 5 - oct 19) - tag dies
 # 242657- sth carolina  Del Bay - James Bay (june 1 -6) King William (june 7 - 9)     - Prince of Wales (june 9 - August 4)- brd of Nunavut and manitoba (August 6 -7 )-WEST JAMES BAY (August 8 - 19) - Sth Caroline August 20 - Oct 8- Georgia - (OCt 8 - 31)
 
-
 ## eastern arctic ### June 7 -16  depart July 9 - august 10 )
 # 213831 - Del Bay- James Bay (may 30 - June 10) - 10 days                                  - Coats Is          (June 11 - June 16 ) - last transmission (possible breeding?)
 # 281663 - sth Carolina (multi stops) (march 31 - may 20)- james bay (May 22-June 6)        - sthampton is      (june 7- july 9) -sth james bay (july 15-20) - sth carolina (july 22- aug 19)  - tag ended here
@@ -689,25 +766,23 @@ global
 
 ## departure from breeding ##
 
-# 282297 - sth Carolina - monomoy - james bay -sth hudson bay - king william (june 18- july 13) - hudson bay (july 14-21) stops here
-# 282294 - sth Carolina - del bay - james bay - king william (june 8- july 13)                  - hudson bay (july 17- aug13)- mulitple stops sth carolina, floridoa, - cuba (aug 18 - sep 13)- tag ends     tag dropped here
-# 260689  -sth carolina - E. James Bay - Vic Is (june 5 - july 18)                              - hudson bay (july23-aug 1)           - Georgia (Aug 8-22) - Florida (aug 22 - sep 9)
-# 213834 - Delaware bay - Hudson Bay- Vic Is (june 15 - jul 14)                                 - Hudson Bay (july 18-20) - dies here
-# 242656- sth carolina- JAMES BAY - HB Nelson River - Vic Is (June 10 - August 3)               - hudson Bay (aug 8-16)               - sth Carolina (Aug 20 -continued - tag dies Dec 16)
-# 281662- sth Carolina  - james bay- sth H Bay- west Hidson Bay- Vic is- king will (July 12-22) - west hudson bay (july 23-26) -sth hudson bay (july 28- NOv - tag dropped here
-# 260812 - sth Carolina - james bay (May 27-June 3) - Hudson Bay - Matty Is (june 17 - july 18) - hudson bay (july 18-28)             -sth carolina (same location (aug 5 - oct 19) - tag dies
+## 282297 - sth Carolina - monomoy - james bay -sth hudson bay - king william (june 18- july 13) - hudson bay (july 14-21) stops here
+## 282294 - sth Carolina - del bay - james bay - king william (june 8- july 13)                  - hudson bay (july 17- aug13)- mulitple stops sth carolina, floridoa, - cuba (aug 18 - sep 13)- tag ends     tag dropped here
+## 260689  -sth carolina - E. James Bay - Vic Is (june 5 - july 18)                              - hudson bay (july23-aug 1)           - Georgia (Aug 8-22) - Florida (aug 22 - sep 9)
+## 213834 - Delaware bay - Hudson Bay- Vic Is (june 15 - jul 14)                                 - Hudson Bay (july 18-20) - dies here
+## 242656- sth carolina- JAMES BAY - HB Nelson River - Vic Is (June 10 - August 3)               - hudson Bay (aug 8-16)               - sth Carolina (Aug 20 -continued - tag dies Dec 16)
+## 281662- sth Carolina  - james bay- sth H Bay- west Hidson Bay- Vic is- king will (July 12-22) - west hudson bay (july 23-26) -sth hudson bay (july 28- NOv - tag dropped here
+## 260812 - sth Carolina - james bay (May 27-June 3) - Hudson Bay - Matty Is (june 17 - july 18) - hudson bay (july 18-28)             -sth carolina (same location (aug 5 - oct 19) - tag dies
 
-# 242657- sth carolina  Del Bay - James Bay- King William  - Prince of Wales (june 9 - August 4)- james bay (August 8 - 19)        - Sth Caroline August 20 - Oct 8- Georgia - (OCt 8 - 31)
-# 281663 - sth Carolina (multi stops)- james bay - sthampton is (june 7- july 9)                - james bay (july 15-20)          - sth carolina (july 22- aug 19)  - tag ended here
-# 242658 -sth carolina - Monom -James Bay - Baffin Is-prince Charles Is (June 16 - August 10)   - james bay (August 12 -24)             - Flew direct to Cuba (August 28 - Oct 7)
-# 282289 - sth Carolina - del bay  -  james bay  prince of wales (june 10-july 13)              - james bay (july 14-30)          - sth carolina (aug 1 - 12) - dom repulblic(Aug 14-sept 21)- tag dies? 
-# 282291 - sth Carolina - james bay - prince of wales (june 9 - july 12)                        - james Bay (july 15-aug 3)             - turks caycos (aug 8 - Dec 4) - tag dies? potential other types
-# 260688 -sth carolina  - E. James Bay - Nun - Vic Is (june 12 - july 11)                       - James Bay (july17 -Aug 3)       - Georgia (Aug 8-11) tag ends
-# 282283-  sth Carolina - james bay- king william (june 9- july 3)                              - James Bay (july 5- 29)                - Cuba (Aug 1- Oct 12 (tag dropped?)) 
+## 242657- sth carolina  Del Bay - James Bay- King William  - Prince of Wales (june 9 - August 4)- james bay (August 8 - 19)        - Sth Caroline August 20 - Oct 8- Georgia - (OCt 8 - 31)
+## 281663 - sth Carolina (multi stops)- james bay - sthampton is (june 7- july 9)                - james bay (july 15-20)          - sth carolina (july 22- aug 19)  - tag ended here
+## 242658 -sth carolina - Monom -James Bay - Baffin Is-prince Charles Is (June 16 - August 10)   - james bay (August 12 -24)             - Flew direct to Cuba (August 28 - Oct 7)
+## 282289 - sth Carolina - del bay  -  james bay  prince of wales (june 10-july 13)              - james bay (july 14-30)          - sth carolina (aug 1 - 12) - dom repulblic(Aug 14-sept 21)- tag dies? 
+## 282291 - sth Carolina - james bay - prince of wales (june 9 - july 12)                        - james Bay (july 15-aug 3)             - turks caycos (aug 8 - Dec 4) - tag dies? potential other types
+## 260688 -sth carolina  - E. James Bay - Nun - Vic Is (june 12 - july 11)                       - James Bay (july17 -Aug 3)       - Georgia (Aug 8-11) tag ends
+## 282283-  sth Carolina - james bay- king william (june 9- july 3)                              - James Bay (july 5- 29)                - Cuba (Aug 1- Oct 12 (tag dropped?)) 
 
-# 260692 - sth Carolina - james bay - Baffin is- Prince charles Is (june 17 - July 24)          - sth to st laurence Qc (July 26 - Aug 4) - del bay (Aug 7-10) - sth carolina (same location (aug 8 -sep 9) - down and back up north to Cuba (Sep 11- Oct 21 -tag ends)
-
-
+## 260692 - sth Carolina - james bay - Baffin is- Prince charles Is (june 17 - July 24)          - sth to st laurence Qc (July 26 - Aug 4) - del bay (Aug 7-10) - sth carolina (same location (aug 8 -sep 9) - down and back up north to Cuba (Sep 11- Oct 21 -tag ends)
 
 
 
@@ -764,18 +839,23 @@ global
 
 ### wintering - only includes tags that had some Dec records 
 
-# 221844 - atlantic shores - Deployed (nov 12 - 19) - Southport, NOrth Carolina (nov   Dec 6) # tag dies 
-# 221845- atlantic shores - Deployed (nov 12 - 18) - Pamlico sound,         NOrth Carolina (nov 19  Dec 5) # tag dies 
-# 221850- atlantic shores - Deployed (nov 12 - 13) - Pamlico sound,         NOrth Carolina (nov 14  -  Dec 5 ) # tag dies
-# 221856- atlantic shores - Deployed (nov 12 - 13) - Pamlico sound,         NOrth Carolina (nov 14  -  Dec 5 ) # tag dies
-# 260808 - Del Bay (Oct 2 - 25) -                                Nth carolina (Oct 25 - Nov 20) - tag dies 
-# 260810 - Del Bay (Oct 2 - Oct 24) - to                                    Nthcarolina (Oct 24 - Nov 14) - tag dies 
-# 240171 - Del bay (Oct 2 - 15) - sth to Virginia (Oct 16 - 30)           - north carolina (nov 9 - Feb 16 (next yr)- tag ends ? dropped?
+# 221844 - atlantic shores - Deployed (nov 12 - 19) - Southport,              NOrth Carolina (nov   Dec 6) # tag dies 
+# 221845- atlantic shores - Deployed (nov 12 - 18) - Pamlico sound,           NOrth Carolina (nov 19  Dec 5) # tag dies 
+# 221850- atlantic shores - Deployed (nov 12 - 13) - Pamlico sound,           NOrth Carolina (nov 14  -  Dec 5 ) # tag dies
+# 221856- atlantic shores - Deployed (nov 12 - 13) - Pamlico sound,           NOrth Carolina (nov 14  -  Dec 5 ) # tag dies
+# 260808 - Del Bay (Oct 2 - 25) -                                             Nth carolina (Oct 25 - Nov 20) - tag dies 
+# 260810 - Del Bay (Oct 2 - Oct 24) - to                                      Nthcarolina (Oct 24 - Nov 14) - tag dies 
+# 240171 - Del bay (Oct 2 - 15) - sth to Virginia (Oct 16 - 30)           -   north carolina (nov 9 - Feb 16 (next yr)- tag ends ? dropped?
 
 # 221866 - atlantic shores - Deployed (nov 12 - 13) - north Charlston,         - Sth Carolina (nov 16 - Dec 10 )
 # 260809 - Del Bay (Oct 2 - Nov 9) - to                                        - sth carolina (Nov 9 - Nov 26) - tag dies 
-# 242656- sth carolina Kiawah Beach (May 23) - EAST JAMES BAY (May 24 - June 3 ) _ 9 days - HB Nelson River (June 4-7) - multiple short stops Queen Maud Gulf Bird Sanctuary - Vic Island - breeding ground (June 10 - August 3) - hudson Bay(aug 8-16) - sth Carolina (Aug 20 -continued - tag dies Dec 16)
-# 260812 - sth Carolina (march 31 - may 25)- james bay (May 27-June 3) - Hudson Bay (JUne 3 - 13) - Matty Is(june 17 - july 18)- hudson bay (july 18-28) -sth carolina (same location (aug 5 - oct 19) - tag dies
+# 242656- sth carolina Kiawah Beach (May 23) - EAST JAMES BAY (May 24 - June 3 ) 
+      #_ 9 days - HB Nelson River (June 4-7) - multiple short stops Queen Maud Gulf Bird Sanctuary - 
+      # Vic Island - breeding ground (June 10 - August 3) - hudson Bay(aug 8-16) 
+      #                                                                        - sth Carolina (Aug 20 -continued - tag dies Dec 16)
+# 260812 - sth Carolina (march 31 - may 25)- james bay (May 27-June 3) - 
+    #Hudson Bay (JUne 3 - 13) - Matty Is(june 17 - july 18)- hudson bay (july 18-28) 
+                                                                              #-sth carolina (same location (aug 5 - oct 19) - tag dies
 
 # 221860- atlantic shores - Deployed (nov 12 - 13) - Exmore,                - Virginia (nov 13-dec 5 ) # tag dies 
 
@@ -783,10 +863,13 @@ global
 # 240175 - Del bay (Oct 2 - 27) - multiple stops short georgia              - florida (Oct 29 - June 3 - tag dropped?
 
 # 234370 - Atlantic Coast deployed (August 26 -Dec 4)                     - Bahamas (Dec 6 - 14) - tags dies 
-# 282291 - sth Carolina (may 18 - 20)- james bay (May 24-June 6) - prince wales (june 9 - july 12)- james Bay (july 15-aug 3) - turks caycos (aug 8 - Dec 4) - tag dies? potential other types
+# 282291 - sth Carolina (may 18 - 20)- james bay (May 24-June 6) - prince wales (june 9 - july 12)- james Bay (july 15-aug 3) 
+                                                                          #- turks caycos (aug 8 - Dec 4) - tag dies? potential other types
 
 
-# 260692 - sth Carolina (May 16 - may 18)- james bay (May 20-June 3) - Baffin is(June 6 - june 16) - Prince charles Is (east arctic) (june 17 - July 24) - sth to st laurence Qc (July 26 - Aug 4) - del bay (Aug 7-10) - sth carolina (same location (aug 8 -sep 9) - down and back up north to Cuba (Sep 11- Oct 21 -tag ends)
+# 260692 - sth Carolina (May 16 - may 18)- james bay (May 20-June 3) - Baffin is(June 6 - june 16) - Prince charles Is (east arctic) (june 17 - July 24) 
+#- sth to st laurence Qc (July 26 - Aug 4) - del bay (Aug 7-10) - sth carolina (same location (aug 8 -sep 9) - 
+                                                                                 #down and back up north to Cuba (Sep 11- Oct 21 -tag ends)
 
 
 

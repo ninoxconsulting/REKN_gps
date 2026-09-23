@@ -12,12 +12,22 @@ library(stringr)
 library(readr)
 library(dplyr)
 library(ggplot2)
-
+library(viridisLite) 
 
 #data_folder <- file.path("../../02_data/REKN_gps/data")
 raw_dat <- file.path("../../02_data/REKN_gps/output_temp")
 final_dat <- file.path("../../02_data/REKN_gps/output_final/draft_outputs_2026")
 out.plots <- file.path("../../02_data/REKN_gps/output_final/figures_2026")
+
+
+# 1. Generate the 4 specific hex codes from the viridis palette (e.g., option "D")
+viridis_colors <- viridis(4,option = "D")
+color_mapping <- c(
+  "north_stopover" = viridis_colors[1],
+  "breeding" = viridis_colors[2],
+  "south_stopover" = viridis_colors[3],
+  "wintering" = viridis_colors[4]
+)
 
 # read in the ref data
 ref <- read_csv(file.path(final_dat, "reference_data_2020_2025_20260124.csv"))
@@ -101,13 +111,30 @@ se_dur <- dur_type_move %>%
   filter(tag.id %in% se_id$tag.id)
 
 
-
-
-
 ########################################################
 # Geographic distributon of tags ## figure 11 = COmBINED
 se_stopover <- se |> 
   filter(movement_final != "deployment")
+
+
+se_stopover_ids <- unique(se_stopover$tag.id)
+
+
+df_all_seg <- df_all %>%
+  filter(tag.id %in% se_stopover_ids) %>%
+  mutate(lon = st_coordinates(.)[, 1],
+         lat = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry() %>%
+  arrange(tag.id, date_time, tag.id.order) %>%
+  group_by(tag.id) %>%
+  mutate(lon_end = lead(lon),
+         lat_end = lead(lat)) %>%
+  ungroup() %>%
+  filter(!is.na(lon_end)) #|> 
+  #filter(month %in% c(1,2,3,4,5,6)) |> 
+ # filter(movement_final != "breeding")
+# filter an end date of July? to capture northward migration. 
+
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
 Americas <- world %>% dplyr::filter(region_un == "Americas")
@@ -115,8 +142,19 @@ Americas <- world %>% dplyr::filter(region_un == "Americas")
 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = se_stopover, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") +
+  #geom_sf(data = se_stopover, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
+   scale_color_manual(values = color_mapping,
+                      breaks = setdiff(names(color_mapping), "NA"),
+                      name = "Movement Type") +
+  geom_segment(data = df_all_seg,
+               aes(x = lon, y = lat, xend = lon_end, yend = lat_end,
+                   colour = "grey"),
+               alpha = 0.3, linewidth = 0.4,
+               inherit.aes = FALSE, show.legend = FALSE) +
+  geom_sf(data = se_stopover, size = 2, alpha = 0.5, aes(colour = movement_final)) +#colour = "dark blue") +
+  xlab("Longitude") + ylab("Latitude") +
+  labs(colour = "Tag ID") + 
+  
   xlab("Longitude") + ylab("Latitude") +
   #coord_sf(xlim = c(-130, -20), ylim = c(-50, 80), expand = FALSE)+
   coord_sf(xlim = c(-130, -20), ylim = c(-20, 80), expand = FALSE)+
@@ -126,9 +164,9 @@ global <- ggplot(data = Americas) +
   theme(axis.text.x=element_blank(),
         axis.text.y=element_blank())
 
-global
+#global
 
- ggsave(file.path(out.plots,"fig25_south_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(plot = global, filename = file.path(out.plots,"fig25_south_stopovers_combinedv2.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 ########################################################
@@ -186,7 +224,65 @@ global
 
 #ggsave(file.path(out.plots,"fig16_south_stopovers_spring_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
+#########################################################################
+# TODO: winter - with suitble datasets for winter
 
+#Belen
+# 229363 - adult - Depart Sep 2 -           - arrive Belen Sep 3 - March 4th - one location stopover - dropped tag?
+# 229368 - HY  - Oct 23 - Nov 2             - arrive belem (Nov 7 - March 13 2023) - one stop 
+# 232348 - HY  - (Oct 23 - Nov 2 )          - arrive belem (Nov 7 - Dec 12) -  several stops
+# 232349 - HY - - (Oct 23 - Nov 8 )         - arrive belem (Nov 12 - April 10 ) - - one stop
+# 239411 - HY - Mingan - depart direct over ocean - Caught in cyclone - Reached Belen, Brazil  Sth Am NOv 13 - Dec 31
+# 239412 - HY - Mingan  - depart direct over ocean - Reached Belen, Brazil  Sth Am NOv 13 - Dec 6
+# 261448 - Del Bay - sth hudson Bay (july 15 - Aug 8) - suriname (Aus 14-24)- belem (aug25- Dec-29) - cut of data 
+# 261451 - Del Bay - mingan (July 20 - August 1)- open ocean and back to NS (cyclone?) - Yarmouth NS (aug18 -31) - georgetown (Guana (multiple stops (Sep5-30)) - Belem - multiple stops - (Oct 6-13) (oct 14-24) - Oct 24 = Dec 29 - taag stopped 
+# 232353 - HY - - (Sep 12 - Nov 2 )           - arrive belem (Nov 7 - Feb 3 ) - - one stop #
+
+#paraiba
+# 232351 - HY - Sept 12 - Nov 2 - Amapa (Nov 8 - 22)                            - near paraiba NOv 25 - Aug 8
+# 229364 - HY - Oct 23 - Nov 7 -                                                - arrive paraiba (Nov 13 - May 24 2023) - several stops
+# 239408 - HY- Mingan (Sep 15 - Nov 5 ) - depart direct over ocean - Caught in cyclone - Reached Parnaiba, Brazil  Sth Am NOv 11 - Dec 12
+# 242583  - Atlantic coast (August 19 - 27) - several stops : 
+#         - Anguilla. caribbean (August 30 Sept 5)
+#         - mulipel short stops stop french guyana, Brazil (macapa), 
+#         - braganca (sep 24 - Oct 12) ,                                        - Brazil Parnaiba (OCt 13 - Dec 9) tag dies 
+
+# Venezuela 
+# 242698 - HY - - Mingan (Oct 3 - Nov 6 ) - depart direct over ocean - Caught in cyclone- Reached Guyana, Venezuala, Sth Am NOv 11 - Dec 21
+
+# French Guiana 
+# 242702 - HY  - Mingan (Oct 3 - Nov 5 ) - depart more West?? - Reached Suriname, French Guiana, Sth Am NOv 10 - Dec 31
+
+
+
+
+
+
+
+se_stopover <- se |> 
+  filter(movement_final == "wintering") |> 
+  filter(month >=12)
+
+se_stopover_ids <- unique(se_stopover$tag.id)
+
+# #Still tranmittting in Dec
+# delbay ish -   242583 ,   260803, 261448, 261451 #242580 (?),        260803,261448, 261451 (4)  #242580 (?),
+# sth carolina -   260698, (1)
+# Mingan - 194904 ,229363 ,229364, 229368, 232348, 232349, 232351, 232353,239408,239411,242698,242702
+#   #194904 , 229363,229364, 229368, 232348, 232349, 232351, 232353,239408,239411, 239425, 242698, 242702, #-239412, 239421
+
+
+df_all_seg <- df_all %>%
+  filter(tag.id %in% se_stopover_ids) %>%
+  mutate(lon = st_coordinates(.)[, 1],
+         lat = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry() %>%
+  arrange(tag.id, date_time, tag.id.order) %>%
+  group_by(tag.id) %>%
+  mutate(lon_end = lead(lon),
+         lat_end = lead(lat)) %>%
+  ungroup() %>%
+  filter(!is.na(lon_end)) #|> 
 
 
 
@@ -218,6 +314,26 @@ global
 
 ### Figure 8 
 
+library(rnaturalearth)
+
+islands <- tibble::tribble(
+  ~name,                     ~lon,    ~lat,
+  "Banks I.",              -121.5,   73.0,
+  "Victoria I.",           -110.0,   70.5,
+  "Melville I.",           -111.5,   75.3,
+  #"Prince Patrick I.",     -119.5,   76.8,
+  "Bathurst I.",            -99.5,   75.8,
+  "Prince of Wales I.",     -99.0,   72.8,
+  "Somerset I.",            -93.3,   73.2,
+  "Devon I.",               -88.0,   75.3,
+  "King William I.",        -97.5,   69.0,
+  "Southampton I.",         -84.5,   64.5,
+  "Coats I.",               -82.5,   62.5,
+  "Prince Charles I.",      -76.2,   67.8,
+  "Baffin I.",              -70.0,   68.5,
+  "Bylot I.",               -78.6,   73.2
+)
+
 ## Breeding locations 
 # pair down the breeding  and select single locaion select only one breeding location for clarity
 se_breed <- se %>% filter(movement_final == "breeding")|>
@@ -229,10 +345,19 @@ se_breed <- se %>% filter(movement_final == "breeding")|>
 # entire north America 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = se_breed, size = 2, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Tag ID") + 
-  coord_sf(xlim = c(-120, -70), ylim = c(59, 78), expand = FALSE)+
+  geom_sf(data = se_breed, size = 3, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
+  #scale_color_viridis_d(name = "Tag ID") + 
+  coord_sf(xlim = c(-118, -69), ylim = c(61, 77), expand = FALSE)+
+  
+  #coord_sf(xlim = c(-120, -70), ylim = c(59, 78), expand = FALSE)+
   theme_bw()+
+  #geom_sf(data = se_breed, size = 3, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
+  geom_text(data = islands,
+            aes(x = lon, y = lat, label = name),
+            inherit.aes = FALSE,
+            colour = "grey25", size = 3, fontface = "italic")+
+  labs(colour = "Tag ID") + 
+ # geom_sf(data = se_breed, size = 3, aes(colour= as.character(tag.id))) +#colour = "dark blue") +
   theme(
     axis.text = element_blank(),
     axis.ticks = element_blank(),
@@ -241,7 +366,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig26_nsa_breeding.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
+ggsave(plot = global, filename = file.path(out.plots,"fig26_nsa_breedingv2.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
 
 
 
@@ -440,11 +565,13 @@ global
 
 # 282296 - sth Carolina (may 18 - 20)- james bay (May 22-June 5) - Vic SI (june 7 - july 15)-- hudson bay (July 21 - 28) -  james Bay (july 29-aug 3) - st carolina (aug 5 - 19) - venzuaela (aug 21 - nov 11) - tag dies? potential other types
 # 282288 - sth Carolina (may 18 - 20)- del bay (may 20 -22) -  james bay (May 24-June 7) - Vic SI (june 8 - july 17)-- hudson bay (July 21 - aug 10) - open ocean like NSA - venzuaela (aug 15 - oct 9) - tag dies? potential other types
+# 260698 - Sth Carolina (may 17 - 21)  - james Bay (may 23-june 5) -- vic Is (june 12 - july 15) - jamesBay(July 17-Aug15) -  Venezuale (Aus 18-Dec 31) dropped tag?
+
+
 
 # 261451 - Del Bay (may 22 - june 2) - mansel Is (jun3-6) - Baffi(june 7 - july13) - prince charles (july 16-19) - mingan (July 20 - August 1)- open ocean and back to NS (cyclone?) - Yarmouth NS (aug18 -31) - georgetown (Guana (multiple stops (Sep5-30)) - Belem - multiple stops - (Oct 6-13) (oct 14-24) - Oct 24 = Dec 29 - taag stopped 
 # 260803 - Del Bay (may 14 - 26) - James Bay (May 28 - June4) - Southampt - (June 4 - July8) - james Bay (july 9 - july15) - mingan (jluy16-Aug12) - ocean - suriname (Aug 17-Nov 27) - tag stopped
 # 261448 - Del Bay (may 17 - june 2) - james Bay (june 3-6) - vic Is (june 9 - july 15) - sth hudson Bay (july 15 - Aug 8) - suriname (Aus 14-24)- belem (aug25- Dec-29) - cut of data 
-# 260698 - Del Bay (may 17 - 21) - james Bay (may 23-june 5) -- vic Is (june 12 - july 15) - jamesBay(July 17-Aug15) -  Venezuale (Aus 18-Dec 31) dropped tag?
 
 
 
@@ -458,11 +585,27 @@ global
 # 238544-  deployed Del Bay (may 16 - 28)                 - Hudson Bay Nelseon River (June 1 - 7)- 6 days    - Sthhamp (June 7 - August 10 )-64d            - Mingan (Aug 12 - Aug 28) - depart (August 25 - 28) sth over ocean and turned back to US coast (arrive August 28 ) - Mingan /Nova scotia region (August 29 _ sept 19  ) - tag dies 
 # 242580  deployed Del Bay (may 19 - 27)                  - West James Bay   (May 29 - june 3 ) - 5 days,    - Matty Island (June 5 - July 30)55day     - southhampton is (July 31 - Aug 2)- Hudson bay (Brder Manitoba - Aug 3 - 16) - Direct to sth Am , Grand Roche, Venezuels (Aug 21 - Sep 1)- isla de coche, Venezuale (Sep 3 - Oct 10 )- Guyana coast (OCt -14 - Dec 31) - potential dropped tag? 
 
-# 242583  - deployed Del Bay (may 16 - 27)         - West James Bay(May 29 - june 1 ) ~ 3 days  - Hudson Bay Nelseon River (June 3 - 11)- Vic Is (june 13 - july 17 ) 34d - Hudson Bay Nelseon River (July 27 - August 15 -)- Atlantic coast (August 19 - 27)- Anguilla. caribbean (August 30 Sept 5)- mulipel short stops stop french guyana, Brazil (macapa), - braganca (sep 24 - Oct 12) , - Brazil Parnaiba (OCt 13 - Dec 9) tag dies 
+# 242583  - deployed Del Bay (may 16 - 27)                - West James Bay(May 29 - june 1 ) ~ 3 days  - Hudson Bay Nelseon River (June 3 - 11)- Vic Is (june 13 - july 17 ) 34d - Hudson Bay Nelseon River (July 27 - August 15 -)- Atlantic coast (August 19 - 27)- Anguilla. caribbean (August 30 Sept 5)- mulipel short stops stop french guyana, Brazil (macapa), - braganca (sep 24 - Oct 12) , - Brazil Parnaiba (OCt 13 - Dec 9) tag dies 
 # 282296 - sth Carolina (may 18 - 20)                     - james bay (May 22-June 5) - 13 days              - Vic SI (june 7 - july 15)- 38 day          - hudson bay (July 21 - 28) -  james Bay (july 29-aug 3) - st carolina (aug 5 - 19) - venzuaela (aug 21 - nov 11) - tag dies? potential other types
-# 282288 - sth Carolina (may 18 - 20)- del bay (may 20 -22) - james bay (May 24-June 7) - 13 days            - Vic SI (june 8 - july 17)-39d          -  hudson bay (July 21 - aug 10) - open ocean like NSA - venzuaela (aug 15 - oct 9) - tag dies? potential other types
-# 260698 - Del Bay (may 17 - 21)                          - james Bay (may 23-june 5) 13 dyas                - vic Is (june 12 - july 15)-33d        - jamesBay(July 17-Aug15) -  Venezuale (Aus 18-Dec 31) dropped tag?
+# 282288 - sth Carolina (may 18 - 20)                     - del bay (may 20 -22) - james bay (May 24-June 7) - 13 days            - Vic SI (june 8 - july 17)-39d          -  hudson bay (July 21 - aug 10) - open ocean like NSA - venzuaela (aug 15 - oct 9) - tag dies? potential other types
+# 260698 - Sth Carolina (may 17 - 21)                     - james Bay (may 23-june 5) -- vic Is (june 12 - july 15) - jamesBay(July 17-Aug15) -  Venezuale (Aus 18-Dec 31) dropped tag?
 # 261448 - Del Bay (may 17 - june 2)                      - james Bay (june 3-6) 3 days                     - vic Is (june 9 - july 15) -36d            - sth hudson Bay (july 15 - Aug 8) - suriname (Aus 14-24)- belem (aug25- Dec-29) - cut of data 
+
+
+# again more refined> 
+# 232981  - deployed Del Bay (may 21 - 29)                  - West James Bay(May 31 - june 6 )- 5 days -       - Baffin (June 7 - July 10 )- 33d            - Mingan (july 18 - Aug 12) - Brazil (macapa), (Aug 18 - 26)- Brazil (Aug 26 - Sept 13) tag dies. 
+# 260803 - Del Bay (may 14 - 26)                            - James Bay (May 28 - June4) ~ 6 days              - Southampt - (June 4 - July8) -34d            - james Bay (july 9 - july15) - mingan (jluy16-Aug12) - ocean - suriname (Aug 17-Nov 27) - tag stopped
+# 242580  deployed Del Bay (may 19 - 27)                    - West James Bay   (May 29 - june 3 ) - 5 days,    - Matty Island (June 5 - July 30)55day     - southhampton is (July 31 - Aug 2)- Hudson bay (Brder Manitoba - Aug 3 - 16) - Direct to sth Am , Grand Roche, Venezuels (Aug 21 - Sep 1)- isla de coche, Venezuale (Sep 3 - Oct 10 )- Guyana coast (OCt -14 - Dec 31) - potential dropped tag? 
+# 242583  - deployed Del Bay (may 16 - 27)                  - West James Bay(May 29 - june 1 ) ~ 3 days  - Hudson Bay Nelseon River (June 3 - 11)- Vic Is (june 13 - july 17 ) 34d - Hudson Bay Nelseon River (July 27 - August 15 -)- Atlantic coast (August 19 - 27)- Anguilla. caribbean (August 30 Sept 5)- mulipel short stops stop french guyana, Brazil (macapa), - braganca (sep 24 - Oct 12) , - Brazil Parnaiba (OCt 13 - Dec 9) tag dies 
+# 282296 - sth Carolina (may 18 - 20)                       - james bay (May 22-June 5) - 13 days             - Vic SI (june 7 - july 15)- 38 day          - hudson bay (July 21 - 28) -  james Bay (july 29-aug 3) - st carolina (aug 5 - 19) - venzuaela (aug 21 - nov 11) - tag dies? potential other types
+# 282288 - sth Carolina (may 18 - 20)- del bay (may 20 -22) - james bay (May 24-June 7) - 13 days             - Vic SI (june 8 - july 17)-39d          -  hudson bay (July 21 - aug 10) - open ocean like NSA - venzuaela (aug 15 - oct 9) - tag dies? potential other types
+# 260698 - Sth Carolina (may 17 - 21)                       - james Bay (may 23-june 5) -                     - vic Is (june 12 - july 15) - jamesBay(July 17-Aug15) -  Venezuale (Aus 18-Dec 31) dropped tag?
+# 261448 - Del Bay (may 17 - june 2)                        - james Bay (june 3-6) 3 days                     - vic Is (june 9 - july 15) -36d            - sth hudson Bay (july 15 - Aug 8) - suriname (Aus 14-24)- belem (aug25- Dec-29) - cut of data 
+
+# 238544-  deployed Del Bay (may 16 - 28)                   - Hudson Bay Nelseon River (June 1 - 7)- 6 days    - Sthhamp (June 7 - August 10 )-64d            - Mingan (Aug 12 - Aug 28) - depart (August 25 - 28) sth over ocean and turned back to US coast (arrive August 28 ) - Mingan /Nova scotia region (August 29 _ sept 19  ) - tag dies 
+# 261451 - Del Bay (may 22 - june 2)                        - mansel Is (jun3-6) 3 days                        - Baffi(june 7 - july13) -36d                  - prince charles (july 16-19) - mingan (July 20 - August 1)- open ocean and back to NS (cyclone?) - Yarmouth NS (aug18 -31) - georgetown (Guana (multiple stops (Sep5-30)) - Belem - multiple stops - (Oct 6-13) (oct 14-24) - Oct 24 = Dec 29 - taag stopped 
+
+
 
 
 ## south 
@@ -483,7 +626,32 @@ global
 
 
 
+## south 
+#VIA MINGAN 
+# 232981  - Del Bay                   - Baffin Is (June 7 - July 10 )                                        - Mingan (july 18 - Aug 12)   25      - Brazil (macapa), (Aug 18 - 26)- Brazil (Aug 26 - Sept 13) tag dies. 
+# 261451 - Del Bay                    - Baffi(june 7 - july13)              - prince charles (july 16-19)    - mingan (July 20 - August 1) 11days        - open ocean and back to NS (cyclone?) - Yarmouth NS (aug18 -31) - georgetown (Guana (multiple stops (Sep5-30)) - Belem - multiple stops - (Oct 6-13) (oct 14-24) - Oct 24 = Dec 29 - taag stopped 
+# 260803 - Del Bay - James Bay        - Southampt - (June 4 - July8)        - james Bay (july 9 - july15)    - mingan (jluy16 = Aug12)    27 days           - ocean - suriname (Aug 17-Nov 27) - tag stopped
+# 238544-  Del Bay  - Hudson Bay Nelseon River (June 1 - 7)            - Sthhamp (June 7 - August 10 )-64d   - Mingan (Aug 12 - Aug 28) 16 days          - depart (August 25 - 28) sth over ocean and turned back to US coast (arrive August 28 ) - Mingan /Nova scotia region (August 29 _ sept 19  ) - tag dies 
 
+# 242580  Del Bay  - West James Bay  - Matty Island (June 5 - July 30) 55day - southhampton(July 31-Aug 2)  - Hudson bay (Brder Manitoba - Aug 3 - 16) 13 days,        - Direct to sth Am , Grand Roche, Venezuels (Aug 21 - Sep 1)- isla de coche, Venezuale (Sep 3 - Oct 10 )- Guyana coast (OCt -14 - Dec 31) - potential dropped tag? 
+# 242583  Del Bay   - West James Bay( - Hudson Bay Nelseon River - Vic Is (june 13 - july 17 ) 34d          - Hudson Bay Nelseon River (July 27 - August 15 -) 18 days - Atlantic coast (August 19 - 27)- Anguilla. caribbean (August 30 Sept 5)- mulipel short stops stop french guyana, Brazil (macapa), - braganca (sep 24 - Oct 12) , - Brazil Parnaiba (OCt 13 - Dec 9) tag dies 
+# 282296 - sth Carolina   - james bay (May 22-June 5)     - Vic SI (june 7 - july 15)- 38 day               - hudson bay (July 21 - 28)                   XXXX          -  jame s Bay (july 29-aug 3) - st carolina (aug 5 - 19) - venzuaela (aug 21 - nov 11) - tag dies? potential other types
+# 282288 - sth Carolina  - del bay - james bay            - Vic SI (june 8 - july 17)-39d                   -  hudson bay (July 21 - aug 10)          20 days   - open ocean like NSA - venzuaela (aug 15 - oct 9) - tag dies? potential other types
+# 261448 - Del Bay         - james Bay (june 3-6) 3 days              - vic Is (june 9 - july 15) -36d       - sth hudson Bay (july 15 - Aug 8)       24 days        - suriname (Aus 14-24)- belem (aug25- Dec-29) - cut of data 
+# 260698 - Del Bay           - james Bay (may 23-june 5) 13 dyas      - vic Is (june 12 - july 15)-33d       - jamesBay(July 17-Aug15)                       -  Venezuale (Aus 18-Dec 31) dropped tag?
+
+
+## south via hudson Bay (ignoring mingan )
+# 242583  Del Bay /James Bay/Hudson Bay River/Vic Is (june 13 - july 17 ) 34d           - Hudson Bay Nelseon River (July 27 - August 15 -) 18 days - Atlantic coast (August 19 - 27)- Anguilla. caribbean (August 30 Sept 5)- mulipel short stops stop french guyana, Brazil (macapa), - braganca (sep 24 - Oct 12) , - Brazil Parnaiba (OCt 13 - Dec 9) tag dies 
+# 261448 Del Bay /james Bay /    - vic Is (june 9 - july 15) -36d                       - sth hudson Bay (july 15 - Aug 8)       24 days        - suriname (Aus 14-24)- belem (aug25- Dec-29) - cut of data 
+# 242580  Del Bay /James Bay /Matty Island (June 5 - July 30) - sthamp (July 31-Aug 2)  - Hudson bay (Brder Manitoba - Aug 3 - 16) 13 days,     - Direct to sth Am , Grand Roche, Venezuels (Aug 21 - Sep 1)- isla de coche, Venezuale (Sep 3 - Oct 10 )- Guyana coast (OCt -14 - Dec 31) - potential dropped tag? 
+
+
+
+# 282296 sthC /james bay /Vic SI (june 7 - july 15)- 38 day                             - hudson bay (July 21 - 28)   -  james  Bay (july 29-aug 3) - st carolina (aug 5 - 19) - venzuaela (aug 21 - nov 11) - tag dies? potential other types
+
+# 260698 Del Bay / james Bay /    - vic Is (june 12 - july 15)-33d                      - jamesBay(July 17-Aug15)                              -  Venezuale (Aus 18-Dec 31) dropped tag?
+# 282288 sthC / del bay/ james bay                 - Vic SI (june 8 - july 17)-39d      - hudson bay (July 21 - aug 10)          20 days   - open ocean like NSA - venzuaela (aug 15 - oct 9) - tag dies? potential other types
 
 
 
@@ -560,19 +728,12 @@ global
 #232345 - HY -    Sep 12 - Nov 2 - depart direct over ocean (disapear )
 #229363 - adult - Depart Sep 2 - 
 #               - arrive Belen Sep 3 - March 4th - one location stopover - dropped tag?
-#229364 - HY - Oct 23 - Nov 7 - 
-#            - arrive paraiba (Nov 13 - May 24 2023) - several stops
-#229368 - HY  - Oct 23 - Nov 2 
-#             - arrive belem (Nov 7 - March 13 2023) - one stop 
-#232348 - HY  - (Oct 23 - Nov 2 )
-#             - arrive belem (Nov 7 - Dec 12) -  several stops 
-#232349 - HY - - (Oct 23 - Nov 8 )
-#              - arrive belem (Nov 12 - April 10 ) - - one stop 
-#232351 - HY - Sept 12 - Nov 2 
-#             - Amapa (Nov 8 - 22) 
-#             - near paraiba NOv 25 - Aug 8
-#232353 - HY - - (Sep 12 - Nov 2 )
-#              - arrive belem (Nov 7 - Feb 3 ) - - one stop 
+#229364 - HY - Oct 23 - Nov 7 - 6 days transit        -  arrive paraiba (Nov 13 - May 24 2023) - several stops
+#229368 - HY  - Oct 23 - Nov 2 - 5 day transit        -  arrive belem (Nov 7 - March 13 2023) - one stop 
+#232348 - HY  - (Oct 23 - Nov 2 ) - 5 day transit     -  arrive belem (Nov 7 - Dec 12) -  several stops 
+#232349 - HY - - (Oct 23 - Nov 8 ) -  5 day transit   -  arrive belem (Nov 12 - April 10 ) - - one stop 
+#232351 - HY - Sept 12 - Nov 2 - 6 days - Amapa (Nov 8 - 22) - near paraiba NOv 25 - Aug 8
+#232353 - HY - - (Sep 12 - Nov 2 ) 5 days - arrive belem (Nov 7 - Feb 3 ) - - one stop 
 
 
 #####################################################################
@@ -647,6 +808,8 @@ global
 
 cy <- c(239424, 239423, 239422,  239420 , 239413, 239409, 239421) 
 
+239409 = this one made it. - made it 
+
 # all locations 
 cyc <- df_all %>% 
   filter(tag.id %in% cy) #%>%
@@ -683,6 +846,50 @@ global
 
 #ggsave(file.path(out.plots,"fig9_west_stopovers_combined.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
+
+
+#########################################################################
+# winter 
+
+## FALL _ SOUTH - WINTERING ####
+# 194904  - HY - 2020. Stopped on Venezula coast (statyed there NOv 12 2020 - Nov 2 2021) - error?
+# 239421 - HY  - Mingan (Sep 29 - Nov 4 ) - depart direct over ocean - Caught in cyclone
+
+#Belen
+# 229363 - adult - Depart Sep 2 -  - arrive Belen Sep 3 - March 4th - one location stopover - dropped tag?
+# 229368 - HY  - Oct 23 - Nov 2  - arrive belem (Nov 7 - March 13 2023) - one stop 
+# 232348 - HY  - (Oct 23 - Nov 2 ) - arrive belem (Nov 7 - Dec 12) -  several stops
+# 232349 - HY - - (Oct 23 - Nov 8 )- arrive belem (Nov 12 - April 10 ) - - one stop
+# 239411 - HY - Mingan (Sep 15 - Nov 6 ) - depart direct over ocean - Caught in cyclone - Reached Belen, Brazil  Sth Am NOv 13 - Dec 31
+# 239412 - HY - Mingan (Sep 29 - Nov 8 ) - depart direct over ocean - Reached Belen, Brazil  Sth Am NOv 13 - Dec 6
+# 261448 - Del Bay (may 17 - june 2) - james Bay (june 3-6) - vic Is (june 9 - july 15) - sth hudson Bay (july 15 - Aug 8) - suriname (Aus 14-24)- belem (aug25- Dec-29) - cut of data 
+# 261451 - Del Bay (may 22 - june 2)  - mingan (July 20 - August 1)- open ocean and back to NS (cyclone?) - Yarmouth NS (aug18 -31) - georgetown (Guana (multiple stops (Sep5-30)) - Belem - multiple stops - (Oct 6-13) (oct 14-24) - Oct 24 = Dec 29 - taag stopped 
+#
+
+#paraiba
+# 232351 - HY - Sept 12 - Nov 2 - Amapa (Nov 8 - 22)  - near paraiba NOv 25 - Aug 8
+# 232353 - HY - - (Sep 12 - Nov 2 ) - arrive belem (Nov 7 - Feb 3 ) - - one stop 
+# 229364 - HY - Oct 23 - Nov 7 - arrive paraiba (Nov 13 - May 24 2023) - several stops
+# 239408 - HY- Mingan (Sep 15 - Nov 5 ) - depart direct over ocean - Caught in cyclone - Reached Parnaiba, Brazil  Sth Am NOv 11 - Dec 12
+# 242583  - deployed Del Bay (may 16 - 27)
+#          - West James Bay   (May 29 - june 1 ) - three days
+#           - Hudson Bay Nelseon River (June 3 - 11)
+#          -  Vic Is (june 13 - july 17 ) 
+#         - Hudson Bay Nelseon River (July 27 - August 15 -)
+#         - Atlantic coast (August 19 - 27)
+#         - Anguilla. caribbean (August 30 Sept 5)
+#         - mulipel short stops stop french guyana, Brazil (macapa), 
+#         - braganca (sep 24 - Oct 12) , 
+#         - Brazil Parnaiba (OCt 13 - Dec 9) tag dies 
+
+# Venezuela 
+# 239425 - HY - Mingan (Sep 15- Nov 6 ) - depart direct over ocean  - Caught in cyclone - Reached Guyana, Venezuala, Sth Am NOv 12 - Nov 22
+# 242698 - HY - - Mingan (Oct 3 - Nov 6 ) - depart direct over ocean - Caught in cyclone- Reached Guyana, Venezuala, Sth Am NOv 11 - Dec 21
+# 282296 - sth Carolina (may 18 - 20) - st carolina (aug 5 - 19) - venzuaela (aug 21 - nov 11) - tag dies? potential other types
+
+# French Guiana 
+# 242702 - HY  - Mingan (Oct 3 - Nov 5 ) - depart more West?? - Reached Suriname, French Guiana, Sth Am NOv 10 - Dec 31
+# 260803 - Del Bay - James Bay   - ocean - suriname (Aug 17-Nov 27) - tag stopped
 
 
 

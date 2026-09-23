@@ -74,7 +74,13 @@ pop_sum <- pop_id |>
 
 ### Figure 9: Movement types 
 df_limit <- dfsubset %>% 
-  filter(movement_final %in% c("breeding", "north_stopover", "south_stopover", "wintering"))
+  #filter(movement_final %in% c("breeding", "north_stopover", "south_stopover", "wintering"))
+  filter(movement_final %in% c("north_stopover", "breeding","south_stopover", "wintering"))
+df_limit$movement_final <- factor(df_limit$movement_final, levels=c("north_stopover", "breeding","south_stopover", "wintering"))
+
+
+
+
 
 # create a plot by movement type 
 
@@ -98,7 +104,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-#ggsave(file.path(out.plots,"figure9_rufa_movmentclass.jpg"), width = 15, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"figure9_rufa_movmentclassv2.jpg"), width = 15, height = 30,units = "cm", dpi = 600)
 
 
 # 

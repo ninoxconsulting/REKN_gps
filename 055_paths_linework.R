@@ -60,7 +60,7 @@ pop_id <- pop %>%
     "north", "breeding", "south", "wintering",
     "type", "usable"
   ) |>
-  filter(usable == "y") %>%
+ # filter(usable == "y") %>%
   # filter(subspecies == "rufa") %>%
   left_join(ref_due)
 
@@ -134,7 +134,26 @@ al<- all_lines |>
   select(proj, tag.id, date_time_from, year, month, day, hour, date_time_to, stopover, movement_final)
 
 
-sf::st_write(al, fs::path(final_dat, "paths_2017_2025_movetype_20260324.gpkg"), driver = "GPKG", append = FALSE)
+al <- st_make_valid(al)
+val<- st_is_valid(al)
+any(val == FALSE)
+
+al <- st_cast(al, "LINESTRING")
+
+sf::st_write(al, fs::path(final_dat, "paths_2017_2025_all_movetype_20260924.gpkg"), driver = "GPKG", append = FALSE)
+
+# this was previous with no "usable tags include"
+#sf::st_write(al, fs::path(final_dat, "paths_2017_2025_movetype_20260324.gpkg"), driver = "GPKG", append = FALSE)
+
+
+
+
+
+# need to clip at antimeridan 
+#Option 1: The Quickest Built-in Fix (Geodesic Line Split)If you have a line layer that crosses the 180° mark and creates ugly horizontal streak lines:Go to the top menu and select Processing > Toolbox.Search for and open the Geodesic line split at antimeridian tool.Select your problematic line layer as the Input layer.Click Run. This outputs a new layer where lines cleanly terminate at 180° and resume on the other side.
+
+
+
 
 
 

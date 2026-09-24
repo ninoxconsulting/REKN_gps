@@ -456,12 +456,6 @@ ggsave(file.path(out.plots,"fig50_geo_dv_ivl.jpg"), width = 20, height = 20,unit
 
 
 
-
-
-
-
-
-
 #####rekn_roselaari_daily_positions_johnson.csv
 geo <- read_csv("C:\\Users\\genev\\OneDrive\\Documents\\02.Contracts\\complete\\2021_NWRC\\04_deliverables\\data\\rekn_roselaari_daily_positions_johnson.csv")
 geosf <- st_as_sf(geo,  coords = c("Median.long", "Median.lat"), crs = 4326)

@@ -259,6 +259,13 @@ all <- rbind(hb_all, jb_all) %>%
 
 df_all <- all 
 
+df_all |>
+  st_drop_geometry() |> 
+  group_by(movement_final, subpop_val) |> 
+  summarise(count = n(),
+            no.tags = length(unique(tag.id)))
+
+
 ########################################################
 # Geographic distributon of tags ## figure 11 = COmBINED
 
@@ -316,10 +323,9 @@ james_stopovers |> select(tag.id, subpop) |> distinct()|> group_by(subpop) |>
 
 
 #######################################################################
-# arrival dates - Nelson River - NORTH 
+# arrival dates - James  River - NORTH 
 
-
-# select tags that include breed as went through on north migration 
+# select tags that include breed as went through on south migration 
 popbr <- pop |> 
   filter(subspecies == "rufa") |> 
   filter(usable == "y") |> 
@@ -345,6 +351,50 @@ james_stopovers <- df_stopover_subset|>
   filter(tag.id %in% jb$tag.id) |> 
   st_drop_geometry()%>% 
   filter(movement_final == "north_stopover") 
+
+
+james_stopovers |> select(tag.id, subpop) |> distinct()|> group_by(subpop) |> 
+  count()
+
+
+####################################################
+## arrival dates - James Bay  SOUTH
+
+# select tags that include breed as went through on north migration 
+popbr <- pop |> 
+  filter(subspecies == "rufa") |> 
+  filter(usable == "y") |> 
+  filter(breeding == "y") |> 
+  filter(subpop %in% c("West", "SE", "NSA", "South")) |> 
+  select(tag.id, subpop)
+
+popbr |> group_by(subpop) |> count()
+
+popbr |> select(tag.id, subpop) |> distinct()|> group_by(subpop) |> 
+  count()
+
+# which of these are found in hudson bay ? 
+jb <- all |> filter(st_type == "james_bay") |> 
+  st_drop_geometry()%>% 
+  filter(movement_final == "south_stopover") |> 
+  select(tag.id,subpop_val) |> 
+  distinct() 
+
+jb <- all |> filter(st_type == "james_bay") |> 
+  st_drop_geometry()%>% 
+  filter(movement_final == "south_stopover") |> 
+  select(tag.id,subpop_val, date_time) |> 
+  arrange(tag.id, date_time) |>
+  group_by(tag.id) |> 
+  slice_head( n = 1)
+
+
+# 21 - bird in james bay in nth migration 
+
+james_stopovers <- df_stopover_subset|> 
+  filter(tag.id %in% jb$tag.id) |> 
+  st_drop_geometry()%>% 
+  filter(movement_final == "south_stopover") 
 
 
 james_stopovers |> select(tag.id, subpop) |> distinct()|> group_by(subpop) |> 
@@ -476,7 +526,9 @@ all <- db |>
   #slice_max(n = 1,  order_by = tag.id.order))
   #slice_sample(n = 1)
 
-   # slice_min(n = 1,  order_by = tag.id.order))
+all |> 
+  group_by(subpop,movement_final ) |> 
+  summarise(length(unique(tag.id)))
 
 
 ########################################################
@@ -607,6 +659,24 @@ db_max_sth <- db_max |> filter(movement_final == "north_stopover")
 
 db_min_sth <- db_min |> filter(movement_final == "south_stopover")
 db_max_sth <- db_max |> filter(movement_final == "south_stopover")
+
+
+all <- db |> 
+  group_by(tag.id,movement_final) |> 
+  slice_min(n = 1,  order_by = tag.id.order)
+#slice_max(n = 1,  order_by = tag.id.order))
+#slice_sample(n = 1)
+
+all |> 
+  group_by(subpop,movement_final ) |> 
+  summarise(length(unique(tag.id)))
+
+
+
+
+
+
+
 
 ########################################################
 # Geographic distributon of tags 

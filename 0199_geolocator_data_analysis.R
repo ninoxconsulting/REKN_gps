@@ -130,43 +130,43 @@ df_stopover_subset <- st_read(file.path(out.plots , "rufa_stopovers.gpkg"))%>%
   filter(movement_final !="deployment") 
 
 # plot 1 by movemnt type 
-
-world <- ne_countries(scale = "medium", returnclass = "sf")
-Americas <- world %>% dplyr::filter(region_un == "Americas")
-#Americas <- world %>% dplyr::filter(continent == "North America")
-
-global <- ggplot(data = Americas) +
-  geom_sf(color = "grey") +
-  geom_sf(data = df_stopover_subset, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
-  scale_color_viridis_d(name = "Movement Type") + 
-  xlab("Longitude") + ylab("Latitude") +
-  coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
-  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
-  theme_bw()+
-  theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank())
-
-global
+# 
+# world <- ne_countries(scale = "medium", returnclass = "sf")
+# Americas <- world %>% dplyr::filter(region_un == "Americas")
+# #Americas <- world %>% dplyr::filter(continent == "North America")
+# 
+# global <- ggplot(data = Americas) +
+#   geom_sf(color = "grey") +
+#   geom_sf(data = df_stopover_subset, size = 2, alpha = 0.8, aes(colour = movement_final)) +#colour = "dark blue") +
+#   scale_color_viridis_d(name = "Movement Type") + 
+#   xlab("Longitude") + ylab("Latitude") +
+#   coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
+#   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
+#   theme_bw()+
+#   theme(axis.text.x=element_blank(),
+#         axis.text.y=element_blank())
+# 
+# global
 
 # plot 2 by month
-
-world <- ne_countries(scale = "medium", returnclass = "sf")
-Americas <- world %>% dplyr::filter(region_un == "Americas")
-#Americas <- world %>% dplyr::filter(continent == "North America")
-
-global <- ggplot(data = Americas) +
-  geom_sf(color = "grey") +
-  geom_sf(data = df_stopover_subset, size = 1, alpha=0.7,colour = "dark blue") +
-  #scale_color_viridis_d(name = "Movement Type") + 
-  facet_wrap(~month)+
-  xlab("Longitude") + ylab("Latitude") +
-  coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
-  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
-  theme_bw()+
-  theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank())
-
-global
+# 
+# world <- ne_countries(scale = "medium", returnclass = "sf")
+# Americas <- world %>% dplyr::filter(region_un == "Americas")
+# #Americas <- world %>% dplyr::filter(continent == "North America")
+# 
+# global <- ggplot(data = Americas) +
+#   geom_sf(color = "grey") +
+#   geom_sf(data = df_stopover_subset, size = 1, alpha=0.7,colour = "dark blue") +
+#   #scale_color_viridis_d(name = "Movement Type") + 
+#   facet_wrap(~month)+
+#   xlab("Longitude") + ylab("Latitude") +
+#   coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
+#   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
+#   theme_bw()+
+#   theme(axis.text.x=element_blank(),
+#         axis.text.y=element_blank())
+# 
+# global
 
 
 ###########################################################
@@ -182,7 +182,24 @@ geosf <- geosf |>
 
 all <- bind_rows(df_stopover_subset,geosf)
 all_subb <- all |> filter(month %in% c(4,5,6,7,8,9,10,11))
-
+all_subb <- all_subb |> 
+  mutate(month_label = case_when(
+  month == 4 ~ "April",
+  month == 5 ~ "May", 
+  month == 6 ~ "June",
+  month == 7 ~ "July",
+  month == 8 ~ "August",
+  month == 9 ~ "September",
+  month == 10 ~ "October",
+  month == 11 ~ "November",
+  month == 12 ~ "December"
+))
+all_subb <-all_subb |> 
+  mutate(month_label = factor(month_label, 
+                                 levels = c("April", "May",  "June", "July",
+                                            "August","September","October",
+                                            "November","December"))) #|> 
+ # filter(!`animal-id` %in% c("tex_4a3", "tex_6j3", "la_172", "la_198"))
 
 summm <- all |> group_by(tag_type,tag.id,`animal-id`) |> count() |> st_drop_geometry() |> 
   group_by(tag_type) |>  count()
@@ -191,9 +208,9 @@ global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
   geom_sf(data = all_subb, size = 1, alpha=0.5,aes(colour = tag_type)) +
   scale_color_viridis_d(name = "Tag Type", begin = 0.2, end = 0.7) + 
-  facet_wrap(~month)+
+  facet_wrap(~month_label)+
   xlab("Longitude") + ylab("Latitude") +
-  coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
+  coord_sf(xlim = c(-120, -20), ylim = c(-58, 80), expand = FALSE)+
   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
@@ -201,30 +218,40 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(file.path(out.plots,"fig40_geo_gps_stopovers_month.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig40_geo_gps_stopovers_monthv2.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 
 ###################################
 
+all_sub <- cbind(all, st_coordinates(all))
+
+all_sub <- all_sub |> 
+  filter(X >= -109)
+
+all_sub <- all_sub |> 
+ filter(!`animal.id` %in% c("tex_4a3", "la_198"))
+#"tex_6j3"
+#filter(!is.na(proj))
+#unique(all$proj)
 
 ## all locations 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = all, size = 1, alpha=0.5,colour = "dark blue") +
-  scale_color_viridis_d(name = "Tag Type", begin = 0.4, end = 0.9) + 
+  geom_sf(data = all_sub, size = 1, alpha=0.5,aes(colour = tag_type)) +
+  scale_colour_viridis_d(name = "Tag Type", begin = 0.2, end = 0.7) + 
   facet_wrap(~tag_type)+
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank())
+        axis.text.y=element_blank(),
+        strip.text = element_text(size = 13),
+        legend.position = "none")
 
 global
 
-
-
-ggsave(file.path(out.plots,"fig40_geo_gps_stopovers_all.jpg"), width = 30, height = 20,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig40_geo_gps_stopovers_allv2.jpg"), width = 30, height = 20,units = "cm", dpi = 600)
 
 #"#440154FF" "#31688EFF" "#35B779FF" "#FDE725FF"
 
@@ -238,10 +265,10 @@ ggsave(file.path(out.plots,"fig40_geo_gps_stopovers_all.jpg"), width = 30, heigh
 #### compare the subpopulations 
 
 
-head(all)
+#head(all)
 
-unique(all$Subpop)
-unique(all$subpop)
+#unique(all$Subpop)
+#unique(all$subpop)
 
 subpop <- all |> 
   mutate(subpop_all = case_when(
@@ -270,26 +297,36 @@ summm <- south |> group_by(tag_type,tag.id,`animal-id`) |> count() |> st_drop_ge
 ## all locations 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = south, size = 1, alpha=0.5,colour = "dark blue") +
-  scale_color_viridis_d(name = "Tag Type", begin = 0.4, end = 0.9) + 
+  geom_sf(data = south, size = 1, alpha=0.5,aes(colour = tag_type)) +
+  scale_color_viridis_d(name = "Tag Type", begin = 0.2, end = 0.7) + 
   facet_wrap(~tag_type)+
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank())
+        axis.text.y=element_blank(),
+        strip.text = element_text(size = 13),
+        legend.position = "none")
 
 global
 
-ggsave(file.path(out.plots,"fig40_geo_gps_south_all.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig40_geo_gps_south_allv2.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
 
 #"#440154FF" "#31688EFF" "#35B779FF" "#FDE725FF"
 
 
 ##########################################################
 #West
-south <- subpop |> filter(subpop_all == "West") 
+  
+south_gps <- subpop |> 
+  filter(subpop_all == "West") #|> 
+  #filter(!`animal-id` %in% c("tex_4a3",  "la_198"))
+#"tex_6j3", "la_172",
+
+south_gps_extra <- subpop |> 
+  filter(`animal-id` %in% c("tex_4j6", "la_198", "tex_6j3", "tex_8ku", "la_172"))
+south_gps <- bind_rows(south_gps, south_gps_extra)
 
 summm <- south |> group_by(tag_type,tag.id,`animal-id`) |> count() |> st_drop_geometry() |> 
   group_by(tag_type) |>  count()
@@ -297,19 +334,23 @@ summm <- south |> group_by(tag_type,tag.id,`animal-id`) |> count() |> st_drop_ge
 ## all locations 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = south, size = 1, alpha=0.5,colour = "dark blue") +
-  scale_color_viridis_d(name = "Tag Type", begin = 0.4, end = 0.9) + 
+  #geom_sf(data = subpop, size = 1, alpha=0.5,colour = "dark blue") +
+  geom_sf(data = south_gps, size = 1, alpha=0.8,aes(colour = tag_type)) +
+  scale_colour_viridis_d(name = "Tag Type", begin = 0.2, end = 0.7) + 
+ #scale_color_viridis_d(name = "Tag Type", begin = 0.4, end = 0.9) + 
   facet_wrap(~tag_type)+
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank())
+        axis.text.y=element_blank(),
+        strip.text = element_text(size = 13),
+        legend.position = "none")
 
 global
 
-ggsave(file.path(out.plots,"fig40_geo_gps_west_all.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig40_geo_gps_west_all.jpg"), width = 20, height = 10,units = "cm", dpi = 600)
 
 #"#440154FF" "#31688EFF" "#35B779FF" "#FDE725FF"
 
@@ -329,19 +370,22 @@ summm <- south |> group_by(tag_type,tag.id,`animal-id`) |> count() |> st_drop_ge
 ## all locations 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = south, size = 1, alpha=0.5,colour = "dark blue") +
-  scale_color_viridis_d(name = "Tag Type", begin = 0.4, end = 0.9) + 
+  #geom_sf(data = south, size = 1, alpha=0.5,colour = "dark blue") +
+  geom_sf(data = south, size = 1, alpha=0.8,aes(colour = tag_type)) +
+  scale_colour_viridis_d(name = "Tag Type", begin = 0.2, end = 0.7) + 
   facet_wrap(~tag_type)+
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank())
+        axis.text.y=element_blank(),
+        strip.text = element_text(size = 13),
+        legend.position = "none")
 
 global
 
-ggsave(file.path(out.plots,"fig40_geo_gps_nsa_all.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig40_geo_gps_nsa_allv2.jpg"), width = 20, height = 15,units = "cm", dpi = 600)
 
 #"#440154FF" "#31688EFF" "#35B779FF" "#FDE725FF"
 
@@ -354,19 +398,21 @@ summm <- south |> group_by(tag_type,tag.id,`animal-id`) |> count() |> st_drop_ge
 ## all locations 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = south, size = 1, alpha=0.5,colour = "dark blue") +
-  scale_color_viridis_d(name = "Tag Type", begin = 0.4, end = 0.9) + 
+  geom_sf(data = south, size = 1, alpha=0.8,aes(colour = tag_type)) +
+  scale_colour_viridis_d(name = "Tag Type", begin = 0.2, end = 0.7) + 
   facet_wrap(~tag_type)+
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(xlim = c(-130, -20), ylim = c(-58, 80), expand = FALSE)+
   #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
   theme_bw()+
   theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank())
+        axis.text.y=element_blank(),
+        strip.text = element_text(size = 13),
+        legend.position = "none")
 
 global
 
-ggsave(file.path(out.plots,"fig40_geo_gps_se_all.jpg"), width = 20, height = 20,units = "cm", dpi = 600)
+ggsave(file.path(out.plots,"fig40_geo_gps_se_allv2.jpg"), width = 20, height = 15,units = "cm", dpi = 600)
 
 #"#440154FF" "#31688EFF" "#35B779FF" "#FDE725FF"
 
@@ -379,29 +425,25 @@ ggsave(file.path(out.plots,"fig40_geo_gps_se_all.jpg"), width = 20, height = 20,
 
 
 # db_ivl 
+present <- sort(unique(month(ll$`arrive date`)))
 
-ll <- all |> 
-  filter(`animal-id` == "db_ivl") |> 
-  select(`animal-id`, `arrive date`, `depart date`) |> 
-  mutate(yearmo = paste0(year(`arrive date`),0, month(`arrive date`))) |> 
-  mutate(year = year(`arrive date`))
+ll <- all |>
+  filter(`animal-id` == "db_ivl") |>
+  select(`animal-id`, `arrive date`, `depart date`) |>
+  mutate(year  = year(`arrive date`),
+         month = factor(month(`arrive date`, label = TRUE, abbr = TRUE),
+                        levels = month.abb[present]))
 
-
-
-
-## all locations 
 global <- ggplot(data = Americas) +
   geom_sf(color = "grey") +
-  geom_sf(data = ll, size = 3, alpha=.8, aes(colour = yearmo)) + #colour = "dark blue") +
-  scale_color_viridis_d(name = "Date") + 
-  facet_wrap(~year)+
+  geom_sf(data = ll, size = 3, alpha = 0.8, aes(colour = month)) +
+  scale_colour_viridis_d(name = "Month", drop = FALSE) +
+  facet_wrap(~year) +
   xlab("Longitude") + ylab("Latitude") +
-  #geom_sf_text(data = ll, aes(label = `arrive date`))+
-  coord_sf(xlim = c(-120, -20), ylim = c(-30, 80), expand = FALSE)+
-  #coord_sf(xlim = c(-130, -60), ylim = c(15, 80), expand = FALSE)+
-  theme_bw()+
-  theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank())
+  coord_sf(xlim = c(-120, -20), ylim = c(-30, 80), expand = FALSE) +
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank())
 
 global
 

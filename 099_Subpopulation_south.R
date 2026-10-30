@@ -264,6 +264,8 @@ south_stopover_fall <-  bind_rows(south_stopover_fall, south_winter ) |>
   mutate(movement_final = droplevels(factor(movement_final,
                                             levels = names(color_mapping))))
 
+unique(south_stopover_fall$tag.id)
+
 df_all_seg <- df_all %>%
   filter(tag.id %in% south_stopover_spring_ids) %>%
   mutate(lon = st_coordinates(.)[, 1],
@@ -321,9 +323,10 @@ nrth.tag <- c(229312, 229314, 240165, 242579, 261440, 262941,262944,262948,
             213835,213841, 240158,240159, 241166,255007, 261441,262940, 262945,
             232982,261435,240167,240164,240168,241167, 282311, 262946)
 
-#South ward migrants: #(n = 20)
-sth.tg <-c(234375, 261434, 261436,261437,261438,261443,261450,261452,261453,
-            280804,280805,280806,280807,280808,280809,280811,280812,280813,285995,285996)
+#South ward migrants: #(n = 28)
+sth.tg <-c(261434,261436,232982, 234375,261437,261438,261443,261450,261452,261453,
+            280804,280805,280806,280807,280808,280809,280811, 240168, 280812,280813,
+           285995,285996, 261435, 240167, 240164,241167,262946,282311)
 
 south_fig <- south |> 
   filter(movement_final != "deployment")
@@ -357,6 +360,7 @@ ggsave(plot = global, filename = file.path(out.plots,"fig12_south_north_migratio
 #############################
 #South ward migrants: #(n = 20)
 
+
 st.nth <- south_fig |> 
   filter(tag.id %in% sth.tg) 
  
@@ -377,7 +381,7 @@ global <- ggplot(data = Americas) +
 
 global
 
-ggsave(plot = global, filename = file.path(out.plots,"fig12_south_sth_migration_stopovers_pertagv2.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
+ggsave(plot = global, filename = file.path(out.plots,"fig12_south_sth_migration_stopovers_pertagv3.jpg"), width = 30, height = 30,units = "cm", dpi = 600)
 
 #"#440154FF" "#31688EFF" "#35B779FF" "#FDE725FF"
 
